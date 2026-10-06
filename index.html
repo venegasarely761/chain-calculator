@@ -1,0 +1,893 @@
+<title>Chain Calculator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+<style>
+/* Layout: rounded light-blue shell holding a blue header card, then full-width white cards stacked: chain inputs, result, top view, sprockets, saved parts. Fixed light theme, white and blue only, matching the belt and motor spacer calculators. */
+:root {
+  --white: #ffffff;
+  --blue: #0075c9;
+  --blue-deep: #005a9c;
+  --blue-soft: #8cc2ea;
+  --blue-50: #f3f8fd;
+  --blue-100: #e3f0fa;
+  --line: #dce8f2;
+  --ink: #0f2a40;
+  --ink-soft: #5a7288;
+  --alert: #b3261e;
+  --alert-bg: #fdeeed;
+  --font: "Roboto", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  /* Same setting as the belt calculator so the page does not paint a white backdrop behind it in dark mode. */
+  color-scheme: light dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: transparent; }
+body { background: transparent; color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.shell { display: grid; gap: 8px; width: min(960px, calc(100% - 24px)); margin: 12px auto; padding: 10px; background: #e8f2fa; border: 1px solid #cfe3f3; border-radius: 22px; }
+.banner { position: relative; background: var(--blue); color: var(--white); padding: 11px 16px; text-align: center; border-radius: 16px; }
+.banner h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+.banner p { margin: 1px auto 0; font-size: 13px; opacity: 0.9; max-width: 56ch; text-wrap: balance; }
+.ver { position: absolute; top: 8px; right: 16px; font-size: 11px; font-weight: 500; color: var(--white); opacity: 0.85; }
+main { display: grid; gap: 8px; }
+section { min-width: 0; }
+.card { background: var(--white); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 2px rgba(0, 90, 156, 0.06), 0 8px 24px rgba(0, 90, 156, 0.08); padding: 20px; display: grid; gap: 18px; }
+.card h2 { margin: 0; line-height: 1; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+.fld { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.fld > label, .fld > .lbl { font-weight: 500; }
+.unit-field { display: flex; align-items: center; background: var(--blue-50); border: 1.5px solid var(--line); border-radius: 10px; padding-right: 12px; }
+.unit-field:focus-within { border-color: var(--blue); background: var(--white); }
+.field { width: 100%; min-width: 0; border: 0; background: transparent; font: 500 15px var(--font); color: var(--ink); padding: 8px 6px 8px 12px; outline: none; font-variant-numeric: tabular-nums; -moz-appearance: textfield; appearance: textfield; }
+.field::-webkit-outer-spin-button, .field::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.unit-field span { color: var(--ink-soft); font-weight: 500; }
+.select { width: 100%; background: var(--blue-50); border: 1.5px solid var(--line); border-radius: 10px; font: 500 14px var(--font); color: var(--ink); padding: 8px 12px; outline: none; }
+.select:focus-visible { border-color: var(--blue); background: var(--white); outline: 3px solid var(--blue-soft); outline-offset: 2px; }
+.hint { font-size: 13px; color: var(--ink-soft); }
+.hint a { color: var(--blue-deep); }
+.fld-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 8px 16px; }
+.fld-row .lbl { font-weight: 500; }
+.card-sub { display: grid; gap: 10px; }
+.card-sub[hidden], .fld[hidden], .table-wrap[hidden] { display: none; }
+main > section:first-child .card { gap: 12px; }
+main > section:first-child .fld { gap: 4px; }
+
+.toggle { position: relative; display: inline-flex; gap: 6px; }
+.toggle input { position: absolute; opacity: 0; pointer-events: none; }
+.toggle label { display: inline-flex; align-items: center; font-size: 12.5px; padding: 6px 14px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--blue-50); cursor: pointer; font-weight: 500; }
+.toggle input:checked + label { border-color: var(--blue); background: var(--blue-100); color: var(--blue-deep); }
+.toggle input:focus-visible + label { outline: 3px solid var(--blue-soft); outline-offset: 2px; }
+
+.unit-field .mini { position: relative; display: inline-flex; gap: 2px; padding: 2px; background: var(--blue-100); border-radius: 8px; }
+.mini input { position: absolute; opacity: 0; pointer-events: none; }
+.mini label { padding: 3px 9px; border-radius: 6px; font-size: 12px; font-weight: 500; color: var(--ink-soft); cursor: pointer; }
+.mini input:checked + label { background: var(--blue); color: var(--white); }
+.mini input:focus-visible + label { outline: 3px solid var(--blue-soft); outline-offset: 1px; }
+
+.seg-group { position: relative; display: grid; gap: 6px; }
+.seg-group.inline { display: flex; flex-wrap: wrap; }
+.seg-group.inline label { display: inline-flex; align-items: center; padding: 6px 12px; white-space: nowrap; }
+.seg-group.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.seg-group input { position: absolute; opacity: 0; pointer-events: none; }
+.seg-group label { display: grid; gap: 2px; padding: 6px 10px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--blue-50); cursor: pointer; font-weight: 500; font-size: 12.5px; }
+.seg-group input:checked + label { border-color: var(--blue); background: var(--blue-100); color: var(--blue-deep); }
+.seg-group input:focus-visible + label { outline: 3px solid var(--blue-soft); outline-offset: 2px; }
+
+.btn { display: inline-flex; align-items: center; padding: 10px 18px; border-radius: 10px; background: var(--blue); color: var(--white); font-weight: 500; text-decoration: none; border: 0; font: 700 15px var(--font); cursor: pointer; justify-content: center; width: 100%; }
+.btn:hover { background: var(--blue-deep); }
+.btn:focus-visible, .pill:focus-visible { outline: 3px solid var(--blue-soft); outline-offset: 2px; }
+.btn.save { margin-top: 8px; padding: 7px 10px; font-size: 13px; }
+.btn.save.on { background: var(--blue-100); color: var(--blue-deep); }
+.btn.off { opacity: 0.45; pointer-events: none; }
+#addAll { gap: 8px; }
+.pill { border: 1.5px solid var(--line); background: var(--blue-50); color: var(--blue-deep); font: 500 12.5px var(--font); padding: 5px 14px; border-radius: 10px; cursor: pointer; }
+.pill:hover { background: var(--blue-100); }
+
+.hero { background: var(--blue); color: var(--white); border-radius: 12px; padding: 9px 14px; display: grid; gap: 1px; }
+.hero .lab { font-size: 11px; line-height: 1.3; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; }
+.hero .big { font-size: 24px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; }
+.hero .sub { font-size: 13px; opacity: 0.92; }
+.hero.bad { background: var(--alert-bg); color: var(--alert); }
+.hero.bad .sub { opacity: 1; }
+
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tiles.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tile { border: 1px solid var(--blue-100); background: var(--blue-50); border-radius: 12px; padding: 12px 8px; text-align: center; }
+.tile .count { font-size: 24px; font-weight: 700; line-height: 1.15; color: var(--blue); }
+.tile .size { font-size: 13px; font-weight: 500; color: var(--ink-soft); }
+.tile.hl { background: var(--blue-100); border-color: var(--blue-soft); }
+.tile .pn { font-size: 12px; font-weight: 500; color: var(--blue-deep); margin-top: 2px; }
+.tile .pn.dim { color: var(--ink-soft); }
+.tile .pn.warn { color: var(--alert); font-weight: 700; }
+.sub-h { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+td { padding: 8px 0; border-top: 1px solid var(--line); }
+tr:first-child td { border-top: 0; }
+td.num { text-align: right; padding-left: 12px; color: var(--ink-soft); }
+td.num.warn { color: var(--alert); font-weight: 700; }
+.note { font-size: 13px; color: var(--ink-soft); margin: 0; }
+
+/* top view */
+.draw-wrap { background: var(--blue-50); border: 1px solid var(--blue-100); border-radius: 12px; overflow: hidden; }
+svg.draw { display: block; width: 100%; height: auto; max-width: 100%; }
+svg.draw text { font-family: var(--font); }
+.empty { padding: 28px 12px; text-align: center; color: var(--ink-soft); font-size: 13px; }
+
+/* saved parts */
+.slist { list-style: none; margin: 0; padding: 0 6px 0 0; max-height: 300px; overflow-y: auto; }
+.slist .none { padding: 18px 12px; text-align: center; color: var(--ink-soft); font-size: 13px; }
+.srow { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.srow:first-child { border-top: 0; }
+.srow .meta { flex: 1; min-width: 0; }
+.srow .meta strong { display: block; font-size: 14.5px; }
+.srow .meta span { font-size: 11px; color: var(--ink-soft); }
+.qty { display: inline-flex; align-items: center; gap: 4px; background: var(--blue-50); border: 1.5px solid var(--line); border-radius: 10px; padding: 2px; }
+.qty button { width: 26px; height: 26px; border: 0; background: transparent; color: var(--blue-deep); font: 500 17px var(--font); cursor: pointer; border-radius: 8px; }
+.qty button:hover { background: var(--blue-100); }
+.qty span { min-width: 22px; text-align: center; font-weight: 500; font-size: 14px; }
+.rm { border: 0; background: none; color: var(--ink-soft); text-decoration: underline; cursor: pointer; font: 400 13px var(--font); }
+
+/* sprocket picker */
+.sp-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto; gap: 10px 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.sp-row:first-child { border-top: 0; }
+.sp-row .who strong { display: block; }
+.sp-row .who span { font-size: 12px; color: var(--ink-soft); }
+.sp-row .btn { width: auto; margin: 0; padding: 8px 16px; font-size: 13px; }
+.sp-none { grid-column: 2 / -1; }
+
+@media (max-width: 520px) {
+  .shell { width: calc(100% - 12px); margin: 6px auto; padding: 6px; border-radius: 18px; gap: 6px; }
+  .banner { padding: 15px 12px 9px; border-radius: 14px; }
+  .banner h1 { font-size: 19px; }
+  .banner p { font-size: 12px; }
+  .ver { top: 3px; right: 10px; font-size: 10px; }
+  main { gap: 6px; }
+  .card { padding: 12px; gap: 12px; border-radius: 14px; }
+  .tiles, .tiles.two { grid-template-columns: minmax(0, 1fr); }
+  .sp-row { grid-template-columns: minmax(0, 1fr); }
+  .sp-none { grid-column: 1; }
+  .sp-row .btn { width: 100%; }
+}
+@media (prefers-reduced-motion: no-preference) { .unit-field, .seg-group label, .toggle label { transition: background 0.15s ease, border-color 0.15s ease; } }
+</style>
+
+<div class="shell">
+<header class="banner">
+  <span class="ver">v1.6.2</span>
+  <h1>Chain Calculator</h1>
+  <p>Chain length and center distance for a two-sprocket chain drive</p>
+</header>
+
+<main>
+  <section aria-labelledby="in-h">
+    <div class="card">
+      <h2 id="in-h">Chain drive</h2>
+
+      <div class="fld-row">
+        <span class="lbl">Chain type</span>
+        <div class="toggle" role="radiogroup" aria-label="Chain type">
+          <input type="radio" name="chain" id="c25" value="25" checked><label for="c25">#25</label>
+          <input type="radio" name="chain" id="c25h" value="25h"><label for="c25h">#25H</label>
+          <input type="radio" name="chain" id="c35" value="35"><label for="c35">#35</label>
+        </div>
+        <span class="hint" id="pitchHint"></span>
+      </div>
+
+      <div class="fld">
+        <span class="lbl" id="tensLbl">Chain tensioner</span>
+        <div class="seg-group inline" id="tens" role="radiogroup" aria-labelledby="tensLbl"></div>
+        <span class="hint" id="tensHint"></span>
+        <button type="button" class="btn save" id="tensSave" data-act="tens" hidden>Save Tensioner</button>
+      </div>
+
+      <div class="fields">
+        <div class="fld">
+          <label for="t1">Sprocket 1</label>
+          <span class="unit-field"><input class="field" id="t1" type="number" inputmode="numeric" step="1" min="6" value="16"><span>Teeth</span></span>
+        </div>
+        <div class="fld">
+          <label for="t2">Sprocket 2</label>
+          <span class="unit-field"><input class="field" id="t2" type="number" inputmode="numeric" step="1" min="6" value="32"><span>Teeth</span></span>
+        </div>
+      </div>
+
+      <div class="fld">
+        <span class="lbl">Known Value</span>
+        <div class="seg-group c2" role="radiogroup" aria-label="Known value">
+          <input type="radio" name="mode" id="m1" value="1" checked><label for="m1">Center Distance</label>
+          <input type="radio" name="mode" id="m2" value="2"><label for="m2">Chain Link Count</label>
+        </div>
+      </div>
+
+      <div id="cdFields" class="card-sub">
+        <div class="fields">
+          <div class="fld">
+            <label for="cd">Desired Center</label>
+            <span class="unit-field"><input class="field" id="cd" type="number" inputmode="decimal" step="any" min="0" value="6"><span class="mini" role="radiogroup" aria-label="Units"><input type="radio" name="unit" id="u-in" value="in" checked><label for="u-in">in</label><input type="radio" name="unit" id="u-mm" value="mm"><label for="u-mm">mm</label></span></span>
+          </div>
+          <div class="fld">
+            <label for="ex">Extra Center</label>
+            <span class="unit-field"><input class="field" id="ex" type="number" inputmode="decimal" step="any" min="0" value="0"><span class="usfx">in</span></span>
+          </div>
+        </div>
+        <span class="hint">Extra center is added to the desired center before the chain is sized, for slack or a tensioning range.</span>
+        <div class="fld-row">
+          <span class="lbl">Allow half links</span>
+          <div class="toggle" role="radiogroup" aria-label="Allow half links">
+            <input type="radio" name="half" id="h0" value="0" checked><label for="h0">Off</label>
+            <input type="radio" name="half" id="h1" value="1"><label for="h1">On</label>
+          </div>
+        </div>
+        <span class="hint">Off keeps the link count even, so the master link closes the loop. On allows odd counts, which need a half link.</span>
+      </div>
+
+      <div class="fld" id="lkFields" hidden>
+        <label for="lk">Chain Links</label>
+        <span class="unit-field"><input class="field" id="lk" type="number" inputmode="numeric" step="1" min="1" value="104"><span>Links</span></span>
+        <span class="hint">Enter the link count of the chain you have.</span>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="out-h">
+    <div class="card">
+      <h2 id="out-h">Result</h2>
+      <div class="hero" id="status" aria-live="polite"></div>
+      <div class="tiles" id="tiles"></div>
+      <div class="table-wrap"><table><tbody id="rows"></tbody></table></div>
+      <div class="card-sub" id="actions" hidden></div>
+      <div class="card-sub" id="opts" hidden>
+        <h3 class="sub-h">Chain options</h3>
+        <div class="tiles two" id="optTiles"></div>
+      </div>
+      <p class="note">Wrap under 120&deg; on the small sprocket is a common rule-of-thumb limit for roller chain, and so is keeping the sprockets at least 1/8" apart. These numbers are estimates, so check the fit on your own drive.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="dr-h">
+    <div class="card">
+      <div class="card-head"><h2 id="dr-h">Top view</h2><button type="button" class="pill" id="playBtn">Pause</button></div>
+      <div class="draw-wrap">
+        <svg class="draw" id="draw" viewBox="0 0 640 220" role="img" aria-label="Top view of the chain drive"></svg>
+        <div class="empty" id="drawEmpty" hidden>Fix the inputs above to see the drive.</div>
+      </div>
+      <p class="note" id="drawNote"></p>
+    </div>
+  </section>
+
+  <section aria-labelledby="sp-h">
+    <div class="card">
+      <h2 id="sp-h">WCP sprockets</h2>
+      <div id="sprBody"></div>
+      <span class="hint">Sprockets listed here match the chain type and tooth counts above. Pick a style and bore, then save it.</span>
+    </div>
+  </section>
+
+  <section aria-labelledby="sv-h">
+    <div class="card">
+      <div class="card-head"><h2 id="sv-h">Saved parts</h2><button type="button" class="rm" id="clearAll">Clear All</button></div>
+      <ul class="slist" id="savedList"></ul>
+      <a class="btn" id="addAll" href="https://wcproducts.com/cart/" target="_blank" rel="noopener"><svg viewBox="0 0 576 512" width="16" height="16" aria-hidden="true" fill="currentColor"><path d="M0 24C0 10.7 10.7 0 24 0H69.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1-96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/></svg>Add To Cart</a>
+      <span class="hint" id="cartHint">Opens wcproducts.com in a new tab with every saved part in your cart.</span>
+    </div>
+  </section>
+</main>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  function radio(name) { var e = document.querySelector('input[name="' + name + '"]:checked'); return e ? e.value : null; }
+  function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function f(x, n) { return x.toFixed(n); }
+
+  // ---------- WCP catalog ----------
+  // Chain types. spr is which sprocket family fits: #25 and #25H chain use the same sprockets.
+  var CHAIN_TYPES = {
+    "25":  { label: "#25",  pitch: 0.25,  spr: "25" },
+    "25h": { label: "#25H", pitch: 0.25,  spr: "25" },
+    "35":  { label: "#35",  pitch: 0.375, spr: "35" }
+  };
+  var ROLLER = "https://wcproducts.com/products/roller-chain";
+  var HALF_SEARCH = "https://wcproducts.com/search?q=half+link";
+  var SPROCKET_PAGE = { "25": "https://wcproducts.com/products/25-sprockets", "35": "https://wcproducts.com/search?q=%2335+sprocket" };
+  // TO FILL IN: id is the Shopify variant id used by the cart link, pn is the WCP part number.
+  // While id is null the part still saves, and opens on its product page instead of going in the cart link.
+  // The Roller Chain page sells #25, #25H and #35 as options on one product, so each one needs its own id.
+  var CHAINS = {
+    "25":  { name: "#25 Roller Chain (10 ft)",  pn: "WCP-0764", id: 35666595086496, url: "https://wcproducts.com/products/wcp-0764" },
+    "25h": { name: "#25H Roller Chain (10 ft)", pn: "WCP-0767", id: 35666712461472, url: "https://wcproducts.com/products/wcp-0767" },
+    "35":  { name: "#35 Roller Chain (10 ft)",  pn: "WCP-0770", id: 35666595119264, url: "https://wcproducts.com/products/wcp-0770" }
+  };
+  var LENGTH_IN = 120; // chain is sold in 10 foot lengths, master link included
+  // Half links are sold in packs of 5.
+  var HALF = {
+    "25":  { name: "#25 Half Link (5 pack)",  pn: "WCP-0766", id: 35666713608352, url: "https://wcproducts.com/products/wcp-0766" },
+    "25h": { name: "#25H Half Link (5 pack)", pn: "WCP-0769", id: 35666714067104, url: "https://wcproducts.com/products/wcp-0769" },
+    "35":  { name: "#35 Half Link (5 pack)",  pn: "WCP-0772", id: 35666713968800, url: "https://wcproducts.com/products/wcp-0772" }
+  };
+  // Chain tensioners. kind "inline": the chain ends attach to the device, which takes up loop length. min and max are the device's
+  // overall length in inches, fully closed and fully extended. kind "cam": it moves a sprocket, so travel is the total center
+  // adjustment in inches. min and max are hole-to-hole lengths from the WCP drawings. Spartans: max is the drawn pin-to-pin length, min is that minus the gap between the plates (0.375 / 0.625), which is the travel. Cam travel is its max minus min radius (0.620 - 0.270) from the WCP-0882 drawing. A null range is not used in the math.
+  var TENSIONERS = [
+    { key: "wcp-0051", short: "Spartan", name: "Spartan #25 Chain Tensioner",  pn: "WCP-0051", id: 35666718130336, price: 14.99, kind: "inline", chains: ["25", "25h"], min: 0.683, max: 1.058 },
+    { key: "wcp-0052", short: "Spartan", name: "Spartan #35 Chain Tensioner",  pn: "WCP-0052", id: 35666718195872, price: 14.99, kind: "inline", chains: ["35"],        min: 1.044, max: 1.669 },
+    { key: "wcp-0247", short: "TurnBuckle", name: "#25 Chain TurnBuckle",         pn: "WCP-0247", id: 35666742182048, price: 14.99, kind: "inline", chains: ["25", "25h"], min: 1.75, max: 2.25 },
+    { key: "wcp-2027", short: "Mini TurnBuckle", name: "#25 Chain Mini TurnBuckle",    pn: "WCP-2027", id: 47619198124244, price: 14.99, kind: "inline", chains: ["25", "25h"], min: 1.125, max: 1.425 },
+    { key: "wcp-0963", short: "TurnBuckle V2", name: "#35 Chain TurnBuckle V2",      pn: "WCP-0963", id: 43793203134676, price: 14.99, kind: "inline", chains: ["35"],        min: 2, max: 2.5 }
+  ];
+  TENSIONERS.forEach(function (t) { t.url = "https://wcproducts.com/products/" + t.pn.toLowerCase(); });
+  // Sprockets, one entry per WCP product: chain family, teeth, style, bore, part number, cart id (Shopify variant id), price, in stock.
+  // #25 and #35 rows come from the WCP cart exports and the sprocket pages, read 2026-10-06. Rows with a null id are out of stock or still need an id.
+  // Add more rows in the same shape.
+  function spr(chain, teeth, style, bore, pn, id, price, stock) { return { chain: chain, teeth: teeth, style: style, bore: bore, pn: pn, id: id, price: price, stock: stock, url: "https://wcproducts.com/products/" + pn.toLowerCase() }; }
+  var SPROCKETS = [
+    spr("25", 10, "Steel Double Hub", "8mm Key Bore", "WCP-1419", 44155001307348, 9.99, true),
+    spr("25", 10, "Steel Double Hub", "8mm SplineXS Bore", "WCP-1019", 43982514913492, 9.99, true),
+    spr("25", 10, "Steel Double Hub", "Falcon Bore", "WCP-0582", 43542914695380, 9.99, true),
+    spr("25", 12, "Steel Double Hub", "1/2\" Rounded Hex Bore", "WCP-0576", 43542915416276, 9.99, true),
+    spr("25", 12, "Steel Double Hub", "8mm SplineXS Bore", "WCP-1020", 43982517141716, 9.99, true),
+    spr("25", 14, "Steel Double Hub", "1/2\" Hex Bore", "WCP-0577", 43542915547348, 9.99, true),
+    spr("25", 16, "Aluminum Chain In Tube Double Hub", "1/2\" Hex Bore", "WCP-0087", 35666721800352, 13.99, true),
+    spr("25", 16, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0558", 43542919020756, 9.99, true),
+    spr("25", 16, "Aluminum Single Hub", "3/8\" Hex Bore", "217-5833", 35666700107936, 9.99, true),
+    spr("25", 16, "Steel Double Hub", "1/2\" Hex Bore", "WCP-0578", 43542918496468, 9.99, true),
+    spr("25", 17, "Aluminum Chain In Tube Double Hub", "1/2\" Hex Bore", "WCP-0088", 35666721865888, 13.99, true),
+    spr("25", 17, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0579", 43542919348436, 9.99, true),
+    spr("25", 18, "Aluminum Chain In Tube Double Hub", "1/2\" Hex Bore", "WCP-0089", 35666721898656, 13.99, true),
+    spr("25", 18, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0559", 43542921150676, 9.99, true),
+    spr("25", 18, "Aluminum Single Hub", "3/8\" Hex Bore", "217-5834", 35666700173472, 9.99, true),
+    spr("25", 20, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0580", 43542921871572, 9.99, true),
+    spr("25", 22, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0560", 43542922133716, 12.99, true),
+    spr("25", 22, "Aluminum Single Hub", "3/8\" Hex Bore", "217-5835", 35666700206240, 9.99, true),
+    spr("25", 24, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0581", 43542922264788, 14.99, true),
+    spr("25", 24, "Aluminum Plate", "SplineXL Bore", "WCP-0964", 44112369680596, 4.99, true),
+    spr("25", 26, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-2101", 46995762151636, 15.99, true),
+    spr("25", 28, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-2102", 46995765133524, 16.99, true),
+    spr("25", 30, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-2103", 46995772342484, 17.99, true),
+    spr("25", 30, "Aluminum Plate", "SplineXL Bore", "WCP-0965", 44112370139348, 4.99, true),
+    spr("25", 32, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-2104", 46995773096148, 18.99, true),
+    spr("25", 34, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-2105", 46995776241876, 19.99, true),
+    spr("25", 36, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-2106", 46995776733396, 20.99, true),
+    spr("25", 36, "Aluminum Plate", "SplineXL Bore", "WCP-0966", null, 9.99, false),
+    spr("25", 42, "Aluminum Plate", "SplineXL Bore", "WCP-0967", null, 9.99, false),
+    spr("25", 48, "Aluminum Plate", "SplineXL Bore", "WCP-0968", null, 9.99, false),
+    spr("25", 54, "Aluminum Plate", "SplineXL Bore", "WCP-0969", 44112373317844, 9.99, true),
+    spr("25", 60, "Aluminum Plate", "SplineXL Bore", "WCP-0970", 44112374137044, 9.99, true),
+    spr("25", 66, "Aluminum Plate", "SplineXL Bore", "WCP-0971", 44112375316692, 14.99, true),
+    spr("25", 72, "Aluminum Plate", "SplineXL Bore", "WCP-0972", 44112376660180, 14.99, true),
+    spr("25", 84, "Aluminum Plate", "SplineXL Bore", "WCP-1376", null, 14.99, false),
+    spr("35", 9, "Steel Double Hub", "1/2\" Rounded Hex Bore", "WCP-0976", 43959682269396, 13.99, true),
+    spr("35", 12, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0973", 43959637311700, 12.99, true),
+    spr("35", 12, "Steel Double Hub", "1/2\" Hex Bore", "WCP-0977", 43959685939412, 13.99, true),
+    spr("35", 15, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0974", 43959643308244, 14.99, true),
+    spr("35", 15, "Steel Double Hub", "1/2\" Hex Bore", "WCP-0978", 43959687708884, 15.99, true),
+    spr("35", 18, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0975", 43959678501076, 16.99, true),
+    spr("35", 18, "Aluminum Plate", "SplineXL Bore", "WCP-0980", 44112331374804, 4.99, true),
+    spr("35", 18, "Steel Double Hub", "1/2\" Hex Bore", "WCP-0979", 43959691378900, 17.99, true),
+    spr("35", 24, "Aluminum Plate", "SplineXL Bore", "WCP-0981", null, 4.99, false),
+    spr("35", 30, "Aluminum Plate", "SplineXL Bore", "WCP-0982", 44112348643540, 9.99, true),
+    spr("35", 36, "Aluminum Plate", "SplineXL Bore", "WCP-0983", 44112357654740, 9.99, true),
+    spr("35", 42, "Aluminum Plate", "SplineXL Bore", "WCP-0984", 44112364830932, 9.99, true),
+    spr("35", 48, "Aluminum Plate", "SplineXL Bore", "WCP-0985", 44112365224148, 9.99, true),
+    spr("35", 54, "Aluminum Plate", "SplineXL Bore", "WCP-0986", 44112365584596, 14.99, true),
+    spr("35", 60, "Aluminum Plate", "SplineXL Bore", "WCP-0987", 44112366272724, 14.99, true),
+    spr("35", 66, "Aluminum Plate", "SplineXL Bore", "WCP-0988", 44112366993620, 14.99, true),
+    spr("35", 72, "Aluminum Plate", "SplineXL Bore", "WCP-0989", 44112368206036, 19.99, true),
+    spr("35", 84, "Aluminum Plate", "SplineXL Bore", "WCP-1377", 45894705250516, 19.99, true)
+  ];
+  var CART_URL = "https://wcproducts.com/cart/add";
+
+  // ---------- state ----------
+  var cur = null;          // the drive being shown: { C, P, N1, N2, links, opt }
+  var saved = [];          // saved parts, in memory only
+  var paused = false;
+  try { paused = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+  var sprSig = "";
+
+  // Link plate outlines taken from the WCP roller chain drawing (outer and inner plate, pitch = 27 units, centered on the plate).
+  var PLATE_O = "M-9.96 12.24 L-13.29 12.74 L-16.63 12.36 L-19.75 11.11 L-22.44 9.09 L-24.50 6.43 L-25.80 3.33 L-26.25 0.00 L-25.80 -3.33 L-24.50 -6.43 L-22.44 -9.09 L-19.75 -11.11 L-16.63 -12.36 L-13.29 -12.74 L-9.96 -12.24 L-7.52 -11.63 L-5.03 -11.19 L-2.52 -10.92 L-0.00 -10.83 L2.52 -10.92 L5.03 -11.19 L7.51 -11.63 L9.96 -12.24 L13.29 -12.74 L16.63 -12.36 L19.75 -11.11 L22.44 -9.09 L24.50 -6.43 L25.80 -3.33 L26.25 0.00 L25.80 3.33 L24.50 6.43 L22.44 9.09 L19.75 11.11 L16.63 12.36 L13.29 12.74 L9.96 12.24 L7.51 11.63 L5.03 11.19 L2.52 10.92 L-0.00 10.83 L-2.52 10.92 L-5.03 11.19 L-7.52 11.63 L-9.96 12.24 Z";
+  var PLATE_I = "M-10.29 10.74 L-13.22 11.21 L-16.18 10.89 L-18.95 9.80 L-21.33 8.03 L-23.17 5.69 L-24.32 2.95 L-24.72 0.00 L-24.32 -2.95 L-23.17 -5.69 L-21.33 -8.03 L-18.95 -9.80 L-16.18 -10.89 L-13.22 -11.21 L-10.29 -10.74 L-7.76 -10.09 L-5.20 -9.62 L-2.61 -9.33 L-0.00 -9.24 L2.60 -9.33 L5.19 -9.62 L7.76 -10.09 L10.28 -10.74 L13.22 -11.21 L16.18 -10.89 L18.95 -9.80 L21.33 -8.03 L23.17 -5.69 L24.32 -2.95 L24.72 0.00 L24.32 2.95 L23.17 5.69 L21.33 8.03 L18.95 9.80 L16.18 10.89 L13.22 11.21 L10.29 10.74 L7.76 10.09 L5.19 9.62 L2.60 9.33 L-0.00 9.24 L-2.61 9.33 L-5.20 9.62 L-7.76 10.09 L-10.29 10.74 Z";
+
+  // Tensioner outlines taken from the WCP drawings (vector views), in inches. Pin holes sit at x = 0 and x = len; x0 / x1 are the full extent.
+  // TurnBuckles use the closed view. Spartans use the front view, turned so the chain runs along x.
+  var TENS_ART = {
+    "wcp-0247": { len: 1.75, x0: -0.124, x1: 1.875, d: "M0.125 0.177L0.156 0.177M0.156 -0.177L0.125 -0.177M0.28 0.081L0.281 0.081M1.625 -0.177L1.594 -0.177M1.594 0.177L1.625 0.177M1.471 -0.081L1.469 -0.081M1.485 -0.217L1.469 -0.188M1.594 -0.188L1.577 -0.217M1.469 0.188L1.485 0.216M1.577 0.216L1.594 0.188M0.173 -0.217L0.156 -0.188M0.281 -0.188L0.265 -0.217M0.156 0.188L0.173 0.216M0.265 0.216L0.281 0.188M1.41 0.216L1.469 0.157M1.469 -0.158L1.41 -0.217M0.34 -0.217L0.281 -0.158M0.281 0.157L0.34 0.216M0.125 -0.177L0.125 0.177M0 -0.047L-0.01 -0.046L-0.019 -0.043L-0.028 -0.037L-0.035 -0.031L-0.041 -0.022L-0.045 -0.012L-0.047 -0.003L-0.046 0.008L-0.044 0.017L-0.039 0.026L-0.032 0.034L-0.024 0.04L-0.015 0.044L-0.005 0.047L0.006 0.047L0.015 0.044L0.024 0.04L0.033 0.034L0.039 0.026L0.044 0.017L0.047 0.008L0.047 -0.003L0.046 -0.012L0.042 -0.022L0.036 -0.031L0.028 -0.037L0.02 -0.043L0.01 -0.046L0 -0.047M0.125 -0.125L0 -0.125M0 0.125L0.125 0.125M0 -0.125L-0.017 -0.124L-0.033 -0.121L-0.049 -0.115L-0.065 -0.107L-0.078 -0.097L-0.091 -0.085L-0.102 -0.072L-0.11 -0.058L-0.117 -0.042L-0.122 -0.026L-0.124 -0.009L-0.124 0.008L-0.122 0.025L-0.117 0.042L-0.11 0.058L-0.102 0.072L-0.091 0.085L-0.078 0.097L-0.065 0.106L-0.049 0.115L-0.033 0.12L-0.017 0.124L0 0.125M1.625 0.177L1.625 -0.177M1.75 0.047L1.76 0.046L1.77 0.042L1.778 0.038L1.786 0.031L1.792 0.022L1.796 0.013L1.797 0.002L1.797 -0.008L1.794 -0.017L1.789 -0.026L1.783 -0.034L1.774 -0.04L1.765 -0.044L1.756 -0.047L1.745 -0.047L1.735 -0.044L1.726 -0.04L1.718 -0.034L1.711 -0.026L1.706 -0.017L1.704 -0.008L1.703 0.002L1.705 0.013L1.709 0.022L1.715 0.031L1.722 0.038L1.731 0.042L1.74 0.046L1.75 0.047M1.625 0.125L1.75 0.125M1.75 -0.125L1.625 -0.125M1.75 0.125L1.767 0.124L1.784 0.12L1.8 0.115L1.815 0.106L1.829 0.097L1.842 0.085L1.852 0.072L1.861 0.058L1.868 0.042L1.873 0.025L1.875 0.008L1.875 -0.009L1.873 -0.026L1.868 -0.042L1.861 -0.058L1.852 -0.072L1.842 -0.085L1.829 -0.097L1.815 -0.107L1.8 -0.115L1.784 -0.121L1.767 -0.124L1.75 -0.125M1.485 0.108L1.474 0.055L1.47 0.028L1.469 0M1.469 0L1.469 -0.008L1.474 -0.058L1.485 -0.108M1.485 -0.108L1.577 -0.108M1.594 0L1.594 -0.008L1.589 -0.058L1.577 -0.108M1.577 0.108L1.59 0.055L1.593 0.028L1.594 0M1.485 0.108L1.577 0.108M1.594 0.163L1.591 0.141L1.583 0.119L1.577 0.108M1.594 0L1.594 0.163M1.469 0.163L1.472 0.141L1.48 0.119L1.485 0.108M1.469 0.163L1.469 0M1.577 -0.108L1.59 -0.135L1.593 -0.149L1.594 -0.162M1.594 -0.162L1.594 0M1.485 -0.108L1.474 -0.135L1.47 -0.149L1.469 -0.162M1.469 0L1.469 -0.162M1.485 0.216L1.476 0.196L1.47 0.175L1.469 0.163M1.577 0.216L1.588 0.196L1.593 0.175L1.594 0.163M1.485 0.216L1.577 0.216M1.469 -0.162L1.469 -0.167L1.474 -0.192L1.485 -0.217M1.485 -0.217L1.577 -0.217M1.594 -0.162L1.594 -0.167L1.589 -0.192L1.577 -0.217M1.469 -0.162L1.469 -0.188M1.594 -0.188L1.594 -0.162M1.469 0.188L1.469 0.163M1.594 0.188L1.594 0.163M0.173 0.108L0.161 0.055L0.158 0.028L0.156 0M0.156 0L0.156 -0.008L0.162 -0.058L0.173 -0.108M0.173 -0.108L0.265 -0.108M0.281 0L0.281 -0.008L0.276 -0.058L0.265 -0.108M0.265 0.108L0.277 0.055L0.281 0.028L0.281 0M0.173 0.108L0.265 0.108M0.265 -0.108L0.275 -0.129L0.281 -0.15L0.281 -0.162M0.281 0L0.281 -0.162M0.173 -0.108L0.163 -0.129L0.158 -0.15L0.156 -0.162M0.156 0L0.156 -0.162M0.156 0.163L0.156 0.158L0.162 0.133L0.173 0.108M0.156 0.163L0.156 0M0.281 0.163L0.281 0.158L0.276 0.133L0.265 0.108M0.281 0L0.281 0.163M0.156 -0.162L0.159 -0.184L0.167 -0.206L0.173 -0.217M0.173 -0.217L0.265 -0.217M0.281 -0.162L0.278 -0.184L0.271 -0.206L0.265 -0.217M0.173 0.216L0.161 0.19L0.158 0.176L0.156 0.163M0.265 0.216L0.277 0.19L0.281 0.176L0.281 0.163M0.173 0.216L0.265 0.216M0.156 -0.162L0.156 -0.188M0.281 -0.188L0.281 -0.162M0.156 0.188L0.156 0.163M0.281 0.163L0.281 0.188M1.41 0.216L1.42 0.205L1.428 0.194L1.435 0.181L1.438 0.169L1.438 0.151L1.431 0.134L1.422 0.121L1.41 0.108M1.41 0.108L1.426 0.071L1.435 0.035L1.439 -0.001L1.435 -0.039L1.424 -0.076L1.41 -0.108M1.41 -0.108L1.42 -0.119L1.428 -0.131L1.435 -0.143L1.438 -0.156L1.438 -0.173L1.431 -0.191L1.422 -0.204L1.41 -0.217M0.34 0.108L0.331 0.119L0.322 0.131L0.315 0.143L0.312 0.156L0.312 0.173L0.319 0.19L0.329 0.203L0.34 0.216M1.41 0.108L0.34 0.108M1.41 0.216L0.34 0.216M0.34 -0.108L0.326 -0.076L0.315 -0.039L0.312 -0.001L0.315 0.035L0.324 0.071L0.34 0.108M1.41 -0.108L0.34 -0.108M0.34 -0.217L0.331 -0.206L0.322 -0.194L0.315 -0.182L0.312 -0.169L0.312 -0.152L0.319 -0.135L0.329 -0.122L0.34 -0.108M1.41 -0.217L0.34 -0.217" },
+    "wcp-2027": { len: 1.125, x0: -0.126, x1: 1.249, d: "M0.249 -0.188L0.233 -0.217M0.124 0.188L0.142 0.216M0.142 -0.217L0.124 -0.188M0.233 0.216L0.249 0.188M0.999 -0.188L0.983 -0.217M0.874 0.188L0.892 0.216M0.892 -0.217L0.874 -0.188M0.983 0.216L0.999 0.188M0.124 -0.178L0.093 -0.178M0.093 0.177L0.124 0.177M1.031 -0.178L0.999 -0.178M0.999 0.177L1.031 0.177M0.831 0.201L0.874 0.157M0.874 -0.158L0.831 -0.202M0.294 -0.202L0.249 -0.158M0.249 0.157L0.294 0.201M0.831 -0.202L0.294 -0.202M0.294 0.201L0.831 0.201M0.142 -0.108L0.233 -0.108M0.233 -0.108L0.238 -0.091L0.242 -0.074L0.245 -0.056L0.247 -0.042L0.249 -0.028L0.249 -0.014L0.249 0M0.249 0L0.249 0.013L0.249 0.027L0.247 0.04L0.245 0.053L0.243 0.067L0.24 0.081L0.237 0.094L0.233 0.108M0.142 0.108L0.233 0.108M0.142 0.108L0.137 0.09L0.133 0.073L0.129 0.055L0.127 0.041L0.126 0.027L0.125 0.014L0.124 0M0.124 0L0.125 -0.014L0.126 -0.028L0.127 -0.041L0.129 -0.054L0.131 -0.068L0.134 -0.082L0.138 -0.095L0.142 -0.108M0.249 0L0.249 0.162M0.233 0.108L0.238 0.117L0.242 0.126L0.245 0.135L0.247 0.142L0.249 0.148L0.249 0.155L0.249 0.162M0.249 0.162L0.249 0.169L0.249 0.176L0.247 0.183L0.245 0.189L0.243 0.196L0.24 0.203L0.237 0.21L0.233 0.216M0.233 0.216L0.142 0.216M0.142 0.216L0.137 0.208L0.133 0.199L0.129 0.19L0.127 0.183L0.126 0.176L0.125 0.169L0.124 0.162M0.124 0.162L0.125 0.156L0.126 0.149L0.127 0.142L0.129 0.135L0.131 0.128L0.134 0.122L0.138 0.115L0.142 0.108M0.124 0L0.124 0.162M0.142 -0.217L0.233 -0.217M0.233 -0.217L0.238 -0.208L0.242 -0.199L0.245 -0.19L0.247 -0.183L0.249 -0.176L0.249 -0.169L0.249 -0.163M0.249 -0.163L0.249 -0.156L0.249 -0.149L0.247 -0.142L0.245 -0.135L0.243 -0.128L0.24 -0.122L0.237 -0.115L0.233 -0.108M0.142 -0.108L0.137 -0.117L0.133 -0.126L0.129 -0.135L0.127 -0.142L0.126 -0.149L0.125 -0.156L0.124 -0.163M0.124 -0.163L0.125 -0.169L0.126 -0.176L0.127 -0.183L0.129 -0.19L0.131 -0.197L0.134 -0.203L0.138 -0.21L0.142 -0.217M0.124 -0.163L0.124 0M0.249 -0.163L0.249 0M0.249 -0.188L0.249 -0.163M0.124 0.162L0.124 0.188M0.124 -0.188L0.124 -0.163M0.249 0.162L0.249 0.188M0.892 -0.108L0.983 -0.108M0.983 -0.108L0.988 -0.091L0.992 -0.074L0.995 -0.056L0.997 -0.042L0.999 -0.028L0.999 -0.014L0.999 0M0.999 0L0.999 0.013L0.999 0.027L0.997 0.04L0.995 0.053L0.993 0.067L0.99 0.081L0.987 0.094L0.983 0.108M0.892 0.108L0.983 0.108M0.892 0.108L0.887 0.09L0.883 0.073L0.879 0.055L0.877 0.041L0.876 0.027L0.875 0.014L0.874 0M0.874 0L0.875 -0.014L0.876 -0.028L0.877 -0.041L0.879 -0.054L0.881 -0.068L0.884 -0.082L0.887 -0.095L0.892 -0.108M0.999 0L0.999 0.162M0.983 0.108L0.986 0.115L0.99 0.121L0.995 0.135L0.997 0.141L0.999 0.148L0.999 0.155L0.999 0.162M0.999 0.162L0.999 0.169L0.999 0.176L0.997 0.183L0.995 0.189L0.993 0.196L0.99 0.203L0.987 0.21L0.983 0.216M0.892 0.216L0.983 0.216M0.892 0.216L0.887 0.21L0.885 0.203L0.882 0.197L0.879 0.19L0.877 0.183L0.876 0.176L0.875 0.169L0.874 0.162M0.874 0.162L0.875 0.156L0.876 0.149L0.877 0.142L0.879 0.135L0.881 0.128L0.884 0.122L0.887 0.115L0.892 0.108M0.892 -0.217L0.983 -0.217M0.983 -0.217L0.986 -0.21L0.99 -0.203L0.992 -0.197L0.995 -0.19L0.997 -0.183L0.999 -0.176L0.999 -0.169L0.999 -0.163M0.999 -0.163L0.999 -0.156L0.999 -0.149L0.997 -0.142L0.995 -0.135L0.993 -0.128L0.99 -0.122L0.987 -0.115L0.983 -0.108M0.892 -0.108L0.887 -0.117L0.883 -0.126L0.879 -0.135L0.877 -0.142L0.876 -0.149L0.875 -0.156L0.874 -0.163M0.874 -0.163L0.875 -0.169L0.876 -0.176L0.877 -0.183L0.879 -0.19L0.881 -0.197L0.884 -0.203L0.887 -0.21L0.892 -0.217M0.999 -0.163L0.999 0M0.874 -0.163L0.874 0M0.874 0L0.874 0.162M0.999 -0.188L0.999 -0.163M0.874 0.162L0.874 0.188M0.874 -0.188L0.874 -0.163M0.999 0.162L0.999 0.188M0.093 -0.145L0.124 -0.145M0.093 -0.178L0.093 -0.145M-0.001 -0.047L-0.003 -0.047L-0.007 -0.047L-0.01 -0.047L-0.013 -0.046L-0.017 -0.044L-0.019 -0.043L-0.022 -0.042L-0.025 -0.04L-0.028 -0.038L-0.031 -0.037L-0.033 -0.035L-0.035 -0.032L-0.038 -0.03L-0.039 -0.027L-0.041 -0.024L-0.044 -0.019L-0.045 -0.015L-0.046 -0.012L-0.047 -0.009L-0.047 -0.006L-0.047 0.003L-0.047 0.007L-0.047 0.01L-0.045 0.013L-0.044 0.017L-0.043 0.019L-0.042 0.022L-0.04 0.025L-0.038 0.028L-0.036 0.031L-0.034 0.033L-0.031 0.035L-0.029 0.037L-0.026 0.039L-0.024 0.04L-0.021 0.042L-0.018 0.043L-0.015 0.044L-0.012 0.045L-0.008 0.046L-0.006 0.047L0.004 0.047L0.008 0.046L0.011 0.045L0.014 0.044L0.017 0.043L0.02 0.042L0.023 0.04L0.026 0.039L0.028 0.037L0.031 0.035L0.033 0.033L0.035 0.031L0.038 0.028L0.039 0.025L0.041 0.022L0.042 0.019L0.044 0.017L0.044 0.013L0.045 0.01L0.046 0.007L0.047 0.003L0.047 -0.006L0.046 -0.009L0.045 -0.012L0.044 -0.015L0.043 -0.019L0.042 -0.022L0.04 -0.024L0.038 -0.027L0.036 -0.03L0.034 -0.032L0.032 -0.035L0.03 -0.037L0.027 -0.038L0.024 -0.04L0.022 -0.042L0.019 -0.043L0.015 -0.044L0.013 -0.046L0.009 -0.047L0.006 -0.047L0.003 -0.047L-0.001 -0.047M0.093 -0.125L-0.001 -0.125M0.093 -0.145L0.093 -0.125M0.124 0.144L0.093 0.144M0.093 0.125L0.093 0.144M-0.001 0.125L0.093 0.125M-0.001 -0.125L-0.011 -0.125L-0.016 -0.124L-0.022 -0.124L-0.027 -0.122L-0.032 -0.122L-0.037 -0.12L-0.042 -0.118L-0.047 -0.116L-0.052 -0.114L-0.057 -0.112L-0.061 -0.11L-0.066 -0.107L-0.07 -0.104L-0.075 -0.101L-0.079 -0.097L-0.083 -0.094L-0.087 -0.09L-0.091 -0.087L-0.094 -0.083L-0.098 -0.079L-0.101 -0.074L-0.104 -0.07L-0.107 -0.066L-0.11 -0.061L-0.112 -0.056L-0.115 -0.052L-0.117 -0.047L-0.118 -0.042L-0.12 -0.037L-0.122 -0.032L-0.123 -0.026L-0.124 -0.022L-0.124 -0.016L-0.125 -0.011L-0.125 -0.006L-0.126 0L-0.125 0.005L-0.125 0.01L-0.124 0.015L-0.124 0.021L-0.123 0.026L-0.122 0.031L-0.12 0.036L-0.118 0.042L-0.117 0.047L-0.115 0.051L-0.112 0.056L-0.11 0.06L-0.107 0.065L-0.104 0.069L-0.101 0.074L-0.098 0.078L-0.094 0.082L-0.091 0.086L-0.083 0.094L-0.079 0.097L-0.075 0.1L-0.07 0.103L-0.066 0.106L-0.061 0.109L-0.057 0.111L-0.052 0.114L-0.047 0.116L-0.042 0.117L-0.037 0.119L-0.027 0.122L-0.022 0.123L-0.016 0.124L-0.011 0.124L-0.006 0.124L-0.001 0.125M0.093 0.144L0.093 0.177M0.999 -0.145L1.031 -0.145M1.031 -0.145L1.031 -0.178M1.124 0.047L1.131 0.047L1.134 0.046L1.137 0.045L1.14 0.044L1.144 0.043L1.147 0.041L1.149 0.04L1.152 0.038L1.155 0.036L1.157 0.034L1.159 0.031L1.161 0.029L1.163 0.026L1.165 0.024L1.167 0.021L1.168 0.018L1.169 0.015L1.17 0.012L1.171 0.008L1.172 0.006L1.172 -0.004L1.171 -0.008L1.17 -0.011L1.169 -0.014L1.169 -0.017L1.167 -0.02L1.166 -0.023L1.164 -0.026L1.163 -0.028L1.16 -0.031L1.158 -0.033L1.156 -0.035L1.153 -0.038L1.151 -0.04L1.148 -0.041L1.145 -0.042L1.142 -0.044L1.139 -0.045L1.136 -0.046L1.133 -0.047L1.129 -0.047L1.119 -0.047L1.117 -0.047L1.113 -0.046L1.11 -0.045L1.107 -0.044L1.104 -0.042L1.101 -0.041L1.099 -0.04L1.096 -0.038L1.094 -0.035L1.091 -0.033L1.089 -0.031L1.087 -0.028L1.085 -0.026L1.083 -0.023L1.082 -0.02L1.081 -0.017L1.08 -0.014L1.078 -0.011L1.078 -0.008L1.078 -0.004L1.078 0.006L1.078 0.008L1.079 0.012L1.08 0.015L1.081 0.018L1.083 0.021L1.084 0.024L1.086 0.026L1.087 0.029L1.09 0.031L1.092 0.034L1.094 0.036L1.097 0.038L1.103 0.041L1.106 0.043L1.108 0.044L1.112 0.045L1.115 0.046L1.118 0.047L1.124 0.047M1.031 0.125L1.124 0.125M1.031 0.144L1.031 0.125M1.031 0.144L0.999 0.144M1.031 -0.125L1.031 -0.145M1.124 -0.125L1.031 -0.125M1.124 0.125L1.13 0.124L1.135 0.124L1.14 0.124L1.146 0.123L1.151 0.122L1.156 0.121L1.161 0.119L1.166 0.117L1.172 0.116L1.176 0.114L1.181 0.111L1.185 0.109L1.19 0.106L1.194 0.103L1.199 0.1L1.203 0.097L1.207 0.094L1.211 0.09L1.215 0.086L1.219 0.082L1.222 0.078L1.225 0.074L1.228 0.069L1.231 0.065L1.234 0.06L1.236 0.056L1.238 0.051L1.242 0.042L1.244 0.036L1.246 0.031L1.247 0.026L1.248 0.021L1.249 0.015L1.249 0.01L1.249 -0.011L1.249 -0.016L1.248 -0.022L1.247 -0.026L1.246 -0.032L1.244 -0.037L1.242 -0.042L1.24 -0.047L1.238 -0.052L1.236 -0.056L1.234 -0.061L1.231 -0.066L1.228 -0.07L1.225 -0.074L1.222 -0.079L1.219 -0.083L1.215 -0.087L1.207 -0.094L1.203 -0.097L1.199 -0.101L1.194 -0.104L1.19 -0.107L1.185 -0.11L1.181 -0.112L1.176 -0.114L1.172 -0.116L1.166 -0.118L1.161 -0.12L1.156 -0.122L1.151 -0.122L1.146 -0.124L1.14 -0.124L1.135 -0.125L1.124 -0.125M1.031 0.177L1.031 0.144M0.831 0.074L0.831 0.071L0.835 0.062L0.837 0.053L0.84 0.044L0.841 0.036L0.842 0.026L0.844 0.017L0.844 0.008L0.844 -0.01L0.844 -0.019L0.842 -0.028L0.841 -0.038L0.839 -0.047L0.833 -0.065L0.831 -0.074M0.831 -0.074L0.831 -0.126M0.831 -0.126L0.833 -0.129L0.835 -0.133L0.84 -0.14L0.841 -0.144L0.842 -0.148L0.843 -0.152L0.844 -0.156L0.844 -0.16L0.844 -0.169L0.843 -0.173L0.842 -0.178L0.84 -0.182L0.839 -0.187L0.836 -0.191L0.833 -0.195L0.831 -0.199M0.831 -0.199L0.831 -0.202M0.831 0.201L0.831 0.199M0.831 0.199L0.833 0.195L0.835 0.192L0.837 0.188L0.84 0.184L0.841 0.181L0.842 0.176L0.843 0.173L0.844 0.169L0.844 0.165L0.844 0.156L0.843 0.151L0.842 0.147L0.84 0.142L0.839 0.138L0.836 0.134L0.833 0.13L0.831 0.125M0.831 0.125L0.831 0.074M0.294 -0.074L0.29 -0.065L0.288 -0.057L0.285 -0.048L0.283 -0.039L0.282 -0.03L0.281 -0.02L0.28 -0.01L0.28 0.008L0.281 0.026L0.283 0.035L0.285 0.044L0.287 0.053L0.29 0.062L0.292 0.071L0.294 0.074M0.294 0.074L0.294 0.125M0.294 0.125L0.29 0.13L0.285 0.14L0.283 0.145L0.281 0.15L0.28 0.156L0.28 0.167L0.281 0.173L0.283 0.178L0.285 0.185L0.288 0.19L0.29 0.194L0.294 0.199M0.294 0.199L0.294 0.201M0.294 -0.202L0.294 -0.199M0.294 -0.199L0.291 -0.196L0.287 -0.189L0.285 -0.185L0.283 -0.181L0.282 -0.177L0.281 -0.174L0.28 -0.169L0.28 -0.156L0.281 -0.152L0.282 -0.148L0.283 -0.143L0.285 -0.139L0.288 -0.135L0.29 -0.13L0.294 -0.126M0.294 -0.126L0.294 -0.074M0.831 0.074L0.294 0.074M0.294 -0.074L0.831 -0.074M0.831 -0.126L0.294 -0.126M0.294 0.125L0.831 0.125M0.294 -0.199L0.831 -0.199M0.831 0.199L0.294 0.199" },
+    "wcp-0963": { len: 2.0, x0: -0.174, x1: 2.174, d: "M0.219 0.25L0.241 0.289M0.406 -0.25L0.384 -0.289M0.384 0.289L0.406 0.25M0.241 -0.289L0.219 -0.25M1.781 -0.25L1.759 -0.289M1.616 -0.289L1.594 -0.25M1.594 0.25L1.616 0.289M1.759 0.289L1.781 0.25M0.187 0.236L0.219 0.236M0.219 -0.236L0.187 -0.236M1.812 -0.236L1.781 -0.236M1.781 0.236L1.812 0.236M0.457 -0.27L0.406 -0.219M0.406 0.219L0.457 0.27M1.542 0.27L1.594 0.219M1.594 -0.219L1.542 -0.27M1.542 -0.27L0.457 -0.27M0.457 0.27L1.542 0.27M0.241 -0.144L0.384 -0.144M0.384 -0.144L0.393 -0.109L0.4 -0.074L0.405 -0.037L0.406 0M0.406 0L0.405 0.036L0.4 0.072L0.393 0.109L0.384 0.144M0.241 0.144L0.384 0.144M0.241 0.144L0.232 0.109L0.225 0.074L0.22 0.037L0.219 0M0.219 0L0.22 -0.036L0.225 -0.072L0.232 -0.108L0.241 -0.144M0.406 0L0.406 0.217M0.384 0.144L0.393 0.162L0.4 0.18L0.405 0.198L0.406 0.217M0.406 0.217L0.405 0.235L0.4 0.253L0.393 0.271L0.384 0.289M0.384 0.289L0.241 0.289M0.241 0.289L0.232 0.271L0.225 0.253L0.22 0.235L0.219 0.217M0.219 0.217L0.22 0.198L0.225 0.18L0.232 0.162L0.241 0.144M0.406 -0.216L0.405 -0.198L0.4 -0.18L0.393 -0.162L0.384 -0.144M0.406 -0.216L0.406 0M0.219 -0.216L0.219 0M0.241 -0.144L0.232 -0.162L0.225 -0.18L0.22 -0.198L0.219 -0.216M0.241 -0.289L0.384 -0.289M0.384 -0.289L0.393 -0.271L0.4 -0.253L0.405 -0.235L0.406 -0.216M0.219 -0.216L0.22 -0.234L0.225 -0.253L0.232 -0.271L0.241 -0.289M0.219 0L0.219 0.217M0.219 0.217L0.219 0.25M0.406 -0.25L0.406 -0.216M0.406 0.217L0.406 0.25M0.219 -0.25L0.219 -0.216M1.616 -0.144L1.759 -0.144M1.759 -0.144L1.768 -0.109L1.775 -0.074L1.78 -0.037L1.781 0M1.781 0L1.78 0.036L1.775 0.072L1.768 0.109L1.759 0.144M1.616 0.144L1.759 0.144M1.616 0.144L1.607 0.109L1.6 0.074L1.595 0.037L1.594 0M1.594 0L1.595 -0.036L1.6 -0.072L1.607 -0.108L1.616 -0.144M1.781 0L1.781 0.217M1.759 0.144L1.768 0.162L1.775 0.18L1.78 0.198L1.781 0.217M1.781 0.217L1.78 0.235L1.775 0.253L1.768 0.271L1.759 0.289M1.759 0.289L1.616 0.289M1.616 0.289L1.607 0.271L1.6 0.253L1.595 0.235L1.594 0.217M1.594 0.217L1.595 0.198L1.6 0.18L1.607 0.162L1.616 0.144M1.616 -0.144L1.607 -0.162L1.6 -0.18L1.595 -0.198L1.594 -0.216M1.594 -0.216L1.594 0M1.781 -0.216L1.78 -0.198L1.775 -0.18L1.768 -0.162L1.759 -0.144M1.781 -0.216L1.781 0M1.594 0L1.594 0.217M1.616 -0.289L1.759 -0.289M1.759 -0.289L1.768 -0.271L1.775 -0.253L1.78 -0.235L1.781 -0.216M1.594 -0.216L1.595 -0.234L1.6 -0.253L1.607 -0.271L1.616 -0.289M1.781 -0.25L1.781 -0.216M1.594 -0.25L1.594 -0.216M1.594 0.217L1.594 0.25M1.781 0.217L1.781 0.25M0.187 -0.236L0.187 0.236M0 -0.073L-0.014 -0.072L-0.027 -0.068L-0.039 -0.062L-0.049 -0.054L-0.058 -0.044L-0.065 -0.033L-0.07 -0.02L-0.073 -0.007L-0.073 0.007L-0.07 0.02L-0.065 0.033L-0.058 0.044L-0.049 0.054L-0.039 0.062L-0.027 0.068L-0.014 0.072L0 0.073L0.013 0.072L0.026 0.068L0.038 0.062L0.049 0.054L0.058 0.044L0.065 0.033L0.07 0.02L0.073 0.007L0.073 -0.007L0.07 -0.02L0.065 -0.033L0.058 -0.044L0.049 -0.054L0.038 -0.062L0.026 -0.068L0.013 -0.072L0 -0.073M0 0.174L0.187 0.174M0 -0.174L-0.021 -0.173L-0.042 -0.169L-0.062 -0.163L-0.081 -0.154L-0.099 -0.143L-0.116 -0.13L-0.13 -0.115L-0.143 -0.099L-0.154 -0.081L-0.163 -0.062L-0.169 -0.042L-0.173 -0.021L-0.174 0L-0.173 0.021L-0.169 0.042L-0.163 0.062L-0.154 0.081L-0.143 0.099L-0.13 0.115L-0.116 0.13L-0.099 0.143L-0.081 0.154L-0.062 0.163L-0.042 0.169L-0.021 0.173L0 0.174M0.187 -0.174L0 -0.174M1.812 0.236L1.812 -0.236M1.812 0.174L2 0.174M2 -0.174L1.812 -0.174M2 0.174L2.021 0.173L2.042 0.169L2.062 0.163L2.081 0.154L2.099 0.143L2.115 0.13L2.13 0.115L2.143 0.099L2.154 0.081L2.163 0.062L2.169 0.042L2.173 0.021L2.174 0L2.173 -0.021L2.169 -0.042L2.163 -0.062L2.154 -0.081L2.143 -0.099L2.13 -0.115L2.115 -0.13L2.099 -0.143L2.081 -0.154L2.062 -0.163L2.042 -0.169L2.021 -0.173L2 -0.174M2 0.073L2.013 0.072L2.026 0.068L2.038 0.062L2.049 0.054L2.058 0.044L2.065 0.033L2.07 0.02L2.073 0.007L2.073 -0.007L2.07 -0.02L2.065 -0.033L2.058 -0.044L2.049 -0.054L2.038 -0.062L2.026 -0.068L2.013 -0.072L2 -0.073L1.986 -0.072L1.973 -0.068L1.961 -0.062L1.951 -0.054L1.942 -0.044L1.935 -0.033L1.93 -0.02L1.927 -0.007L1.927 0.007L1.93 0.02L1.935 0.033L1.942 0.044L1.951 0.054L1.961 0.062L1.973 0.068L1.986 0.072L2 0.073M0.457 -0.165L0.457 -0.102M1.542 -0.165L0.457 -0.165M1.542 -0.165L1.542 -0.102M1.542 -0.102L0.457 -0.102M0.457 -0.102L0.445 -0.064L0.439 -0.025L0.437 0L0.439 0.026L0.443 0.052L0.449 0.077L0.457 0.102M1.542 0.102L1.554 0.065L1.561 0.025L1.562 0L1.561 -0.025L1.557 -0.051L1.551 -0.077L1.542 -0.102M1.542 0.102L0.457 0.102M0.457 -0.267L0.443 -0.243L0.439 -0.23L0.437 -0.218L0.439 -0.204L0.442 -0.192L0.449 -0.178L0.457 -0.165M0.457 0.102L0.457 0.166M0.457 0.166L0.443 0.19L0.439 0.202L0.437 0.215L0.439 0.229L0.442 0.241L0.449 0.255L0.457 0.268M0.457 0.268L0.457 0.27M0.457 -0.27L0.457 -0.267M1.542 -0.165L1.557 -0.19L1.561 -0.202L1.562 -0.215L1.561 -0.228L1.557 -0.241L1.551 -0.255L1.542 -0.267M1.542 -0.27L1.542 -0.267M1.542 0.268L1.542 0.27M1.542 0.268L1.557 0.243L1.561 0.231L1.562 0.218L1.561 0.205L1.557 0.192L1.551 0.178L1.542 0.166M1.542 0.102L1.542 0.166M1.542 0.166L0.457 0.166M1.542 -0.267L0.457 -0.267M1.542 0.268L0.457 0.268" },
+    "wcp-0051": { len: 1.0576, x0: -0.351, x1: 1.409, d: "M1.076 -0.472L1.082 -0.471L1.087 -0.469L1.092 -0.467L1.097 -0.463L1.1 -0.458L1.103 -0.453L1.104 -0.448L1.105 -0.442M1.105 -0.156L1.104 -0.151L1.103 -0.145L1.1 -0.14L1.097 -0.136L1.092 -0.133L1.087 -0.13L1.082 -0.128L1.076 -0.128M1.076 0.127L1.082 0.128L1.087 0.13L1.092 0.132L1.097 0.136L1.1 0.14L1.103 0.145L1.104 0.151L1.105 0.156M1.105 0.442L1.104 0.448L1.103 0.453L1.1 0.458L1.097 0.462L1.092 0.467L1.087 0.469L1.082 0.471L1.076 0.471M0.117 0.434L-0.023 0.434M-0.023 0.165L0.117 0.165M0.117 0.165L0.125 0.172M0.125 0.426L0.117 0.434M-0.023 0.434L-0.039 0.418M-0.039 0.181L-0.023 0.165M0.717 0.381L0.342 0.381M0.342 0.217L0.717 0.217M1.105 0.221L1.125 0.241M1.125 0.358L1.105 0.378M0.117 -0.435L0.125 -0.426M0.125 -0.173L0.117 -0.165M-0.023 -0.165L-0.039 -0.181M-0.039 -0.418L-0.023 -0.435M0.117 -0.165L-0.023 -0.165M-0.023 -0.435L0.117 -0.435M0.717 -0.217L0.342 -0.217M0.342 -0.381L0.717 -0.381M1.105 -0.378L1.125 -0.358M1.125 -0.241L1.105 -0.221M0.044 0L0.044 -0.01L0.042 -0.017M-0.009 -0.044L-0.013 -0.043L-0.022 -0.039L-0.031 -0.033L-0.038 -0.024L-0.042 -0.015L-0.044 -0.006L-0.044 0.005L-0.042 0.015L-0.038 0.024L-0.031 0.033L-0.022 0.039L-0.013 0.043L-0.009 0.044M0.042 0.017L0.044 0.01L0.044 0M-0.011 0.099L0.01 0.099M0.092 0.037L0.097 0.022L0.099 0.008L0.099 -0.008L0.097 -0.023L0.092 -0.037L0.092 -0.038M0.01 -0.099L-0.003 -0.099L-0.011 -0.099M-0.24 -0.099L-0.247 -0.099L-0.262 -0.099L-0.273 -0.097M-0.273 0.097L-0.262 0.099L-0.24 0.099M-0.206 0L-0.206 -0.01L-0.21 -0.02L-0.216 -0.028L-0.224 -0.036L-0.233 -0.041L-0.235 -0.042M-0.235 0.042L-0.233 0.041L-0.224 0.036L-0.216 0.028L-0.21 0.02L-0.206 0.01L-0.206 0M1.069 -0.099L1.062 -0.099L1.047 -0.099M0.966 -0.038L0.966 -0.037L0.962 -0.023L0.959 -0.008L0.959 0.008L0.962 0.022L0.966 0.037M1.047 0.099L1.069 0.099M1.297 0.099L1.319 0.099L1.331 0.097M1.331 -0.097L1.319 -0.099L1.304 -0.099L1.297 -0.099M1.263 0L1.265 0.01L1.268 0.02L1.274 0.028L1.281 0.036L1.29 0.041L1.292 0.042M1.292 -0.042L1.29 -0.041L1.281 -0.036L1.274 -0.028L1.268 -0.02L1.265 -0.01L1.263 0M1.013 0L1.015 0.01L1.017 0.017M1.067 0.044L1.071 0.043L1.081 0.039L1.089 0.033L1.095 0.024L1.1 0.015L1.102 0.005L1.102 -0.006L1.1 -0.015L1.095 -0.024L1.089 -0.033L1.081 -0.039L1.071 -0.043L1.067 -0.044M1.017 -0.017L1.015 -0.01L1.013 0M1.022 0L1.024 0.013L1.028 0.02L1.032 0.026L1.038 0.031L1.044 0.034L1.058 0.036L1.072 0.034L1.078 0.031L1.084 0.026L1.088 0.02L1.092 0.013L1.094 0M1.094 0L1.092 -0.013L1.088 -0.02L1.084 -0.026L1.078 -0.031L1.072 -0.034L1.058 -0.037L1.044 -0.034L1.038 -0.031L1.032 -0.026L1.028 -0.02L1.024 -0.013L1.022 0M1.102 0L1.101 -0.01L1.098 -0.02L1.092 -0.028L1.085 -0.035L1.076 -0.041L1.066 -0.044L1.056 -0.044L1.045 -0.042L1.036 -0.038L1.028 -0.032L1.021 -0.024L1.017 -0.015L1.014 -0.006L1.014 0.005L1.017 0.015L1.021 0.024L1.028 0.032L1.036 0.038L1.045 0.042L1.056 0.044L1.066 0.044L1.076 0.04L1.085 0.035L1.092 0.028L1.098 0.02L1.101 0.01L1.102 0M1.103 0L1.101 -0.01L1.098 -0.02L1.092 -0.028L1.085 -0.036L1.076 -0.041L1.067 -0.044M1.017 -0.017L1.016 -0.015L1.014 -0.006L1.014 0.005L1.016 0.015L1.017 0.017M1.067 0.044L1.076 0.041L1.085 0.036L1.092 0.028L1.098 0.02L1.101 0.01L1.103 0M0.036 0L0.034 -0.013L0.031 -0.02L0.026 -0.026L0.02 -0.031L0.013 -0.034L0 -0.037L-0.013 -0.034L-0.02 -0.031L-0.026 -0.026L-0.031 -0.02L-0.034 -0.013L-0.037 0M-0.037 0L-0.034 0.013L-0.031 0.02L-0.026 0.026L-0.02 0.031L-0.013 0.034L0 0.036L0.013 0.034L0.02 0.031L0.026 0.026L0.031 0.02L0.034 0.013L0.036 0M-0.044 0L-0.043 0.01L-0.04 0.02L-0.034 0.028L-0.026 0.035L-0.017 0.04L-0.008 0.044L0.003 0.044L0.012 0.042L0.022 0.038L0.031 0.032L0.037 0.024L0.042 0.015L0.044 0.005L0.044 -0.006L0.042 -0.015L0.037 -0.024L0.031 -0.032L0.022 -0.038L0.012 -0.042L0.003 -0.044L-0.008 -0.044L-0.017 -0.041L-0.026 -0.035L-0.034 -0.028L-0.04 -0.02L-0.043 -0.01L-0.044 0M-0.044 0L-0.044 0.01L-0.04 0.02L-0.034 0.028L-0.027 0.036L-0.018 0.041L-0.009 0.044M0.042 0.017L0.042 0.015L0.044 0.005L0.044 -0.006L0.042 -0.015L0.042 -0.017M-0.009 -0.044L-0.018 -0.041L-0.027 -0.036L-0.034 -0.028L-0.04 -0.02L-0.044 -0.01L-0.044 0M1.272 0L1.274 0.013L1.278 0.02L1.282 0.026L1.288 0.031L1.294 0.034L1.308 0.036L1.322 0.034L1.328 0.031L1.334 0.026L1.338 0.02L1.342 0.013L1.344 0M1.344 0L1.342 -0.013L1.338 -0.02L1.334 -0.026L1.328 -0.031L1.322 -0.034L1.308 -0.037L1.294 -0.034L1.288 -0.031L1.282 -0.026L1.278 -0.02L1.274 -0.013L1.272 0M1.352 0L1.351 -0.01L1.348 -0.02L1.342 -0.028L1.335 -0.035L1.326 -0.041L1.316 -0.044L1.306 -0.044L1.295 -0.042L1.286 -0.038L1.278 -0.032L1.271 -0.024L1.267 -0.015L1.264 -0.006L1.264 0.005L1.267 0.015L1.271 0.024L1.278 0.032L1.286 0.038L1.295 0.042L1.306 0.044L1.316 0.044L1.326 0.04L1.335 0.035L1.342 0.028L1.348 0.02L1.351 0.01L1.352 0M1.292 -0.042L1.285 -0.039L1.277 -0.033L1.271 -0.024L1.266 -0.015L1.264 -0.006L1.264 0.005L1.266 0.015L1.271 0.024L1.277 0.033L1.285 0.039L1.292 0.042M-0.214 0L-0.216 -0.013L-0.219 -0.02L-0.224 -0.026L-0.23 -0.031L-0.237 -0.034L-0.25 -0.037L-0.263 -0.034L-0.27 -0.031L-0.276 -0.026L-0.281 -0.02L-0.284 -0.013L-0.287 0M-0.287 0L-0.284 0.013L-0.281 0.02L-0.276 0.026L-0.27 0.031L-0.263 0.034L-0.25 0.036L-0.237 0.034L-0.23 0.031L-0.224 0.026L-0.219 0.02L-0.216 0.013L-0.214 0M-0.294 0L-0.293 0.01L-0.29 0.02L-0.284 0.028L-0.276 0.035L-0.267 0.04L-0.258 0.044L-0.247 0.044L-0.238 0.042L-0.228 0.038L-0.219 0.032L-0.213 0.024L-0.208 0.015L-0.206 0.005L-0.206 -0.006L-0.208 -0.015L-0.213 -0.024L-0.219 -0.032L-0.228 -0.038L-0.238 -0.042L-0.247 -0.044L-0.258 -0.044L-0.267 -0.041L-0.276 -0.035L-0.284 -0.028L-0.29 -0.02L-0.293 -0.01L-0.294 0M-0.235 0.042L-0.228 0.039L-0.219 0.033L-0.213 0.024L-0.208 0.015L-0.206 0.005L-0.206 -0.006L-0.208 -0.015L-0.213 -0.024L-0.219 -0.033L-0.228 -0.039L-0.235 -0.042M1.09 -0.049L1.084 -0.049L1.079 -0.048L1.074 -0.047L1.069 -0.045L1.067 -0.044M1.267 -0.049L1.09 -0.049M1.292 -0.042L1.292 -0.042L1.287 -0.045L1.282 -0.047L1.277 -0.048L1.272 -0.049L1.267 -0.049M1.267 0.049L1.272 0.049L1.277 0.048L1.282 0.047L1.287 0.044L1.292 0.042L1.292 0.042M1.067 0.044L1.069 0.044L1.074 0.047L1.079 0.048L1.084 0.049L1.09 0.049M1.017 0.017L1.016 0.017M0.964 0.038L1.016 0.017M0.964 0.038L0.962 0.039L0.961 0.04L0.96 0.041L0.959 0.043L0.959 0.048L0.96 0.049M0.96 0.049L0.967 0.06L0.976 0.069L0.985 0.078L0.996 0.085L1.008 0.091L1.019 0.095L1.032 0.097L1.045 0.099M1.31 0.099L1.045 0.099M1.045 -0.099L1.31 -0.099M1.045 -0.099L1.032 -0.098L1.019 -0.095L1.008 -0.091L0.996 -0.085L0.985 -0.078L0.976 -0.069L0.967 -0.06L0.96 -0.049M0.96 -0.049L0.959 -0.048L0.959 -0.043L0.96 -0.042L0.962 -0.039L0.964 -0.038M1.016 -0.017L0.964 -0.038M1.31 0.099L1.326 0.097L1.341 0.094L1.356 0.087L1.369 0.08L1.381 0.069L1.39 0.058L1.399 0.044L1.404 0.031L1.408 0.015L1.409 0L1.408 -0.015L1.404 -0.031L1.399 -0.044L1.39 -0.058L1.381 -0.069L1.369 -0.08L1.356 -0.088L1.341 -0.094L1.326 -0.097L1.31 -0.099M1.016 -0.017L1.017 -0.017M1.09 0.049L1.267 0.049M-0.031 0.049L-0.026 0.049L-0.021 0.048L-0.016 0.047L-0.011 0.044L-0.009 0.044M-0.208 0.049L-0.031 0.049M-0.235 0.042L-0.233 0.042L-0.229 0.044L-0.224 0.047L-0.219 0.048L-0.214 0.049L-0.208 0.049M0.041 -0.017L0.042 -0.017M0.098 -0.049L0.091 -0.06L0.083 -0.069L0.073 -0.078L0.062 -0.085L0.051 -0.091L0.038 -0.095L0.026 -0.098L0.013 -0.099M0.013 0.099L-0.253 0.099M0.013 0.099L0.026 0.097L0.038 0.095L0.051 0.091L0.062 0.085L0.073 0.078L0.083 0.069L0.091 0.06L0.098 0.049M0.098 0.049L0.099 0.048L0.099 0.046L0.099 0.044L0.099 0.043L0.098 0.041L0.097 0.04L0.096 0.039L0.094 0.038M-0.253 -0.099L0.013 -0.099M0.042 0.017L0.094 0.038M0.042 0.017L0.041 0.017M-0.008 -0.044L-0.011 -0.045L-0.016 -0.047L-0.021 -0.048L-0.026 -0.049L-0.031 -0.049M0.094 -0.038L0.042 -0.017M-0.253 -0.099L-0.268 -0.097L-0.283 -0.094L-0.297 -0.088L-0.31 -0.08L-0.322 -0.069L-0.333 -0.058L-0.34 -0.044L-0.347 -0.031L-0.35 -0.015L-0.351 0L-0.35 0.015L-0.347 0.031L-0.34 0.044L-0.333 0.058L-0.322 0.069L-0.31 0.08L-0.297 0.087L-0.283 0.094L-0.268 0.097L-0.253 0.099M-0.208 -0.049L-0.214 -0.049L-0.219 -0.048L-0.224 -0.047L-0.229 -0.045L-0.233 -0.042L-0.235 -0.042M0.094 -0.038L0.096 -0.039L0.097 -0.04L0.098 -0.042L0.099 -0.043L0.099 -0.044L0.099 -0.047L0.099 -0.048L0.098 -0.049M-0.031 -0.049L-0.208 -0.049M0.933 -0.213L0.936 -0.253L0.945 -0.299M0.945 -0.128L0.936 -0.17L0.933 -0.213M1.064 -0.128L0.945 -0.128M1.076 -0.213L1.074 -0.174L1.064 -0.128M1.064 -0.299L1.073 -0.257L1.076 -0.213M1.064 -0.299L0.945 -0.299M1.105 -0.176L1.105 -0.156M1.105 -0.442L1.105 -0.176M1.076 -0.472L1.076 -0.385M1.076 -0.385L1.076 -0.213M1.076 -0.213L1.076 -0.128M0.945 -0.299L0.94 -0.321L0.935 -0.353L0.933 -0.385M0.933 -0.368L0.933 -0.231M1.076 -0.385L1.074 -0.353L1.069 -0.321L1.064 -0.299M0.933 -0.385L0.934 -0.411L0.938 -0.437L0.945 -0.472M1.064 -0.472L1.072 -0.437L1.075 -0.411L1.076 -0.385M1.064 -0.472L0.945 -0.472M0.933 -0.128L0.945 -0.128M1.064 -0.128L1.076 -0.128M1.076 -0.472L1.064 -0.472M0.945 -0.472L0.933 -0.472M0.933 0.385L0.936 0.345L0.945 0.299M0.945 0.471L0.936 0.428L0.933 0.385M1.064 0.471L0.945 0.471M1.076 0.385L1.074 0.425L1.064 0.471M1.064 0.299L1.073 0.342L1.076 0.385M1.064 0.299L0.945 0.299M1.105 0.424L1.105 0.442M1.105 0.156L1.105 0.424M1.076 0.127L1.076 0.213M1.076 0.213L1.076 0.385M1.076 0.385L1.076 0.471M0.945 0.299L0.94 0.278L0.935 0.246L0.933 0.213M0.933 0.231L0.933 0.368M1.076 0.213L1.074 0.246L1.069 0.278L1.064 0.299M0.933 0.213L0.934 0.188L0.938 0.162L0.945 0.127M1.064 0.127L1.072 0.162L1.075 0.188L1.076 0.213M1.064 0.127L0.945 0.127M1.064 0.471L1.076 0.471M0.933 0.471L0.945 0.471M1.076 0.127L1.064 0.127M0.945 0.127L0.933 0.127M-0.023 0.434L-0.023 0.165M0.117 0.165L0.117 0.434M-0.039 0.181L-0.039 0.418M1.125 0.326L1.125 0.241M1.125 0.358L1.125 0.326M0.117 -0.435L0.117 -0.165M-0.039 -0.418L-0.039 -0.181M-0.023 -0.165L-0.023 -0.435M1.125 -0.273L1.125 -0.358M1.125 -0.241L1.125 -0.273M0 -0.474L0.125 -0.474M0.125 -0.513L0 -0.513M0 -0.513L0 -0.474M0 0.661L0.342 0.661M0.342 0.543L0 0.543M0 0.543L0 0.661M0.342 0.661L0.342 0.543M0 -0.543L0.342 -0.543M0.342 -0.661L0 -0.661M0 -0.661L0 -0.543M0.342 -0.543L0.342 -0.661M0 0.513L0.125 0.513M0.125 0.474L0 0.474M0 0.474L0 0.513M0.125 0.513L0.125 -0.513M0 -0.543L0 -0.513M0 0.513L0 0.543M0.342 0.543L0.342 -0.543M0.125 0.125L0 0.125M0 0.125L-0.017 0.124L-0.034 0.12L-0.05 0.115L-0.065 0.107L-0.077 0.099M-0.077 -0.099L-0.065 -0.107L-0.05 -0.115L-0.034 -0.12L-0.017 -0.124L0 -0.125M0 -0.125L0.125 -0.125M1.058 0.543L0.717 0.543M0.717 0.661L1.058 0.661M1.058 0.661L1.058 0.543M0.717 0.543L0.717 0.661M1.058 0.543L1.058 0.513M0.933 0.513L1.058 0.513M0.933 -0.513L0.933 -0.368M0.933 -0.231L0.933 0.231M0.933 0.368L0.933 0.513M1.058 -0.513L0.933 -0.513M1.058 -0.513L1.058 -0.543M0.717 -0.543L1.058 -0.543M0.717 -0.543L0.717 0.543M0.933 -0.474L1.058 -0.474M1.058 -0.474L1.058 -0.513M1.058 0.474L0.933 0.474M1.058 0.513L1.058 0.474M1.058 -0.661L0.717 -0.661M1.058 -0.543L1.058 -0.661M0.717 -0.661L0.717 -0.543M1.058 0.125L0.933 0.125M0.933 -0.125L1.058 -0.125M1.058 -0.125L1.075 -0.124L1.092 -0.12L1.108 -0.115L1.123 -0.107L1.135 -0.099M1.135 0.099L1.123 0.107L1.108 0.115L1.092 0.12L1.075 0.124L1.058 0.125" },
+    "wcp-0052": { len: 1.6694, x0: -0.527, x1: 2.197, d: "M0.179 -0.221L0.017 -0.221M0.017 -0.533L0.179 -0.533M0.179 -0.533L0.188 -0.524M0.188 -0.231L0.179 -0.221M0.017 -0.221L-0.002 -0.24M-0.002 -0.514L0.017 -0.533M1.665 -0.282L1.654 -0.282M1.147 -0.282L0.522 -0.282M0.522 -0.472L1.147 -0.472M1.654 -0.472L1.665 -0.472M1.665 -0.472L1.688 -0.449M1.688 -0.306L1.665 -0.282M0.179 0.534L0.017 0.534M0.017 0.222L0.179 0.222M0.179 0.222L0.188 0.231M0.188 0.524L0.179 0.534M0.017 0.534L-0.002 0.515M-0.002 0.241L0.017 0.222M1.665 0.473L1.654 0.473M1.147 0.473L0.522 0.473M0.522 0.283L1.147 0.283M1.654 0.283L1.665 0.283M1.665 0.283L1.688 0.306M1.688 0.449L1.665 0.473M1.625 0.191L1.631 0.191L1.636 0.193L1.642 0.195L1.649 0.203L1.652 0.208L1.654 0.214L1.654 0.219M1.654 0.537L1.654 0.543L1.652 0.548L1.649 0.553L1.645 0.557L1.642 0.56L1.636 0.563L1.631 0.565L1.625 0.566M1.625 -0.565L1.631 -0.564L1.642 -0.56L1.645 -0.556L1.649 -0.552L1.652 -0.547L1.654 -0.542L1.654 -0.536M1.654 -0.219L1.654 -0.213L1.652 -0.207L1.649 -0.203L1.645 -0.198L1.642 -0.194L1.636 -0.192L1.631 -0.19L1.625 -0.19M1.772 -0.079L1.762 -0.079L1.757 -0.078L1.753 -0.076L1.749 -0.074L1.744 -0.071L1.741 -0.069L1.737 -0.066M2.012 -0.062L1.772 -0.079M1.772 0.08L2.012 0.063M1.737 0.067L1.741 0.069L1.744 0.072L1.749 0.075L1.753 0.077L1.757 0.078L1.762 0.079L1.768 0.08L1.772 0.08M1.72 0.049L1.737 0.067M1.588 0.08L1.619 0.049M1.604 0.119L1.596 0.118L1.591 0.115L1.586 0.11L1.582 0.105L1.581 0.098L1.581 0.092L1.583 0.085L1.588 0.08M2.044 0.119L1.604 0.119M2.044 -0.118L2.064 -0.116L2.083 -0.111L2.101 -0.104L2.117 -0.093L2.131 -0.08L2.144 -0.064L2.153 -0.047L2.159 -0.029L2.162 -0.009L2.162 0.01L2.159 0.03L2.153 0.048L2.144 0.065L2.131 0.081L2.117 0.094L2.101 0.104L2.083 0.112L2.064 0.117L2.044 0.119M1.588 -0.079L1.583 -0.084L1.581 -0.091L1.581 -0.097L1.582 -0.104L1.586 -0.109L1.591 -0.114L1.596 -0.117L1.604 -0.118M1.619 -0.049L1.588 -0.079M1.737 -0.066L1.72 -0.049M1.604 -0.118L2.044 -0.118M-0.102 0.08L-0.097 0.08L-0.088 0.078L-0.083 0.077L-0.079 0.075L-0.075 0.072L-0.07 0.069L-0.067 0.067M-0.102 -0.079L-0.342 -0.062M-0.067 -0.066L-0.07 -0.069L-0.075 -0.071L-0.079 -0.074L-0.088 -0.078L-0.093 -0.079L-0.102 -0.079M-0.05 -0.049L-0.067 -0.066M0.082 -0.079L0.051 -0.049M0.067 -0.118L0.073 -0.117L0.08 -0.114L0.084 -0.109L0.088 -0.104L0.089 -0.097L0.089 -0.091L0.086 -0.084L0.082 -0.079M-0.375 -0.118L0.067 -0.118M-0.375 0.119L-0.394 0.117L-0.413 0.112L-0.431 0.104L-0.447 0.094L-0.461 0.081L-0.473 0.065L-0.482 0.048L-0.489 0.03L-0.493 0.01L-0.493 -0.009L-0.489 -0.029L-0.482 -0.047L-0.473 -0.064L-0.461 -0.08L-0.447 -0.093L-0.431 -0.104L-0.413 -0.111L-0.394 -0.116L-0.375 -0.118M0.067 0.119L-0.375 0.119M0.051 0.049L0.082 0.08M-0.067 0.067L-0.05 0.049M0.082 0.08L0.086 0.085L0.089 0.092L0.089 0.098L0.088 0.105L0.084 0.11L0.08 0.115L0.073 0.118L0.067 0.119M-0.342 0.063L-0.102 0.08M1.74 0L1.739 0.016L1.733 0.03L1.726 0.043L1.716 0.054L1.703 0.063L1.689 0.069L1.673 0.07L1.658 0.07L1.644 0.066L1.631 0.058L1.619 0.049L1.609 0.037L1.603 0.023L1.6 0.008L1.6 -0.007L1.603 -0.022L1.609 -0.036L1.619 -0.048L1.631 -0.058L1.644 -0.065L1.658 -0.069L1.673 -0.07L1.689 -0.068L1.703 -0.062L1.716 -0.054L1.726 -0.043L1.733 -0.03L1.739 -0.015L1.74 0M2.115 0L2.114 0.016L2.108 0.03L2.101 0.043L2.091 0.054L2.078 0.063L2.064 0.069L2.048 0.07L2.033 0.07L2.019 0.066L2.006 0.058L1.994 0.049L1.984 0.037L1.978 0.023L1.975 0.008L1.975 -0.007L1.978 -0.022L1.984 -0.036L1.994 -0.048L2.006 -0.058L2.019 -0.065L2.033 -0.069L2.048 -0.07L2.064 -0.068L2.078 -0.062L2.091 -0.054L2.101 -0.043L2.108 -0.03L2.114 -0.015L2.115 0M2.002 0.147L1.967 0.138L1.931 0.131L1.894 0.128L1.857 0.126L1.82 0.128L1.784 0.131L1.748 0.138L1.713 0.147M1.713 0.147L1.691 0.152L1.668 0.153L1.645 0.151L1.623 0.145L1.602 0.137L1.582 0.126L1.565 0.112L1.55 0.095L1.537 0.076L1.528 0.056L1.52 0.034L1.518 0.012L1.518 -0.011L1.52 -0.033L1.528 -0.055L1.537 -0.075L1.55 -0.094L1.565 -0.111L1.582 -0.125L1.602 -0.137L1.623 -0.145L1.645 -0.15L1.668 -0.152L1.691 -0.151L1.713 -0.146M2.002 -0.146L2.024 -0.151L2.046 -0.152L2.069 -0.15L2.091 -0.145L2.112 -0.137L2.131 -0.125L2.149 -0.111L2.165 -0.094L2.177 -0.075L2.187 -0.055L2.194 -0.033L2.197 -0.011L2.197 0.012L2.194 0.034L2.187 0.056L2.177 0.076L2.165 0.095L2.149 0.112L2.131 0.126L2.112 0.137L2.091 0.145L2.069 0.151L2.046 0.153L2.024 0.152L2.002 0.147M1.713 -0.146L1.748 -0.137L1.784 -0.131L1.82 -0.127L1.857 -0.125L1.894 -0.127L1.931 -0.131L1.967 -0.137L2.002 -0.146M-0.445 0L-0.444 -0.015L-0.439 -0.03L-0.431 -0.043L-0.42 -0.054L-0.407 -0.062L-0.394 -0.068L-0.379 -0.07L-0.363 -0.069L-0.348 -0.065L-0.335 -0.058L-0.323 -0.048L-0.314 -0.036L-0.307 -0.022L-0.305 -0.007L-0.305 0.008L-0.307 0.023L-0.314 0.037L-0.323 0.049L-0.335 0.058L-0.348 0.066L-0.363 0.07L-0.379 0.07L-0.394 0.069L-0.407 0.063L-0.42 0.054L-0.431 0.043L-0.439 0.03L-0.444 0.016L-0.445 0M-0.07 0L-0.069 -0.015L-0.064 -0.03L-0.056 -0.043L-0.045 -0.054L-0.032 -0.062L-0.019 -0.068L-0.004 -0.07L0.012 -0.069L0.027 -0.065L0.04 -0.058L0.052 -0.048L0.061 -0.036L0.068 -0.022L0.07 -0.007L0.07 0.008L0.068 0.023L0.061 0.037L0.052 0.049L0.04 0.058L0.027 0.066L0.012 0.07L-0.004 0.07L-0.019 0.069L-0.032 0.063L-0.045 0.054L-0.056 0.043L-0.064 0.03L-0.069 0.016L-0.07 0M-0.331 -0.146L-0.296 -0.137L-0.26 -0.131L-0.224 -0.127L-0.187 -0.125L-0.151 -0.127L-0.114 -0.131L-0.078 -0.137L-0.043 -0.146M-0.043 -0.146L-0.02 -0.151L0.002 -0.152L0.025 -0.15L0.047 -0.145L0.068 -0.137L0.087 -0.125L0.105 -0.111L0.12 -0.094L0.133 -0.075L0.143 -0.055L0.149 -0.033L0.153 -0.011L0.153 0.012L0.149 0.034L0.143 0.056L0.133 0.076L0.12 0.095L0.105 0.112L0.087 0.126L0.068 0.137L0.047 0.145L0.025 0.151L0.002 0.153L-0.02 0.152L-0.043 0.147M-0.043 0.147L-0.078 0.138L-0.114 0.131L-0.151 0.128L-0.187 0.126L-0.224 0.128L-0.26 0.131L-0.296 0.138L-0.331 0.147M-0.331 0.147L-0.354 0.152L-0.377 0.153L-0.399 0.151L-0.421 0.145L-0.442 0.137L-0.462 0.126L-0.48 0.112L-0.494 0.095L-0.507 0.076L-0.517 0.056L-0.523 0.034L-0.527 0.012L-0.527 -0.011L-0.523 -0.033L-0.517 -0.055L-0.507 -0.075L-0.494 -0.094L-0.48 -0.111L-0.462 -0.125L-0.442 -0.137L-0.421 -0.145L-0.399 -0.15L-0.377 -0.152L-0.354 -0.151L-0.331 -0.146M0.017 -0.221L0.017 -0.533M0.179 -0.533L0.179 -0.221M-0.002 -0.514L-0.002 -0.24M1.665 -0.304L1.665 -0.282M1.665 -0.472L1.665 -0.304M1.688 -0.321L1.688 -0.449M1.688 -0.306L1.688 -0.321M0.017 0.534L0.017 0.222M0.179 0.222L0.179 0.534M-0.002 0.241L-0.002 0.515M1.665 0.452L1.665 0.473M1.665 0.283L1.665 0.452M1.688 0.433L1.688 0.306M1.688 0.449L1.688 0.433M1.482 0.471L1.485 0.428L1.495 0.378M1.495 0.566L1.486 0.519L1.482 0.471M1.612 0.566L1.495 0.566M1.625 0.471L1.622 0.515L1.612 0.566M1.612 0.378L1.621 0.424L1.625 0.471M1.612 0.378L1.495 0.378M1.625 0.284L1.622 0.328L1.612 0.378M1.625 0.284L1.625 0.471M1.482 0.284L1.485 0.241L1.495 0.191M1.495 0.378L1.486 0.331L1.482 0.284M1.612 0.191L1.621 0.237L1.625 0.284M1.612 0.191L1.495 0.191M1.654 0.378L1.654 0.537M1.654 0.219L1.654 0.378M1.625 0.191L1.625 0.284M1.625 0.471L1.625 0.566M1.482 0.566L1.495 0.566M1.495 0.191L1.482 0.191M1.612 0.566L1.625 0.566M1.625 0.191L1.612 0.191M1.482 -0.471L1.485 -0.515L1.495 -0.565M1.495 -0.377L1.486 -0.423L1.482 -0.471M1.612 -0.377L1.495 -0.377M1.625 -0.471L1.622 -0.427L1.612 -0.377M1.612 -0.565L1.621 -0.519L1.625 -0.471M1.612 -0.565L1.495 -0.565M1.482 -0.283L1.485 -0.327L1.495 -0.377M1.495 -0.19L1.486 -0.236L1.482 -0.283M1.612 -0.19L1.495 -0.19M1.625 -0.283L1.622 -0.24L1.612 -0.19M1.612 -0.377L1.621 -0.331L1.625 -0.283M1.625 -0.471L1.625 -0.283M1.654 -0.377L1.654 -0.219M1.654 -0.536L1.654 -0.377M1.625 -0.565L1.625 -0.471M1.625 -0.283L1.625 -0.19M1.495 -0.565L1.482 -0.565M1.482 -0.19L1.495 -0.19M1.625 -0.565L1.612 -0.565M1.612 -0.19L1.625 -0.19M0.063 0.607L0.188 0.607M0.188 0.568L0.063 0.568M0.063 0.568L0.063 0.607M0.063 0.756L0.522 0.756M0.522 0.756L0.522 0.637M0.522 0.637L0.063 0.637M0.063 0.637L0.063 0.756M0.522 0.637L0.522 -0.636M0.063 -0.636L0.522 -0.636M0.063 -0.636L0.063 -0.606M0.188 -0.606L0.063 -0.606M0.188 0.607L0.188 -0.606M0.063 0.607L0.063 0.637M0.522 -0.755L0.063 -0.755M0.063 -0.755L0.063 -0.636M0.522 -0.636L0.522 -0.755M0.063 -0.567L0.188 -0.567M0.063 -0.606L0.063 -0.567M0.188 0.188L0 0.188M0 0.188L-0.024 0.186L-0.048 0.181L-0.071 0.173L-0.094 0.163L-0.114 0.149L-0.132 0.133L-0.136 0.129M-0.136 -0.128L-0.132 -0.132L-0.114 -0.148L-0.094 -0.162L-0.071 -0.173L-0.048 -0.181L-0.024 -0.185L0 -0.187M0 -0.187L0.188 -0.187M1.607 -0.755L1.147 -0.755M1.147 -0.755L1.147 -0.636M1.147 -0.636L1.607 -0.636M1.607 -0.636L1.607 -0.755M1.607 0.637L1.147 0.637M1.147 0.637L1.147 0.756M1.147 0.756L1.607 0.756M1.607 0.756L1.607 0.637M1.147 -0.636L1.147 0.637M1.607 0.637L1.607 0.607M1.482 0.607L1.607 0.607M1.482 -0.606L1.482 0.607M1.607 -0.606L1.482 -0.606M1.607 -0.606L1.607 -0.636M1.607 0.568L1.482 0.568M1.607 0.607L1.607 0.568M1.482 -0.567L1.607 -0.567M1.607 -0.567L1.607 -0.606M1.669 0.188L1.694 0.186L1.719 0.181L1.742 0.173L1.763 0.163L1.784 0.149L1.802 0.133L1.806 0.129M1.806 -0.128L1.802 -0.132L1.784 -0.148L1.763 -0.162L1.742 -0.173L1.719 -0.181L1.694 -0.185L1.669 -0.187M1.669 -0.187L1.482 -0.187M1.482 0.188L1.669 0.188" }
+  };
+
+  // ---------- helpers ----------
+  function chainKey() { return radio("chain") || "25"; }
+  function pitchNow() { return CHAIN_TYPES[chainKey()].pitch; }
+  // All math is in inches. Lengths show in whichever unit the in / mm switch is set to.
+  function both(inch) { return radio("unit") === "mm" ? f(inch * 25.4, 2) + " mm" : f(inch, 3) + " in"; }
+  function signed(inch) {
+    var mm = radio("unit") === "mm", v = mm ? inch * 25.4 : inch, u = mm ? " mm" : " in";
+    if (Math.abs(v) < 0.0005) return "0" + u;
+    return (v > 0 ? "+" : "−") + f(Math.abs(v), mm ? 2 : 3) + u;
+  }
+  function linkWord(n) { return n + (n === 1 ? " Link" : " Links"); }
+  function pitchDia(P, N) { return P / Math.sin(Math.PI / N); }
+  // Outside diameter of a standard roller chain sprocket.
+  function odRadius(P, N) { return P * (0.6 + 1 / Math.tan(Math.PI / N)) / 2; }
+  // Chain length in links for center distance C (inches), standard open-chain formula.
+  function linksFor(C, P, N1, N2) {
+    var d = (N2 - N1) / (2 * Math.PI);
+    return 2 * C / P + (N1 + N2) / 2 + d * d * P / C;
+  }
+  // Center distance (inches) for L links, or null if the chain is too short to wrap both sprockets.
+  function centerFor(L, P, N1, N2) {
+    var s = L - (N1 + N2) / 2, d = (N2 - N1) / (2 * Math.PI), disc = s * s - 8 * d * d;
+    if (disc < 0 || s <= 0) return null;
+    return P * (s + Math.sqrt(disc)) / 4;
+  }
+  // Wrap on the small sprocket in degrees, and how many of its teeth the chain touches.
+  function wrap(C, P, N1, N2) {
+    var R1 = pitchDia(P, N1) / 2, R2 = pitchDia(P, N2) / 2;
+    var x = Math.min(1, Math.abs(R2 - R1) / C);
+    var deg = 180 - 2 * Math.asin(x) * 180 / Math.PI;
+    return { deg: deg, teeth: deg / 360 * Math.min(N1, N2) };
+  }
+  // Gap between the two sprocket outside diameters. Negative means they overlap.
+  function gapBetween(C, P, N1, N2) { return C - odRadius(P, N1) - odRadius(P, N2); }
+  var MIN_GAP = 0.125;
+
+  function setStatus(bad, big, sub, label) {
+    var el = $("status");
+    el.className = "hero" + (bad ? " bad" : "");
+    el.innerHTML = (label ? '<div class="lab">' + esc(label) + "</div>" : "") + '<div class="big">' + esc(big) + "</div>" + (sub ? '<div class="sub">' + esc(sub) + "</div>" : "");
+  }
+  function tile(value, label, sub, hl, extra) {
+    return '<div class="tile' + (hl ? " hl" : "") + '"><div class="count">' + esc(value) + '</div><div class="size">' + esc(label) + '</div>' + (sub ? '<div class="pn">' + esc(sub) + "</div>" : "") + (extra || "") + "</div>";
+  }
+  function row(label, text, warn) { return "<tr><td>" + esc(label) + '</td><td class="num' + (warn ? " warn" : "") + '">' + esc(text) + "</td></tr>"; }
+
+  // ---------- saved parts and cart ----------
+  function saveBtn(act, attrs, label) { return '<button type="button" class="btn save" data-act="' + act + '" ' + (attrs || "") + ">" + label + "</button>"; }
+  function chainItem(n, inline) {
+    var k = chainKey(), t = CHAIN_TYPES[k], c = CHAINS[k], ten = Math.max(1, Math.ceil(n * t.pitch / LENGTH_IN - 1e-9));
+    return { key: "chain:" + k, mode: "max", name: c.name, sub: ten + " x 10 ft length, cut to " + n + " links. " + (inline ? "Ends attach to the tensioner." : "Master link included."), qty: ten, pn: c.pn, id: c.id, url: c.url };
+  }
+  // ---------- tensioner ----------
+  var tensSig = "", hideHalf = false, halfWas = false;
+  function curTens() {
+    var v = radio("tens") || "";
+    return TENSIONERS.filter(function (t) { return t.key === v; })[0] || null;
+  }
+  function renderTens() {
+    var k = chainKey();
+    if (tensSig !== k) {
+      var keep = radio("tens") || "";
+      if (!TENSIONERS.some(function (t) { return t.key === keep && t.chains.indexOf(k) >= 0; })) keep = "";
+      function btn(v, name, sub) {
+        var id = "tn-" + (v || "none");
+        return '<input type="radio" name="tens" id="' + id + '" value="' + v + '"' + (v === keep ? " checked" : "") + '><label for="' + id + '">' + esc(name) + (sub ? '<span class="hint">' + esc(sub) + "</span>" : "") + "</label>";
+      }
+      $("tens").innerHTML = btn("", "None", "") + TENSIONERS.filter(function (t) { return t.chains.indexOf(k) >= 0; }).map(function (t) {
+        return btn(t.key, t.short, "");
+      }).join("");
+      tensSig = k;
+    }
+    var T = curTens(), h = "";
+    if (!T) h = "Optional. Pick a tensioner to include it in the chain length and see the adjustment range.";
+    else if (T.kind === "cam") h = "A cam slides a sprocket to take up slack, so it adjusts the center distance instead of the chain length.";
+    else h = "The chain ends attach to this tensioner, so it counts toward the loop length. WCP's product page notes this style is not meant for a continuous sprocket loop, so check it before using it here.";
+    $("tensHint").textContent = h;
+    $("tensSave").hidden = !T;
+  }
+  function tensItem() {
+    var T = curTens();
+    if (!T) return null;
+    return { key: "tens:" + T.key, mode: "max", name: T.name, sub: "Chain tensioner", qty: 1, pn: T.pn, id: T.id, url: T.url };
+  }
+  function halfItem() {
+    var k = chainKey(), h = HALF[k];
+    return { key: "half:" + k, mode: "max", name: h.name, sub: "Offset link for an odd link count", qty: 1, pn: h.pn, id: h.id, url: h.url };
+  }
+  function addSaved(it) {
+    var hit = saved.filter(function (s) { return s.key === it.key; })[0];
+    if (hit) {
+      if (it.mode === "inc") hit.qty += it.qty;
+      else { hit.qty = Math.max(hit.qty, it.qty); hit.sub = it.sub; }
+    } else saved.push({ key: it.key, name: it.name, sub: it.sub, qty: it.qty, pn: it.pn, id: it.id, url: it.url });
+    renderSaved();
+  }
+  function cartLink() {
+    var q = [];
+    saved.forEach(function (it) {
+      if (it.id) { var n = q.length / 2; q.push("items[" + n + "][id]=" + it.id, "items[" + n + "][quantity]=" + it.qty); }
+    });
+    return CART_URL + "?" + q.join("&") + "&return_to=/cart";
+  }
+  function renderSaved() {
+    var linked = saved.filter(function (s) { return s.id; }), loose = saved.filter(function (s) { return !s.id; });
+    $("addAll").href = linked.length ? cartLink() : "https://wcproducts.com/cart/";
+    $("addAll").classList.toggle("off", linked.length === 0);
+    $("addAll").setAttribute("aria-disabled", linked.length === 0 ? "true" : "false");
+    $("clearAll").style.visibility = saved.length ? "visible" : "hidden";
+    if (!saved.length) {
+      $("savedList").innerHTML = '<li class="none">Nothing saved yet. Use Save on a chain option, a half link, a tensioner or a sprocket.</li>';
+    } else {
+      $("savedList").innerHTML = saved.map(function (it, i) {
+        return '<li class="srow" data-i="' + i + '"><div class="meta"><strong>' + esc(it.name) + "</strong><span>" + esc(it.sub) + (it.pn && !/^217-/.test(it.pn) ? " | " + esc(it.pn) : "") + '</span></div>' +
+          '<div class="qty"><button type="button" data-act="dec" aria-label="Fewer">&minus;</button><span>' + it.qty + '</span><button type="button" data-act="inc" aria-label="More">+</button></div>' +
+          '<button type="button" class="rm" data-act="rm">Remove</button></li>';
+      }).join("");
+    }
+    if (!saved.length) $("cartHint").textContent = "Opens wcproducts.com in a new tab with every saved part in your cart.";
+    else if (!loose.length) $("cartHint").textContent = "Opens wcproducts.com in a new tab with every saved part in your cart.";
+    else {
+      $("cartHint").innerHTML = (linked.length ? "The cart button adds " + linked.length + " of " + saved.length + " saved parts. " : "") +
+        "These parts are not in the cart link yet, so open them on wcproducts.com: " +
+        loose.map(function (s) { return '<a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.name) + "</a>"; }).join(", ") + ".";
+    }
+  }
+  $("savedList").addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("[data-act]") : null;
+    if (!b) return;
+    var i = parseInt(b.closest("li").getAttribute("data-i"), 10), act = b.getAttribute("data-act");
+    if (act === "rm" || (act === "dec" && saved[i].qty <= 1)) saved.splice(i, 1);
+    else saved[i].qty += act === "inc" ? 1 : -1;
+    renderSaved();
+  });
+  $("clearAll").addEventListener("click", function () { saved = []; renderSaved(); });
+
+  function onSave(e) {
+    var b = e.target.closest ? e.target.closest("[data-act]") : null;
+    if (!b) return;
+    var act = b.getAttribute("data-act");
+    if (act === "chain") addSaved(chainItem(parseInt(b.getAttribute("data-links"), 10), b.getAttribute("data-inline") === "1"));
+    else if (act === "half") addSaved(halfItem());
+    else if (act === "tens") { var ti = tensItem(); if (ti) addSaved(ti); }
+  }
+  $("optTiles").addEventListener("click", onSave);
+  $("actions").addEventListener("click", onSave);
+  $("tensSave").addEventListener("click", onSave);
+
+  // ---------- sprocket picker ----------
+  function renderSprockets() {
+    var body = $("sprBody");
+    if (!cur) { sprSig = ""; body.innerHTML = '<div class="empty">Enter valid tooth counts to see matching sprockets.</div>'; return; }
+    var k = chainKey(), fam = CHAIN_TYPES[k].spr;
+    var sig = fam + "|" + cur.N1 + "|" + cur.N2;
+    if (sig === sprSig) return;
+    sprSig = sig;
+    var html = "";
+    [1, 2].forEach(function (w) {
+      var N = w === 1 ? cur.N1 : cur.N2;
+      var list = SPROCKETS.filter(function (s) { return s.chain === fam && s.teeth === N; });
+      html += '<div class="sp-row"><div class="who"><strong>Sprocket ' + w + '</strong><span>' + N + " teeth, " + (fam === "25" ? "#25 / #25H" : "#35") + " chain</span></div>";
+      if (list.length) {
+        var inStock = list.filter(function (s) { return s.stock; }).length;
+        if (inStock) {
+          html += '<select class="select" id="sel' + w + '" aria-label="Sprocket ' + w + ' style and bore">' + list.map(function (s, i) {
+            return '<option value="' + i + '"' + (s.stock ? "" : " disabled") + ">" + esc(s.style + " | " + s.bore + (s.stock ? "" : " | Out of stock")) + "</option>";
+          }).join("") + '</select><button type="button" class="btn" data-which="' + w + '">Save Sprocket</button>';
+        } else {
+          html += '<div class="hint sp-none">The ' + N + ' tooth sprocket is out of stock right now. <a href="' + list[0].url + '" target="_blank" rel="noopener">View on wcproducts.com</a></div>';
+        }
+      } else {
+        html += '<div class="hint sp-none">No ' + N + ' tooth sprocket is listed here yet. <a href="' + SPROCKET_PAGE[fam] + '" target="_blank" rel="noopener">Browse WCP sprockets</a></div>';
+      }
+      html += "</div>";
+    });
+    body.innerHTML = html;
+  }
+  $("sprBody").addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("button[data-which]") : null;
+    if (!b || !cur) return;
+    var w = parseInt(b.getAttribute("data-which"), 10), N = w === 1 ? cur.N1 : cur.N2, fam = CHAIN_TYPES[chainKey()].spr;
+    var list = SPROCKETS.filter(function (s) { return s.chain === fam && s.teeth === N; });
+    var s = list[parseInt($("sel" + w).value, 10)];
+    if (!s || !s.stock) return;
+    addSaved({ key: "spr:" + s.pn, mode: "inc", name: s.teeth + "T " + s.style + " Sprocket", sub: s.bore + " | " + (fam === "25" ? "#25" : "#35") + " chain", qty: 1, pn: s.pn, id: s.id, url: s.url });
+  });
+
+  // ---------- top view drawing ----------
+  function drawDrive() {
+    var svg = $("draw");
+    if (!cur) { svg.innerHTML = ""; svg.hidden = true; $("drawEmpty").hidden = false; $("drawNote").textContent = ""; return; }
+    svg.hidden = false; $("drawEmpty").hidden = true;
+    var C = cur.C, P = cur.P, N1 = cur.N1, N2 = cur.N2, links = cur.links;
+    var R1 = pitchDia(P, N1) / 2, R2 = pitchDia(P, N2) / 2, ro1 = odRadius(P, N1), ro2 = odRadius(P, N2);
+    var vw = 640, pad = 36, labelH = 26, maxro = Math.max(ro1, ro2), total = C + ro1 + ro2;
+    var sc = Math.min((vw - 2 * pad) / total, (380 - 2 * pad - labelH) / (2 * maxro));
+    var vh = Math.max(170, Math.min(380, 2 * maxro * sc + 2 * pad + labelH));
+    var cy = (vh - labelH) / 2, drawW = total * sc, cx1 = (vw - drawW) / 2 + ro1 * sc, cx2 = cx1 + C * sc;
+    var r1 = R1 * sc, r2 = R2 * sc, px = P * sc;
+    var gap = gapBetween(C, P, N1, N2), tight = gap < MIN_GAP;
+    svg.setAttribute("viewBox", "0 0 " + vw + " " + f(vh, 0));
+
+    // open belt tangents, chain runs clockwise
+    var s = (R1 - R2) / C, c = Math.sqrt(1 - s * s);
+    var p1x = cx1 + r1 * s, p1y = cy - r1 * c, p2x = cx2 + r2 * s, p2y = cy - r2 * c;
+    var q2y = cy + r2 * c, q1y = cy + r1 * c;
+    var d = "M" + f(p1x, 2) + " " + f(p1y, 2) + " L" + f(p2x, 2) + " " + f(p2y, 2) +
+      " A" + f(r2, 2) + " " + f(r2, 2) + " 0 " + (R2 > R1 ? 1 : 0) + " 1 " + f(p2x, 2) + " " + f(q2y, 2) +
+      " L" + f(p1x, 2) + " " + f(q1y, 2) +
+      " A" + f(r1, 2) + " " + f(r1, 2) + " 0 " + (R1 > R2 ? 1 : 0) + " 1 " + f(p1x, 2) + " " + f(p1y, 2) + " Z";
+
+    var T1 = Math.max(1.2, N1 * px / 70), T2 = T1 * N2 / N1;
+    // An inline tensioner cannot go around a sprocket. It rides the top run, and the chain reverses before it would touch a sprocket.
+    var tn = cur.tens || null, Lsp = Math.sqrt((p2x - p1x) * (p2x - p1x) + (p2y - p1y) * (p2y - p1y));
+    var art = tn ? TENS_ART[tn.key] : null, tlen = art ? art.len * sc : 0, ext = art ? (art.x1 - art.x0) * sc : 0;
+    var travel = art ? Math.max(0, Lsp - ext) : 0, rev = !!art && travel > 0.5;
+    var moves = rev || !!art; // with a tensioner the chain only travels along the run, so a run too short to move is drawn still
+    var swing1 = 0, swing2 = 0, revDur = 0, dashTravel = 0;
+    var as = Math.asin(s), pathPx = 2 * Lsp + r1 * (Math.PI + 2 * as) + r2 * (Math.PI - 2 * as);
+    if (rev) {
+      swing1 = travel / r1 * 180 / Math.PI; swing2 = travel / r2 * 180 / Math.PI;
+      dashTravel = travel * links / pathPx;
+      revDur = Math.max(3, Math.min(20, 2 * (travel / px) / (N1 / T1)));
+    }
+    if (!revDur) revDur = 3;
+    var SPL = ' calcMode="spline" keyTimes="0;0.5;1" keySplines="0.45 0 0.55 1;0.45 0 0.55 1"';
+    var plate = Math.max(2.5, Math.min(0.5 * px, 9));
+    var odStroke = tight ? "var(--alert)" : "var(--ink-soft)";
+
+    // Tooth outline: flat-topped teeth from the root circle up to the outside diameter, valleys on the root circle.
+    function toothPath(N, r, rt) {
+      var rr = Math.max(r * 0.5, r - 0.31 * px), dl = 2 * Math.PI / N, d = "";
+      function pt(a, rad) { return f(rad * Math.sin(a), 2) + " " + f(-rad * Math.cos(a), 2); }
+      for (var i = 0; i < N; i++) {
+        var a = i * dl;
+        d += (i ? " L" : "M") + pt(a - 0.38 * dl, rr) + " L" + pt(a - 0.13 * dl, rt) + " L" + pt(a + 0.13 * dl, rt) + " L" + pt(a + 0.38 * dl, rr) +
+          " A" + f(rr, 2) + " " + f(rr, 2) + " 0 0 1 " + pt(a + 0.62 * dl, rr);
+      }
+      return d + " Z";
+    }
+    function sprocket(cx, r, ro, N, dur, swing) {
+      var th = Math.max(2, 0.3 * px), ring = r + th * 0.1, circ = 2 * Math.PI * ring, tooth = circ / N;
+      var g = '<g transform="translate(' + f(cx, 2) + " " + f(cy, 2) + ')">' +
+        '<circle r="' + f(ro * sc, 2) + '" fill="none" stroke="' + odStroke + '" stroke-width="1" stroke-dasharray="4 3" opacity="0.7"/>' +
+        '<g>' + (rev ? '<animateTransform attributeName="transform" type="rotate" values="0;' + f(swing, 2) + ';0" dur="' + f(revDur, 2) + 's" repeatCount="indefinite"' + SPL + "/>"
+          : '<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="' + f(dur, 2) + 's" repeatCount="indefinite"/>') +
+        '<path d="' + toothPath(N, r, ro * sc) + '" fill="none" stroke="var(--blue-deep)" stroke-width="1.3" stroke-linejoin="round"/>';
+      // Hex bore, 1/2" across flats (the WCP hex bore size), kept inside the root circle on small sprockets.
+      var af = Math.min(0.5 * sc, (r - 0.31 * px) * 1.5), hr = af / Math.sqrt(3), hp = "";
+      for (var k = 0; k < 6; k++) { var ha = (k * 60 + 30) * Math.PI / 180; hp += (k ? " L" : "M") + f(hr * Math.sin(ha), 2) + " " + f(-hr * Math.cos(ha), 2); }
+      g += '<path d="' + hp + ' Z" fill="none" stroke="var(--blue-deep)" stroke-width="1.3" stroke-linejoin="round"/></g></g>';
+      return g;
+    }
+    function label(cx, ro, txt) {
+      return '<text x="' + f(cx, 2) + '" y="' + f(cy - ro * sc - 9, 2) + '" text-anchor="middle" font-size="12" font-weight="500" fill="var(--ink)">' + esc(txt) + "</text>";
+    }
+
+    var out = '<rect x="0" y="0" width="' + vw + '" height="' + f(vh, 0) + '" fill="var(--blue-50)"/>';
+    out += sprocket(cx1, r1, ro1, N1, T1, swing1) + sprocket(cx2, r2, ro2, N2, T2, swing2);
+    // Roller chain links built from the vector outlines in the WCP roller chain drawing: outer plates, inner plates and pin holes,
+    // each link placed along the chain path and moved with SMIL motion. Inner plates sit on top of outer plates, as in the drawing.
+    var nL = art ? tn.n : links, sB = art ? (-art.x0 + art.len) * sc : 0;
+    var ds = (pathPx - tlen) / nL, kk = ds / 27;
+    var dLoop = d.replace(/ Z$/, ""), dTwice = dLoop + dLoop.replace(/^M\S+ \S+/, "");
+    var plateDefs = '<defs><g id="chO"><path d="' + PLATE_O + '" fill="var(--blue-100)" stroke="var(--blue-deep)" stroke-width="1.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>' +
+        '<circle cx="-13.5" r="4.89" fill="var(--blue-50)" stroke="var(--blue-deep)" stroke-width="1.2" vector-effect="non-scaling-stroke"/><circle cx="13.5" r="4.89" fill="var(--blue-50)" stroke="var(--blue-deep)" stroke-width="1.2" vector-effect="non-scaling-stroke"/></g>' +
+      '<g id="chI"><path d="' + PLATE_I + '" fill="var(--white)" stroke="var(--blue-deep)" stroke-width="1.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>' +
+        '<circle cx="-13.5" r="4.89" fill="var(--blue-50)" stroke="var(--blue-deep)" stroke-width="1.2" vector-effect="non-scaling-stroke"/><circle cx="13.5" r="4.89" fill="var(--blue-50)" stroke="var(--blue-deep)" stroke-width="1.2" vector-effect="non-scaling-stroke"/></g></defs>';
+    var outerLinks = "", innerLinks = "", cycle = Math.max(1, T1 * links / N1);
+    for (var li = 0; li < nL; li++) {
+      var frac = (sB + (li + 0.5) * ds) / pathPx, motion;
+      if (moves) {
+        var f0 = frac / 2, f1 = f0 + (rev ? travel : 0) / (2 * pathPx);
+        motion = '<animateMotion path="' + dTwice + '" rotate="auto" dur="' + f(revDur, 2) + 's" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.45 0 0.55 1;0.45 0 0.55 1" keyPoints="' + f(f0, 5) + ";" + f(f1, 5) + ";" + f(f0, 5) + '"/>';
+      } else {
+        motion = '<animateMotion path="' + dLoop + '" rotate="auto" dur="' + f(cycle, 3) + 's" begin="' + f(-frac * cycle, 3) + 's" repeatCount="indefinite"/>';
+      }
+      var one = "<g>" + motion + '<use href="#' + (li % 2 ? "chI" : "chO") + '" transform="scale(' + f(kk, 4) + ')"/></g>';
+      if (li % 2) innerLinks += one; else outerLinks += one;
+    }
+    out += plateDefs + outerLinks + innerLinks;
+    if (art) {
+      // Tensioner drawn from the vector views in the WCP drawings (holes at x = 0 and x = len, units in inches), on the top run.
+      var ang = Math.atan2(p2y - p1y, p2x - p1x) * 180 / Math.PI;
+      out += '<g transform="translate(' + f(p1x, 2) + " " + f(p1y, 2) + ") rotate(" + f(ang, 2) + ')"><g>' +
+        (rev ? '<animateTransform attributeName="transform" type="translate" values="0 0;' + f(travel, 2) + ' 0;0 0" dur="' + f(revDur, 2) + 's" repeatCount="indefinite"' + SPL + "/>" : "") +
+        '<g transform="translate(' + f(-art.x0 * sc, 2) + ') scale(' + f(sc, 3) + ')">' +
+        '<path d="' + art.d + '" fill="none" stroke="var(--ink)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>' +
+        "</g></g></g>";
+    }
+    out += label(cx1, ro1, "Sprocket 1 | " + N1 + "T (driver)") + label(cx2, ro2, "Sprocket 2 | " + N2 + "T");
+    var dy = cy + maxro * sc + 16;
+    out += '<line x1="' + f(cx1, 2) + '" y1="' + f(dy, 2) + '" x2="' + f(cx2, 2) + '" y2="' + f(dy, 2) + '" stroke="var(--blue-soft)" stroke-width="1"/>' +
+      '<line x1="' + f(cx1, 2) + '" y1="' + f(dy - 4, 2) + '" x2="' + f(cx1, 2) + '" y2="' + f(dy + 4, 2) + '" stroke="var(--blue-soft)" stroke-width="1"/>' +
+      '<line x1="' + f(cx2, 2) + '" y1="' + f(dy - 4, 2) + '" x2="' + f(cx2, 2) + '" y2="' + f(dy + 4, 2) + '" stroke="var(--blue-soft)" stroke-width="1"/>' +
+      '<text x="' + f((cx1 + cx2) / 2, 2) + '" y="' + f(dy + 16, 2) + '" text-anchor="middle" font-size="12" font-weight="500" fill="var(--ink)">Center ' + esc(both(C)) + "</text>";
+    svg.innerHTML = out;
+    applyPlay();
+    $("drawNote").textContent = "Drawn to scale. " + (tight
+      ? (gap < 0 ? "The sprocket outside diameters overlap at this center distance." : "The sprockets are less than 1/8\" apart at this center distance.")
+      : "The dashed rings are the sprocket outside diameters, " + both(gap) + " apart.") +
+      (rev ? " The tensioner cannot go around a sprocket, so the chain runs back and forth and reverses before the tensioner would touch one." : art ? " The tensioner is too long to fit on the straight run between the sprockets, so it is drawn without motion." : " Sprocket 1 drives, and the chain speed matches the tooth counts.");
+  }
+  function applyPlay() {
+    var svg = $("draw");
+    try { if (paused) svg.pauseAnimations(); else svg.unpauseAnimations(); } catch (e) {}
+    $("playBtn").textContent = paused ? "Play" : "Pause";
+    $("playBtn").setAttribute("aria-pressed", paused ? "true" : "false");
+  }
+  $("playBtn").addEventListener("click", function () { paused = !paused; applyPlay(); });
+
+  // ---------- main calculation ----------
+  function renderAll() { drawDrive(); renderSprockets(); }
+
+  function calc() {
+    var mode = radio("mode") === "2" ? 2 : 1;
+    $("cdFields").hidden = mode !== 1;
+    $("lkFields").hidden = mode !== 2;
+    var P = pitchNow();
+    renderTens();
+    var T = curTens();
+    // An inline tensioner takes both chain ends, so there is no master link or half link. Turn half links off and hide the choice.
+    var inlSel = !!(T && T.kind === "inline");
+    var hRow = $("h0").closest(".fld-row"), hHint = hRow.nextElementSibling;
+    if (inlSel && !hideHalf) { halfWas = radio("half") === "1"; $("h0").checked = true; }
+    else if (!inlSel && hideHalf && halfWas) $("h1").checked = true;
+    hideHalf = inlSel;
+    hRow.hidden = inlSel; if (hHint) hHint.hidden = inlSel;
+    var inl = !!(T && T.kind === "inline" && T.min != null && T.max != null && T.max >= T.min);
+    var cam = !!(T && T.kind === "cam" && T.travel != null && T.travel > 0);
+    var tensPending = !!(T && !inl && !cam);
+    function tensRow() {
+      return tensPending ? row("Tensioner", T.name + ". Adjustment range not entered yet, so it is not included in the numbers.") : "";
+    }
+    $("pitchHint").textContent = P + '" pitch';
+    $("opts").hidden = true; $("actions").hidden = true; $("actions").innerHTML = "";
+    var unit = radio("unit") === "mm" ? "mm" : "in";
+    var toIn = function (v) { return unit === "mm" ? v / 25.4 : v; };
+    var N1 = parseInt($("t1").value, 10), N2 = parseInt($("t2").value, 10);
+
+    function bad(msg) {
+      setStatus(true, "Check inputs", msg);
+      $("tiles").innerHTML = ""; $("rows").innerHTML = ""; $("rows").closest(".table-wrap").hidden = true; $("opts").hidden = true;
+      cur = null; renderAll();
+    }
+    if (!(N1 >= 6) || !(N2 >= 6)) { bad("Enter a tooth count of 6 or more for both sprockets."); return; }
+
+    var D1 = pitchDia(P, N1), D2 = pitchDia(P, N2);
+    var ratio = N2 >= N1 ? N2 / N1 : N1 / N2;
+    var tiles = tile(both(D1), "Sprocket 1 Pitch Diameter", "") +
+                tile(both(D2), "Sprocket 2 Pitch Diameter", "") +
+                tile(f(ratio, 2) + " : 1", "Ratio", "");
+    var rows = "";
+    function driveRows(C, links) {
+      var w = wrap(C, P, N1, N2), low = w.deg < 120, gap = gapBetween(C, P, N1, N2), gb = gap < MIN_GAP;
+      var out = row("Small Sprocket Wrap", f(w.deg, 0) + "°, " + f(w.teeth, 0) + " teeth in mesh" + (low ? ". Low, chain may skip." : ""), low);
+      out += row("Gap Between Sprockets", gap < 0 ? "Sprockets overlap by " + both(-gap) : both(gap) + (gb ? ". Tight." : ""), gb);
+      var ten = Math.max(1, Math.ceil(links * P / LENGTH_IN - 1e-9));
+      out += row("Chain To Order", ten + " x 10 ft length (master link included)");
+      return out;
+    }
+
+    if (mode === 1) {
+      var c = parseFloat($("cd").value);
+      if (!(c > 0)) { bad("Enter a center distance greater than 0."); return; }
+      var ex = parseFloat($("ex").value); if (!(ex > 0)) ex = 0;
+      var C = toIn(c + ex);
+      if (C <= Math.abs(D2 - D1) / 2) { bad("Center distance is too small for these sprockets. The chain cannot wrap them."); return; }
+      var L = linksFor(C, P, N1, N2);
+
+      if (inl) {
+        // The tensioner sits in the loop: loop length = chain links x pitch + tensioner length.
+        var mid = (T.min + T.max) / 2, nI = Math.max(1, Math.round((L * P - mid) / P));
+        var loopLo = (nI * P + T.min) / P, loopHi = (nI * P + T.max) / P, loopMid = (nI * P + mid) / P;
+        var cA = centerFor(loopLo, P, N1, N2), cB = centerFor(loopHi, P, N1, N2), cM = centerFor(loopMid, P, N1, N2);
+        if (cA === null || cB === null || cM === null) { bad("These sprockets are too large for a chain this short at this center distance."); return; }
+        var inRange = C >= cA - 1e-6 && C <= cB + 1e-6;
+        var fixedT = T.max - T.min < 1e-9;
+        setStatus(false, linkWord(nI), "Plus the " + T.name + ". " + (fixedT ? "Center comes out at " + both(cM) + "." : "The drive can run from " + both(cA) + " to " + both(cB) + " center."), "Chain Length Needed");
+        rows += row("Chain Length Needed", both(nI * P) + " of chain, plus the tensioner");
+        if (fixedT) {
+          rows += row("Tensioner Length", both(T.min) + " (fixed length)");
+          rows += row("Center With Tensioner", both(cM) + " (" + signed(cM - C) + " from desired)");
+        } else {
+          rows += row("Tensioner Length", both(T.min) + " closed to " + both(T.max) + " extended");
+          rows += row("Center Range With Tensioner", both(cA) + " to " + both(cB), !inRange);
+          rows += row("Desired Center", both(C) + (inRange ? ". Inside the range." : ". Outside the range. Try a different tensioner or chain length."), !inRange);
+        }
+        rows += driveRows(cM, nI);
+        $("actions").innerHTML = saveBtn("chain", 'data-links="' + nI + '" data-inline="1"', "Save Chain") +
+          '<div class="hint">Both chain ends attach to the tensioner, so no master link is needed.</div>';
+        $("actions").hidden = false;
+        cur = { C: cM, P: P, N1: N1, N2: N2, links: Math.max(1, Math.round(loopMid)), opt: null, tens: { key: T.key, n: nI } };
+      } else {
+        var step = radio("half") === "1" ? 1 : 2;
+        var lo = Math.floor(L / step + 1e-9) * step, hi = lo + step;
+        var cLo = centerFor(lo, P, N1, N2), cHi = centerFor(hi, P, N1, N2);
+        var dLo = cLo === null ? Infinity : Math.abs(cLo - C), dHi = cHi === null ? Infinity : Math.abs(cHi - C);
+        var best = dLo <= dHi ? "lo" : "hi";
+        // A cam only takes slack out, so prefer the chain whose center is at or past the desired center.
+        if (cam && cHi !== null) best = "hi";
+        var bestN = best === "lo" ? lo : hi, bestC = best === "lo" ? cLo : cHi;
+        if (bestC === null) { bad("These sprockets are too large for a chain this short at this center distance."); return; }
+
+        var oddNote = bestN % 2 !== 0 ? " Odd count, so it needs a half link." : "";
+        var camNote = cam ? " The cam adjusts from " + both(bestC - T.travel) + " to " + both(bestC) + " center." : "";
+        setStatus(false, f(L, 2) + " Links", "Closest chain is " + linkWord(bestN) + " at " + both(bestC) + " center." + oddNote + camNote, "Chain Length Needed");
+        rows += row("Chain Length Needed", both(L * P));
+        if (ex > 0) rows += row("Center Distance Used", both(C) + " (desired + extra)");
+        rows += driveRows(bestC, bestN);
+        if (cam) {
+          var fits = C >= bestC - T.travel - 1e-6 && C <= bestC + 1e-6;
+          rows += row("Cam Center Range", both(bestC - T.travel) + " to " + both(bestC) + " (" + both(T.travel) + " of travel)");
+          if (!fits) rows += row("Desired Center", both(C) + ". Outside the cam range.", true);
+        }
+        rows += tensRow();
+
+        var opt = function (n, cc, label, hl) {
+          if (cc === null) return tile(linkWord(n), label, "too short for these sprockets", hl, "");
+          var extra = '<div class="pn dim">' + esc(signed(cc - C) + " from desired") + "</div>";
+          if (cam) {
+            var ok = C >= cc - T.travel - 1e-6 && C <= cc + 1e-6;
+            extra += '<div class="pn' + (ok ? " dim" : " warn") + '">' + (ok ? "Desired center is inside the cam range" : "Desired center is outside the cam range") + "</div>";
+          }
+          var btns = saveBtn("chain", 'data-links="' + n + '"', "Save Chain");
+          if (n % 2 !== 0) { extra += '<div class="pn warn">Odd count, needs a half link</div>'; btns += saveBtn("half", "", "Save Half Link"); }
+          return tile(linkWord(n), label, "Center " + both(cc), hl, extra + btns);
+        };
+        $("optTiles").innerHTML = opt(lo, cLo, "Smaller Chain", best === "lo") + opt(hi, cHi, "Larger Chain", best === "hi");
+        $("opts").hidden = false;
+        cur = { C: bestC, P: P, N1: N1, N2: N2, links: bestN, opt: { lo: lo, hi: hi, cLo: cLo, cHi: cHi, desired: C } };
+      }
+    } else {
+      var n = parseInt($("lk").value, 10);
+      if (!(n > 0)) { bad("Enter the chain link count."); return; }
+      if (inl) {
+        var mid2 = (T.min + T.max) / 2;
+        var lA = (n * P + T.min) / P, lB = (n * P + T.max) / P, lM = (n * P + mid2) / P;
+        var kA = centerFor(lA, P, N1, N2), kB = centerFor(lB, P, N1, N2), kM = centerFor(lM, P, N1, N2);
+        if (kA === null || kB === null || kM === null) { bad("This chain is too short to wrap both sprockets."); return; }
+        var fixed2 = T.max - T.min < 1e-9;
+        setStatus(false, both(kM), fixed2 ? "With the " + T.name + "." : "With the " + T.name + ", the center can run from " + both(kA) + " to " + both(kB) + ".", "Center Distance");
+        rows += row("Chain Length", both(n * P) + ", plus the tensioner");
+        rows += row("Tensioner Length", fixed2 ? both(T.min) + " (fixed length)" : both(T.min) + " closed to " + both(T.max) + " extended");
+        if (!fixed2) rows += row("Center Range With Tensioner", both(kA) + " to " + both(kB));
+        rows += driveRows(kM, n);
+        $("actions").innerHTML = saveBtn("chain", 'data-links="' + n + '" data-inline="1"', "Save Chain") +
+          '<div class="hint">Both chain ends attach to the tensioner, so no master link is needed.</div>';
+        $("actions").hidden = false;
+        cur = { C: kM, P: P, N1: N1, N2: N2, links: Math.max(1, Math.round(lM)), opt: null, tens: { key: T.key, n: n } };
+      } else {
+        var cc = centerFor(n, P, N1, N2);
+        if (cc === null) { bad("This chain is too short to wrap both sprockets."); return; }
+        setStatus(false, both(cc), (n % 2 !== 0 ? "An odd link count needs a half link. " : "") + (cam ? "The cam adjusts from " + both(cc - T.travel) + " to " + both(cc) + "." : ""), "Center Distance");
+        rows += row("Chain Length", both(n * P));
+        if (cam) rows += row("Cam Center Range", both(cc - T.travel) + " to " + both(cc) + " (" + both(T.travel) + " of travel)");
+        rows += tensRow();
+        rows += driveRows(cc, n);
+        var act = saveBtn("chain", 'data-links="' + n + '"', "Save Chain");
+        if (n % 2 !== 0) act += '<div class="hint">Odd link count: the chain needs one half link to close the loop.</div>' + saveBtn("half", "", "Save Half Link");
+        $("actions").innerHTML = act; $("actions").hidden = false;
+        cur = { C: cc, P: P, N1: N1, N2: N2, links: n, opt: null };
+      }
+    }
+    $("tiles").innerHTML = tiles;
+    $("rows").innerHTML = rows;
+    $("rows").closest(".table-wrap").hidden = !rows;
+    renderAll();
+  }
+
+  ["t1", "t2", "cd", "ex", "lk"].forEach(function (id) { $(id).addEventListener("input", calc); });
+  var lastUnit = "in";
+  function onUnit() {
+    var u = radio("unit") === "mm" ? "mm" : "in";
+    if (u !== lastUnit) {
+      ["cd", "ex"].forEach(function (id) {
+        var v = parseFloat($(id).value);
+        if (v > 0) $(id).value = +(u === "mm" ? v * 25.4 : v / 25.4).toFixed(u === "mm" ? 2 : 3);
+      });
+      lastUnit = u;
+    }
+    Array.prototype.forEach.call(document.querySelectorAll(".usfx"), function (e) { e.textContent = u; });
+    calc();
+  }
+  ["u-in", "u-mm"].forEach(function (id) { $(id).addEventListener("change", onUnit); });
+  ["c25", "c25h", "c35", "m1", "m2", "h0", "h1"].forEach(function (id) { $(id).addEventListener("change", calc); });
+  $("tens").addEventListener("change", calc);
+  renderSaved();
+  calc();
+})();
+</script>
