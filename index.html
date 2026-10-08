@@ -167,7 +167,7 @@ svg.draw text { font-family: var(--font); }
 
 <div class="shell">
 <header class="banner">
-  <span class="ver">v1.10.3</span>
+  <span class="ver">v1.12.10</span>
   <h1>Chain Calculator</h1>
   <p>Chain length and center distance for a two-sprocket chain drive</p>
 </header>
@@ -191,16 +191,6 @@ svg.draw text { font-family: var(--font); }
           <div class="seg-group inline" id="tens" role="radiogroup" aria-labelledby="tensLbl"></div>
           <span class="hint" id="tensHint"></span>
         </div>
-      </div>
-
-      <div class="grp fld-row" id="idGrp" style="margin-top:12px;flex-direction:row;align-items:center">
-        <span class="lbl">Idler</span>
-        <div class="toggle" role="radiogroup" aria-label="Idler">
-          <input type="radio" name="idm" id="idOff" value="0" checked><label for="idOff">None</label>
-          <input type="radio" name="idm" id="idOn" value="1"><label for="idOn">Use idler</label>
-        </div>
-        <span class="unit-field" id="idSize" style="width:150px;display:none"><input class="field" id="idt" type="number" inputmode="numeric" step="1" min="6" value="16" aria-label="Idler teeth"><span>Teeth</span></span>
-        <span class="hint" id="idHint" style="flex-basis:100%">Pushes into the slack run to take up extra chain.</span>
       </div>
 
       <div class="fields">
@@ -252,6 +242,36 @@ svg.draw text { font-family: var(--font); }
     </div>
   </section>
 
+  <section aria-labelledby="dr-h">
+    <div class="card">
+      <div class="card-head"><h2 id="dr-h">Top view</h2><div class="hd-r"><span class="seg" id="viewSeg"><button type="button" class="pill" id="vRun" aria-pressed="true">Run</button><button type="button" class="pill" id="vTight" aria-pressed="false">Tighten</button><button type="button" class="pill" id="vIdler" aria-pressed="false" hidden>Idler</button></span><button type="button" class="pill" id="playBtn">Pause</button></div></div>
+      <div class="grp fld-row" id="idGrp" style="margin:4px 0 12px;flex-direction:row;align-items:center">
+        <span class="lbl">Idler</span>
+        <div class="toggle" role="radiogroup" aria-label="Idler">
+          <input type="radio" name="idm" id="idOff" value="0" checked><label for="idOff">None</label>
+          <input type="radio" name="idm" id="idOn" value="1"><label for="idOn">Use idler</label>
+        </div>
+        <span id="idOpts" style="display:none;align-items:center;gap:8px 16px;flex-wrap:wrap">
+        <div class="toggle" role="radiogroup" aria-label="Idler side">
+          <input type="radio" name="idside" id="idsIn" value="in" checked><label for="idsIn">Inside</label>
+          <input type="radio" name="idside" id="idsOut" value="out"><label for="idsOut">Outside</label>
+        </div>
+        <span class="unit-field" id="idSize" style="width:150px"><input class="field" id="idt" type="number" inputmode="numeric" step="1" min="6" value="16" aria-label="Idler teeth"><span>Teeth</span></span>
+        <span class="unit-field" id="idxBox" style="width:210px;white-space:nowrap"><input class="field" id="idx" type="number" inputmode="numeric" step="1" min="0" value="0" aria-label="Additional links"><span>Extra Links</span></span>
+        </span>
+        <span class="hint" id="idHint" style="flex-basis:100%">Pushes into the slack run to take up extra chain.</span>
+      </div>
+      <div class="draw-wrap">
+        <svg class="draw" id="draw" viewBox="0 0 640 220" role="img" aria-label="Top view of the chain drive"></svg>
+        <div class="empty" id="drawEmpty" hidden>Fix the inputs above to see the drive.</div>
+      </div>
+      <div id="idBox" class="card-sub" hidden>
+        <div class="table-wrap"><table><tbody id="idRows"></tbody></table></div>
+      </div>
+      <p class="note" id="drawNote"></p>
+    </div>
+  </section>
+
   <section aria-labelledby="out-h">
     <div class="card">
       <h2 id="out-h">Result</h2>
@@ -264,20 +284,6 @@ svg.draw text { font-family: var(--font); }
         <div class="tiles two" id="optTiles"></div>
       </div>
       <p class="note">Wrap under 120&deg; on the small sprocket is a common rule-of-thumb limit for roller chain, and so is keeping the sprockets at least 1/8" apart. These numbers are estimates, so check the fit on your own drive.</p>
-    </div>
-  </section>
-
-  <section aria-labelledby="dr-h">
-    <div class="card">
-      <div class="card-head"><h2 id="dr-h">Top view</h2><div class="hd-r"><span class="seg" id="viewSeg"><button type="button" class="pill" id="vRun" aria-pressed="true">Run</button><button type="button" class="pill" id="vTight" aria-pressed="false">Tighten</button><button type="button" class="pill" id="vIdler" aria-pressed="false" hidden>Idler</button></span><button type="button" class="pill" id="playBtn">Pause</button></div></div>
-      <div class="draw-wrap">
-        <svg class="draw" id="draw" viewBox="0 0 640 220" role="img" aria-label="Top view of the chain drive"></svg>
-        <div class="empty" id="drawEmpty" hidden>Fix the inputs above to see the drive.</div>
-      </div>
-      <div id="idBox" class="card-sub" hidden>
-        <div class="table-wrap"><table><tbody id="idRows"></tbody></table></div>
-      </div>
-      <p class="note" id="drawNote"></p>
     </div>
   </section>
 
@@ -367,40 +373,19 @@ svg.draw text { font-family: var(--font); }
     spr("25", 22, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0560", 43542922133716, 12.99, true),
     spr("25", 22, "Aluminum Single Hub", "3/8\" Hex Bore", "217-5835", 35666700206240, 9.99, true),
     spr("25", 24, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0581", 43542922264788, 14.99, true),
-    spr("25", 24, "Aluminum Plate", "SplineXL Bore", "WCP-0964", 44112369680596, 4.99, true),
     spr("25", 26, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-2101", 46995762151636, 15.99, true),
     spr("25", 28, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-2102", 46995765133524, 16.99, true),
     spr("25", 30, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-2103", 46995772342484, 17.99, true),
-    spr("25", 30, "Aluminum Plate", "SplineXL Bore", "WCP-0965", 44112370139348, 4.99, true),
     spr("25", 32, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-2104", 46995773096148, 18.99, true),
     spr("25", 34, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-2105", 46995776241876, 19.99, true),
     spr("25", 36, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-2106", 46995776733396, 20.99, true),
-    spr("25", 36, "Aluminum Plate", "SplineXL Bore", "WCP-0966", null, 9.99, false),
-    spr("25", 42, "Aluminum Plate", "SplineXL Bore", "WCP-0967", null, 9.99, false),
-    spr("25", 48, "Aluminum Plate", "SplineXL Bore", "WCP-0968", null, 9.99, false),
-    spr("25", 54, "Aluminum Plate", "SplineXL Bore", "WCP-0969", 44112373317844, 9.99, true),
-    spr("25", 60, "Aluminum Plate", "SplineXL Bore", "WCP-0970", 44112374137044, 9.99, true),
-    spr("25", 66, "Aluminum Plate", "SplineXL Bore", "WCP-0971", 44112375316692, 14.99, true),
-    spr("25", 72, "Aluminum Plate", "SplineXL Bore", "WCP-0972", 44112376660180, 14.99, true),
-    spr("25", 84, "Aluminum Plate", "SplineXL Bore", "WCP-1376", null, 14.99, false),
     spr("35", 9, "Steel Double Hub", "1/2\" Rounded Hex Bore", "WCP-0976", 43959682269396, 13.99, true),
     spr("35", 12, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0973", 43959637311700, 12.99, true),
     spr("35", 12, "Steel Double Hub", "1/2\" Hex Bore", "WCP-0977", 43959685939412, 13.99, true),
     spr("35", 15, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0974", 43959643308244, 14.99, true),
     spr("35", 15, "Steel Double Hub", "1/2\" Hex Bore", "WCP-0978", 43959687708884, 15.99, true),
     spr("35", 18, "Aluminum Double Hub", "1/2\" Hex Bore", "WCP-0975", 43959678501076, 16.99, true),
-    spr("35", 18, "Aluminum Plate", "SplineXL Bore", "WCP-0980", 44112331374804, 4.99, true),
     spr("35", 18, "Steel Double Hub", "1/2\" Hex Bore", "WCP-0979", 43959691378900, 17.99, true),
-    spr("35", 24, "Aluminum Plate", "SplineXL Bore", "WCP-0981", null, 4.99, false),
-    spr("35", 30, "Aluminum Plate", "SplineXL Bore", "WCP-0982", 44112348643540, 9.99, true),
-    spr("35", 36, "Aluminum Plate", "SplineXL Bore", "WCP-0983", 44112357654740, 9.99, true),
-    spr("35", 42, "Aluminum Plate", "SplineXL Bore", "WCP-0984", 44112364830932, 9.99, true),
-    spr("35", 48, "Aluminum Plate", "SplineXL Bore", "WCP-0985", 44112365224148, 9.99, true),
-    spr("35", 54, "Aluminum Plate", "SplineXL Bore", "WCP-0986", 44112365584596, 14.99, true),
-    spr("35", 60, "Aluminum Plate", "SplineXL Bore", "WCP-0987", 44112366272724, 14.99, true),
-    spr("35", 66, "Aluminum Plate", "SplineXL Bore", "WCP-0988", 44112366993620, 14.99, true),
-    spr("35", 72, "Aluminum Plate", "SplineXL Bore", "WCP-0989", 44112368206036, 19.99, true),
-    spr("35", 84, "Aluminum Plate", "SplineXL Bore", "WCP-1377", 45894705250516, 19.99, true)
   ];
   var CART_URL = "https://wcproducts.com/cart/add";
 
@@ -518,8 +503,8 @@ svg.draw text { font-family: var(--font); }
     $("tensHint").textContent = h;
     // An idler and a chain tensioner do the same job, so the idler options grey out while a tensioner is picked.
     var lock = !!T;
-    if (lock && $("idOn").checked) { $("idOff").checked = true; $("idSize").style.display = "none"; if (tview === "idler") tview = "run"; }
-    ["idOff", "idOn", "idt"].forEach(function (i) { $(i).disabled = lock; });
+    if (lock && $("idOn").checked) { $("idOff").checked = true; $("idOpts").style.display = "none"; if (tview === "idler") tview = "run"; }
+    ["idOff", "idOn", "idt", "idsIn", "idsOut"].forEach(function (i) { $(i).disabled = lock; });
     $("idGrp").style.opacity = lock ? "0.45" : "";
     $("idHint").textContent = lock ? "Not available while a chain tensioner is selected." : "Pushes into the slack run to take up extra chain.";
     syncTens();
@@ -615,14 +600,9 @@ svg.draw text { font-family: var(--font); }
       var list = SPROCKETS.filter(function (s) { return s.chain === fam && s.teeth === N; });
       html += '<div class="sp-row"><div class="who"><strong>Sprocket ' + w + '</strong><span>' + N + " teeth, " + (fam === "25" ? "#25 / #25H" : "#35") + " chain</span></div>";
       if (list.length) {
-        var inStock = list.filter(function (s) { return s.stock; }).length;
-        if (inStock) {
-          html += '<select class="select" id="sel' + w + '" aria-label="Sprocket ' + w + ' style and bore">' + list.map(function (s, i) {
-            return '<option value="' + i + '"' + (s.stock ? "" : " disabled") + ">" + esc(s.style + " | " + s.bore + (s.stock ? "" : " | Out of stock")) + "</option>";
-          }).join("") + '</select><button type="button" class="btn" data-which="' + w + '">Save Sprocket</button>';
-        } else {
-          html += '<div class="hint sp-none">The ' + N + ' tooth sprocket is out of stock right now. <a href="' + list[0].url + '" target="_blank" rel="noopener">View on wcproducts.com</a></div>';
-        }
+        html += '<select class="select" id="sel' + w + '" aria-label="Sprocket ' + w + ' style and bore">' + list.map(function (s, i) {
+          return '<option value="' + i + '">' + esc(s.style + " | " + s.bore) + "</option>";
+        }).join("") + '</select><button type="button" class="btn" data-which="' + w + '">Save Sprocket</button>';
       } else {
         html += '<div class="hint sp-none">No ' + N + ' tooth sprocket is listed here yet. <a href="' + SPROCKET_PAGE[fam] + '" target="_blank" rel="noopener">Browse WCP sprockets</a></div>';
       }
@@ -636,7 +616,7 @@ svg.draw text { font-family: var(--font); }
     var w = parseInt(b.getAttribute("data-which"), 10), N = w === 1 ? cur.N1 : cur.N2, fam = CHAIN_TYPES[chainKey()].spr;
     var list = SPROCKETS.filter(function (s) { return s.chain === fam && s.teeth === N; });
     var s = list[parseInt($("sel" + w).value, 10)];
-    if (!s || !s.stock) return;
+    if (!s) return;
     addSaved({ key: "spr:" + s.pn, mode: "inc", name: s.teeth + "T " + s.style + " Sprocket", sub: s.bore + " | " + (fam === "25" ? "#25" : "#35") + " chain", qty: 1, pn: s.pn, id: s.id, url: s.url });
   });
 
@@ -654,8 +634,9 @@ svg.draw text { font-family: var(--font); }
     var R1 = pitchDia(P, N1) / 2, R2 = pitchDia(P, N2) / 2, ro1 = odRadius(P, N1), ro2 = odRadius(P, N2);
     var vw = 640, pad = 36, labelH = 26, maxro = Math.max(ro1, ro2), total = C + ro1 + ro2;
     var rsv = (cur.tens && TENS_ART[cur.tens.key]) ? 70 : 0; // room on the right for the range-of-motion callout
-    var sc = Math.min((vw - 2 * pad - rsv) / total, (380 - 2 * pad - labelH) / (2 * maxro));
-    var vh = Math.max(170, Math.min(380, 2 * maxro * sc + 2 * pad + labelH));
+    var sc = Math.min((vw - 2 * pad - rsv) / total, (380 - 2 * pad - labelH - (rsv ? 44 : 0)) / (2 * maxro));
+    var degR = rsv ? Math.max(ro2 * sc, (R2 + 0.5 * P) * sc) + 14 : 0, maxD = Math.max(maxro * sc, degR + 13); // radius of the range-of-motion arc
+    var vh = Math.max(170, Math.min(380, 2 * maxD + 2 * pad + labelH));
     var cy = (vh - labelH) / 2, drawW = total * sc, cx1 = (vw - rsv - drawW) / 2 + ro1 * sc, cx2 = cx1 + C * sc;
     var r1 = R1 * sc, r2 = R2 * sc, px = P * sc;
     var gap = gapBetween(C, P, N1, N2), tight = gap < MIN_GAP;
@@ -757,16 +738,21 @@ svg.draw text { font-family: var(--font); }
     var degLive = false;
     if (rev) {
       degLive = true;
-      var rA = Math.max(ro2 * sc, r2 + 0.5 * px) + 14, sw = swing2, swc = Math.min(sw, 359.9), rad = Math.PI / 180;
+      var REVC = ["#0075c9", "#00a389", "#e08a00", "#8e44ad", "#d6336c"], rA = degR, sw = swing2, swc = Math.min(sw, 359.9), rad = Math.PI / 180;
       var ax = function (deg, rr) { return f(rr * Math.sin(deg * rad), 2) + " " + f(-rr * Math.cos(deg * rad), 2); };
       var mid = swc / 2, side = Math.sin(mid * rad) >= 0 ? 1 : -1;
-      var tx = (rA + 12) * Math.sin(mid * rad), ty = -(rA + 12) * Math.cos(mid * rad);
+      var ta = swc >= 100 ? 90 : mid; // big swings pass under the chain, so the readout sits on the open right side
+      mid = ta; side = 1;
+      var tx = (rA + 12) * Math.sin(ta * rad), ty = -(rA + 12) * Math.cos(ta * rad) + (swc >= 100 ? 4 : 0);
       out += '<g transform="translate(' + f(cx2, 2) + " " + f(cy, 2) + ')" id="degG">' +
+        '<path d="M' + ax(0, rA) + " A" + f(rA, 2) + " " + f(rA, 2) + " 0 " + (swc > 180 ? 1 : 0) + " 1 " + ax(swc, rA) + '" fill="none" stroke="var(--blue-50)" stroke-width="5"/>' +
         '<path d="M' + ax(0, rA) + " A" + f(rA, 2) + " " + f(rA, 2) + " 0 " + (swc > 180 ? 1 : 0) + " 1 " + ax(swc, rA) + '" fill="none" stroke="var(--blue)" stroke-width="1.4"/>' +
+        (sw > 360 ? '<path id="degDone" d="M0 ' + f(-rA, 2) + " A" + f(rA, 2) + " " + f(rA, 2) + " 0 1 1 0 " + f(rA, 2) + " A" + f(rA, 2) + " " + f(rA, 2) + ' 0 1 1 0 ' + f(-rA, 2) + '" fill="none" stroke="var(--blue)" stroke-width="2.6" display="none"/>' : "") +
+        (sw > 360 ? '<path id="degProg" d="" fill="none" stroke="var(--blue)" stroke-width="2.6" stroke-linecap="round"/>' : "") +
         '<line x1="0" y1="' + f(-rA + 4, 2) + '" x2="0" y2="' + f(-rA - 5, 2) + '" stroke="var(--blue)" stroke-width="1.4"/>' +
-        '<g transform="rotate(' + f(swc, 2) + ')"><line x1="0" y1="' + f(-rA + 4, 2) + '" x2="0" y2="' + f(-rA - 5, 2) + '" stroke="var(--blue)" stroke-width="1.4"/></g>' +
+        '<g transform="rotate(' + f(sw > 360 ? sw % 360 : swc, 2) + ')"><line x1="0" y1="' + f(-rA + 4, 2) + '" x2="0" y2="' + f(-rA - 5, 2) + '" stroke="' + (sw > 360 ? REVC[Math.floor(sw / 360) % REVC.length] : "var(--blue)") + '" stroke-width="2"/></g>' +
         '<g><animateTransform attributeName="transform" type="rotate" values="0;' + f(sw, 2) + ';0" dur="' + f(revDur, 2) + 's" repeatCount="indefinite"' + SPL + '/>' +
-        '<g id="degHandle" style="cursor:grab;touch-action:none"><circle cx="0" cy="' + f(-rA - 3, 2) + '" r="13" fill="transparent"/><path d="M0 ' + f(-rA, 2) + ' l-5 -11 h10 z" fill="var(--blue)"/></g></g>' +
+        '<g id="degHandle" style="cursor:grab;touch-action:none"><circle cx="0" cy="' + f(-rA - 3, 2) + '" r="13" fill="transparent"/><path id="degMark" d="M0 ' + f(-rA, 2) + ' l-5 -11 h10 z" fill="var(--blue)"/></g></g>' +
         '<text id="degTxt" x="' + f(tx, 2) + '" y="' + f(ty, 2) + '" text-anchor="' + (side > 0 ? "start" : "end") + '" font-size="12" font-weight="600" fill="var(--blue-deep)">0° / ' + f(sw, 0) + '°</text></g>';
     }
     // Roller chain links built from the vector outlines in the WCP roller chain drawing: outer plates, inner plates and pin holes,
@@ -866,18 +852,19 @@ svg.draw text { font-family: var(--font); }
     if (art) {
       // Tensioner drawn from the vector views in the WCP drawings (holes at x = 0 and x = len, units in inches), on the top run.
       var ang = Math.atan2(p2y - p1y, p2x - p1x) * 180 / Math.PI;
-      out += '<g transform="translate(' + f(p1x, 2) + " " + f(p1y, 2) + ") rotate(" + f(ang, 2) + ')"><g transform="translate(' + f(lo, 2) + ' 0)">' +
+      out += '<g id="tenRun" transform="translate(' + f(p1x, 2) + " " + f(p1y, 2) + ") rotate(" + f(ang, 2) + ')"><g transform="translate(' + f(lo, 2) + ' 0)">' +
         (rev ? '<animateTransform attributeName="transform" type="translate" values="' + f(lo, 2) + ' 0;' + f(lo + travel, 2) + ' 0;' + f(lo, 2) + ' 0" dur="' + f(revDur, 2) + 's" repeatCount="indefinite"' + SPL + "/>" : "") +
-        '<g transform="scale(' + f(sc, 3) + ')">' +
+        (rev ? '<rect id="tenHandle" x="' + f(art.x0 * sc, 2) + '" y="' + f(-art.y * sc, 2) + '" width="' + f((art.x1 - art.x0) * sc, 2) + '" height="' + f(2 * art.y * sc, 2) + '" fill="transparent" style="cursor:grab;touch-action:none"/>' : "") +
+        '<g transform="scale(' + f(sc, 3) + ')" style="pointer-events:none">' +
         '<path d="' + art.d + '" fill="none" stroke="var(--ink)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>' +
         "</g></g></g>";
     }
     }
-    var lt1 = "Sprocket 1 | " + N1 + "T (driver)", lt2 = "Sprocket 2 | " + N2 + "T", ly1 = labelY(cx1, lt1), ly2 = labelY(rev ? cx2 - 10 - lt2.length * 3.3 : cx2, lt2);
+    var lt1 = "Sprocket 1 | " + N1 + "T (Input)", lt2 = "Sprocket 2 | " + N2 + "T (Output)", ly1 = labelY(cx1, lt1), ly2 = labelY(rev ? cx2 - 10 - lt2.length * 3.3 : cx2, lt2);
     var extra = Math.max(0, Math.ceil(16 - Math.min(ly1, ly2)));
     var lx2 = rev ? cx2 - 10 - lt2.length * 3.3 : cx2; // keep the label left of the range-of-motion arc, which starts at the top of sprocket 2
     out += label(cx1, ly1, lt1) + label(lx2, ly2, lt2);
-    var dy = cy + maxro * sc + 16 + botExtra;
+    var dy = cy + maxD + 16 + botExtra;
     out += '<line x1="' + f(cx1, 2) + '" y1="' + f(dy, 2) + '" x2="' + f(cx2, 2) + '" y2="' + f(dy, 2) + '" stroke="var(--blue-soft)" stroke-width="1"/>' +
       '<line x1="' + f(cx1, 2) + '" y1="' + f(dy - 4, 2) + '" x2="' + f(cx1, 2) + '" y2="' + f(dy + 4, 2) + '" stroke="var(--blue-soft)" stroke-width="1"/>' +
       '<line x1="' + f(cx2, 2) + '" y1="' + f(dy - 4, 2) + '" x2="' + f(cx2, 2) + '" y2="' + f(dy + 4, 2) + '" stroke="var(--blue-soft)" stroke-width="1"/>' +
@@ -885,36 +872,66 @@ svg.draw text { font-family: var(--font); }
     svg.setAttribute("viewBox", "0 0 " + vw + " " + f(vh + extra + botExtra, 0));
     svg.innerHTML = '<rect x="0" y="0" width="' + vw + '" height="' + f(vh + extra + botExtra, 0) + '" fill="var(--blue-50)"/><g transform="translate(0 ' + extra + ')">' + out + "</g>";
     if (degLive && $("degTxt")) {
-      var dT = $("degTxt"), dSw = swing2, dDur = revDur, dSvg = svg;
+      var dDone = $("degDone"), dProg = $("degProg"), dMark = $("degMark"), dT = $("degTxt"), dSw = swing2, dDur = revDur, dSvg = svg;
       var bez = function (x) { var lo2 = 0, hi2 = 1, t = 0.5; for (var k = 0; k < 24; k++) { var u = 1 - t, xx = 3 * u * u * t * 0.45 + 3 * u * t * t * 0.55 + t * t * t; if (xx < x) lo2 = t; else hi2 = t; t = (lo2 + hi2) / 2; } var v = 1 - t; return 3 * v * v * t * 0 + 3 * v * t * t * 1 + t * t * t; };
       var degLoop = function () {
         var t = 0; try { t = dSvg.getCurrentTime(); } catch (e) {}
         var ph = (t % dDur) / dDur, u = ph < 0.5 ? ph * 2 : (1 - ph) * 2;
-        dT.textContent = f(dSw * bez(u), 0) + "° / " + f(dSw, 0) + "°";
+        var angNow = dSw * bez(u);
+        dT.textContent = f(angNow, 0) + "° / " + f(dSw, 0) + "°";
+        if (dSw > 360 && dProg && dMark) {
+          // A new colour for every full revolution; the coloured arc shows how far round the current turn has gone.
+          var rv = Math.floor(angNow / 360), col = REVC[rv % REVC.length], aa = (angNow - rv * 360) * Math.PI / 180;
+          if (dDone) { if (rv >= 1) { dDone.setAttribute("stroke", REVC[(rv - 1) % REVC.length]); dDone.setAttribute("display", ""); } else dDone.setAttribute("display", "none"); }
+          dProg.setAttribute("stroke", col); dMark.setAttribute("fill", col); dT.setAttribute("fill", col);
+          dProg.setAttribute("d", aa < 0.002 ? "" : "M0 " + f(-degR, 2) + " A" + f(degR, 2) + " " + f(degR, 2) + " 0 " + (aa > Math.PI ? 1 : 0) + " 1 " + f(degR * Math.sin(aa), 2) + " " + f(-degR * Math.cos(aa), 2));
+        }
         raf = requestAnimationFrame(degLoop);
       };
       raf = requestAnimationFrame(degLoop);
       // Drag the arrow along the arc to scrub the motion: the animation pauses and jumps to the time that matches the angle.
-      var hd = $("degHandle"), dG = $("degG"), swMax = Math.min(dSw, 359.9);
+      var hd = $("degHandle"), dG = $("degG");
       var invBez = function (y) { var l = 0, h = 1; for (var k = 0; k < 24; k++) { var m = (l + h) / 2; if (bez(m) < y) l = m; else h = m; } return (l + h) / 2; };
+      var acc = 0; // total angle dragged so far, so going past a full turn keeps counting instead of wrapping back to the start
+      var nowAng = function () { var t = 0; try { t = dSvg.getCurrentTime(); } catch (e) {} var ph = (t % dDur) / dDur; return dSw * bez(ph < 0.5 ? ph * 2 : (1 - ph) * 2); };
+      var seek = function (ang) {
+        ang = Math.max(0, Math.min(dSw, ang)); acc = ang;
+        var u = invBez(ang / dSw), cyc = 0; try { cyc = Math.floor(dSvg.getCurrentTime() / dDur) * dDur; } catch (e) {}
+        try { dSvg.setCurrentTime(cyc + u * dDur / 2); } catch (e) {}
+      };
       var scrub = function (ev) {
         var pt = dSvg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
         var m = dG.getScreenCTM(); if (!m) return;
-        var q = pt.matrixTransform(m.inverse()), ang = Math.atan2(q.x, -q.y) * 180 / Math.PI;
-        if (ang < 0) ang += 360;
-        if (ang > swMax) ang = ang > swMax + (360 - swMax) / 2 ? 0 : swMax;
-        var u = invBez(ang / dSw), cyc = 0; try { cyc = Math.floor(dSvg.getCurrentTime() / dDur) * dDur; } catch (e) {}
-        try { dSvg.setCurrentTime(cyc + u * dDur / 2); } catch (e) {}
+        var q = pt.matrixTransform(m.inverse()), raw = Math.atan2(q.x, -q.y) * 180 / Math.PI;
+        if (raw < 0) raw += 360;
+        seek(raw + 360 * Math.round((acc - raw) / 360));
       };
       hd.addEventListener("pointerdown", function (ev) {
         ev.preventDefault();
         try { hd.setPointerCapture(ev.pointerId); } catch (e) {}
+        acc = nowAng();
         if (!paused) { paused = true; applyPlay(); }
         hd.style.cursor = "grabbing"; hd._drag = true; scrub(ev);
       });
       hd.addEventListener("pointermove", function (ev) { if (hd._drag) scrub(ev); });
       var endDrag = function () { hd._drag = false; hd.style.cursor = "grab"; };
       hd.addEventListener("pointerup", endDrag); hd.addEventListener("pointercancel", endDrag);
+      // Dragging the tensioner along the run does the same thing as the angle slider: the tensioner position maps straight onto the swing.
+      var th = $("tenHandle"), tr = $("tenRun");
+      if (th && tr && travel > 0.5) {
+        var tenX = function (ev) { var pt = dSvg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY; var m = tr.getScreenCTM(); return m ? pt.matrixTransform(m.inverse()).x : 0; };
+        var grab = 0, tdrag = false;
+        th.addEventListener("pointerdown", function (ev) {
+          ev.preventDefault();
+          try { th.setPointerCapture(ev.pointerId); } catch (e) {}
+          acc = nowAng();
+          if (!paused) { paused = true; applyPlay(); }
+          grab = tenX(ev) - (lo + travel * acc / dSw); tdrag = true; th.style.cursor = "grabbing";
+        });
+        th.addEventListener("pointermove", function (ev) { if (tdrag) seek((tenX(ev) - grab - lo) / travel * dSw); });
+        var tEnd = function () { tdrag = false; th.style.cursor = "grab"; };
+        th.addEventListener("pointerup", tEnd); th.addEventListener("pointercancel", tEnd);
+      }
     }
     if (tickFn) {
       var fnT = tickFn, clock = 0, last = 0;
@@ -932,7 +949,7 @@ svg.draw text { font-family: var(--font); }
     $("drawNote").textContent = "Drawn to scale. " + (tight
       ? (gap < 0 ? "The sprocket outside diameters overlap at this center distance." : "The sprockets are less than 1/8\" apart at this center distance.")
       : "The dashed rings are the sprocket outside diameters, " + both(gap) + " apart.") +
-      (tighten ? tightNote : rev ? " The tensioner cannot go around a sprocket, so the chain runs back and forth and reverses before the tensioner would touch one. Drag the arrow on the degree arc to move it yourself." : art ? " The tensioner is too long to fit on the straight run between the sprockets, so it is drawn without motion." : " Sprocket 1 drives, and the chain speed matches the tooth counts.");
+      (tighten ? tightNote : rev ? " The tensioner cannot go around a sprocket, so the chain runs back and forth and reverses before the tensioner would touch one. Drag the arrow on the degree arc, or the tensioner itself, to move it yourself." : art ? " The tensioner is too long to fit on the straight run between the sprockets, so it is drawn without motion." : " Sprocket 1 drives, and the chain speed matches the tooth counts.");
   }
   function applyPlay() {
     var svg = $("draw");
@@ -940,7 +957,8 @@ svg.draw text { font-family: var(--font); }
     $("playBtn").textContent = paused ? "Play" : "Pause";
     $("playBtn").setAttribute("aria-pressed", paused ? "true" : "false");
   }
-  function syncIdler() { var on = $("idOn").checked; $("idSize").style.display = on ? "inline-flex" : "none"; tview = on ? "idler" : "run"; drawDrive(); }
+  function syncIdler() { var on = $("idOn").checked; $("idOpts").style.display = on ? "inline-flex" : "none"; tview = on ? "idler" : "run"; drawDrive(); }
+  $("idsIn").addEventListener("change", function () { drawDrive(); }); $("idsOut").addEventListener("change", function () { drawDrive(); });
   $("idOff").addEventListener("change", syncIdler); $("idOn").addEventListener("change", syncIdler);
   $("vRun").addEventListener("click", function () { if (tview !== "run") { tview = "run"; drawDrive(); } });
   $("vIdler").addEventListener("click", function () { if (tview !== "idler") { tview = "idler"; drawDrive(); } });
@@ -952,8 +970,9 @@ svg.draw text { font-family: var(--font); }
   // A plain sprocket pressed into the slack (bottom) run from inside the loop. The chain is cut for the drive without the idler, so the
   // leftover length is slack. The animation starts loose, then the idler pushes the bottom run out until the top run pulls straight.
   idSlackIn = 0;
+  var idPl = { run: "bottom", side: "in", f: 0.5 }, idPlaced = false, idDrag = false, idHold = false;
   function drawIdler() {
-    idSlackIn = 0;
+    idSlackIn = 0; idDrag = false; idHold = paused && idPlaced; var idSide = radio("idside") === "out" ? "out" : "in";
     var svg = $("draw");
     svg.hidden = false; $("drawEmpty").hidden = true;
     $("vRun").setAttribute("aria-pressed", "false"); $("vTight").setAttribute("aria-pressed", "false"); $("vIdler").setAttribute("aria-pressed", "true");
@@ -967,7 +986,7 @@ svg.draw text { font-family: var(--font); }
       var Cd = (radio("unit") === "mm" ? (cdv + exv) / 25.4 : cdv + exv);
       if (Cd > Math.abs(pitchDia(P, N2) - pitchDia(P, N1)) / 2 + 0.01) {
         var Lx = linksFor(Cd, P, N1, N2);
-        if (isFinite(Lx) && Lx > 0) { C = Cd; links = Math.max(2, Math.ceil(Lx / 2 - 1e-9) * 2); idSlackIn = (links - Lx) * P; }
+        if (isFinite(Lx) && Lx > 0) { C = Cd; var xl = Math.max(0, Math.round(parseFloat($("idx").value) || 0)); links = Math.max(2, Math.ceil(Lx / 2 - 1e-9) * 2) + xl; idSlackIn = (links - Lx) * P; }
       }
     }
     var R1 = pitchDia(P, N1) / 2, R2 = pitchDia(P, N2) / 2, ro1 = odRadius(P, N1), ro2 = odRadius(P, N2), Ri = pitchDia(P, Ni) / 2, roI = odRadius(P, Ni);
@@ -982,33 +1001,117 @@ svg.draw text { font-family: var(--font); }
     // Slack in the chain: whole links bought minus the exact loop length.
     var eIn = idSlackIn > 0 ? idSlackIn : Math.max(0, links * P - pathPx / sc), ePx = eIn * sc;
     // The bottom run in its own frame: u from sprocket 1 to sprocket 2, v pointing out of the loop (down).
-    var ub = [(q2x - q1x) / Lsp, (q2y - q1y) / Lsp], nb = [-ub[1], ub[0]], uc = Lsp / 2;
-    function W(u, v) { return [q1x + ub[0] * u + nb[0] * v, q1y + ub[1] * u + nb[1] * v]; }
-    function wrap(D) {
-      var vc = D - ri, dist = Math.hypot(uc, vc);
-      if (dist <= ri) return null;
-      var be = Math.atan2(vc, uc), al = Math.asin(ri / dist), t = Math.sqrt(dist * dist - ri * ri);
-      var t1u = t * Math.cos(be + al), t1v = t * Math.sin(be + al), t2u = Lsp - t1u;
-      var a1 = Math.atan2(t1v - vc, t1u - uc), a2 = Math.atan2(t1v - vc, t2u - uc);
-      return { vc: vc, t1u: t1u, t1v: t1v, t2u: t2u, a1: a1, a2: a2, dL: 2 * t + ri * (a1 - a2) - Lsp };
+    // ----- General idler placement. The chain is a loop of circles (sprocket 1, sprocket 2, and the idler) joined by tangent lines. -----
+    var TAU = 2 * Math.PI, Lchain = pathPx + ePx, roIpx = roI * sc;
+    var cc1 = { x: cx1, y: cy, r: r1, s: 1 }, cc2 = { x: cx2, y: cy, r: r2, s: 1 }; // s = +1 wraps clockwise (centre on the right of travel), -1 counter-clockwise
+    function tang(A, B) {
+      var dx = B.x - A.x, dy = B.y - A.y, dist = Math.hypot(dx, dy), k = B.s * B.r - A.s * A.r;
+      if (dist <= Math.abs(k) + 1e-6) return null;
+      var th = Math.atan2(dy, dx) - Math.asin(k / dist), nx = -Math.sin(th), ny = Math.cos(th);
+      var pa = [A.x - A.s * A.r * nx, A.y - A.s * A.r * ny], pb = [B.x - B.s * B.r * nx, B.y - B.s * B.r * ny];
+      return { pa: pa, pb: pb, L: Math.sqrt(dist * dist - k * k), aA: Math.atan2(pa[1] - A.y, pa[0] - A.x), aB: Math.atan2(pb[1] - B.y, pb[0] - B.x) };
     }
-    var Dmax = 3.2 * ri, Dstar = 0, wst = wrap(0);
-    if (ePx > 0.01) {
-      var lo = 0, hi = Dmax;
-      if (wrap(hi) && wrap(hi).dL < ePx) Dstar = hi;
-      else { for (var it = 0; it < 40; it++) { var mid = (lo + hi) / 2, wm = wrap(mid); if (wm && wm.dL < ePx) lo = mid; else hi = mid; } Dstar = (lo + hi) / 2; }
-      wst = wrap(Dstar);
+    function geo(I, run) {
+      var seq = !I ? [cc1, cc2] : run === "top" ? [cc1, I, cc2] : [cc1, cc2, I], n = seq.length, T = [], arcs = [], len = 0, i;
+      for (i = 0; i < n; i++) { T[i] = tang(seq[i], seq[(i + 1) % n]); if (!T[i]) return null; }
+      for (i = 0; i < n; i++) {
+        var tin = T[(i + n - 1) % n], sw = (T[i].aA - tin.aB) * seq[i].s;
+        sw = ((sw % TAU) + TAU) % TAU; if (sw > TAU - 1e-4) sw = 0;
+        arcs[i] = { a0: tin.aB, sw: sw }; len += seq[i].r * sw + T[i].L;
+      }
+      return { seq: seq, T: T, arcs: arcs, len: len };
     }
-    var reached = ePx <= 0.01 || (wst && wst.dL >= ePx - 0.05);
-    var botY = Math.max(cy + Math.max(r1, r2) + 0.5 * px + 2, W(uc, Dstar)[1] + 0.5 * px + 2, q1y + 0.5 * px + 2, q2y + 0.5 * px + 2), vh = Math.ceil(botY + 18);
+    function pathPts(g, hangI, h) {
+      var pts = [], n = g.seq.length;
+      for (var i = 0; i < n; i++) {
+        var C = g.seq[i], A = g.arcs[i], m = Math.max(2, Math.ceil(A.sw / 0.12)), t = g.T[i];
+        for (var j = 0; j <= m; j++) { var a = A.a0 + C.s * A.sw * j / m; pts.push([C.x + C.r * Math.cos(a), C.y + C.r * Math.sin(a)]); }
+        if (i === hangI && h > 0.01) {
+          var dx = t.pb[0] - t.pa[0], dy = t.pb[1] - t.pa[1], nx = -dy / t.L, ny = dx / t.L; if (ny < 0) { nx = -nx; ny = -ny; }
+          for (var q = 1; q < 40; q++) { var u = q / 40, b = 4 * h * u * (1 - u); pts.push([t.pa[0] + dx * u + nx * b, t.pa[1] + dy * u + ny * b]); }
+        }
+      }
+      pts.push(pts[0]);
+      return pts;
+    }
+    // The two straight runs, each travelled in the chain direction. Right-hand normal points into the loop.
+    var runs = { top: { P0: [p1x, p1y], d: [(p2x - p1x) / Lsp, (p2y - p1y) / Lsp] }, bottom: { P0: [q2x, q2y], d: [(q1x - q2x) / Lsp, (q1y - q2y) / Lsp] } };
+    function idlerAt(run, side, f, D) {
+      var R = runs[run], bx = R.P0[0] + R.d[0] * Lsp * f, by = R.P0[1] + R.d[1] * Lsp * f, sg = side === "in" ? -1 : 1, mx = sg * -R.d[1], my = sg * R.d[0], off = D - ri;
+      return { x: bx + mx * off, y: by + my * off, r: ri, s: side === "in" ? 1 : -1, bx: bx, by: by, mx: mx, my: my };
+    }
+    // Sample the tight chain path (arcs and straight runs) so spacing between any two parts of the chain, and between the chain and the idler teeth, can be checked.
+    function tagPts(g, run) {
+      var pts = [], n = g.seq.length, ii = run === "top" ? 1 : 2, stp = 0.5 * px, sAcc = 0;
+      function add(x, y, tag, e) { if (pts.length) sAcc += Math.hypot(x - pts[pts.length - 1].x, y - pts[pts.length - 1].y); pts.push({ x: x, y: y, s: sAcc, tag: tag, e: e || 0 }); }
+      for (var i = 0; i < n; i++) {
+        var C = g.seq[i], A = g.arcs[i], t = g.T[i], m = Math.max(1, Math.ceil(C.r * A.sw / stp));
+        for (var j = 0; j <= m; j++) { var a = A.a0 + C.s * A.sw * j / m; add(C.x + C.r * Math.cos(a), C.y + C.r * Math.sin(a), i === ii ? "I" : "A"); }
+        var nn = Math.max(1, Math.ceil(t.L / stp));
+        for (var k = 1; k < nn; k++) add(t.pa[0] + (t.pb[0] - t.pa[0]) * k / nn, t.pa[1] + (t.pb[1] - t.pa[1]) * k / nn, (i === ii || (i + 1) % n === ii) ? "I" : "S", Math.min(k, nn - k) * t.L / nn);
+      }
+      return { pts: pts, total: sAcc };
+    }
+    function segX(p, q, r, t) {
+      function o(a, b, c) { return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x); }
+      return o(p, q, r) * o(p, q, t) < 0 && o(r, t, p) * o(r, t, q) < 0;
+    }
+    function pathClear(g, I, run) {
+      var tp = tagPts(g, run), P2 = tp.pts, n2 = P2.length, minSep = 1.5 * px, minD = 0.78 * px, a, b;
+      for (a = 0; a < n2; a++) {
+        if (P2[a].e > 3 * px && (Math.hypot(P2[a].x - cx1, P2[a].y - cy) < ro1 * sc + 0.1 * px || Math.hypot(P2[a].x - cx2, P2[a].y - cy) < ro2 * sc + 0.1 * px)) return false; // chain running through a sprocket's teeth
+        if (P2[a].tag !== "I" && Math.hypot(P2[a].x - I.x, P2[a].y - I.y) < roIpx + 0.6 * px) return false; // chain running through the idler's teeth
+        for (b = a + 1; b < n2; b++) {
+          var ds2 = P2[b].s - P2[a].s;
+          if (ds2 < minSep || tp.total - ds2 < minSep) continue;
+          if (Math.hypot(P2[a].x - P2[b].x, P2[a].y - P2[b].y) < minD) return false; // two parts of the chain on top of each other
+          if (a + 1 < n2 && b + 1 < n2 && segX(P2[a], P2[a + 1], P2[b], P2[b + 1])) return false; // chain crossing itself
+        }
+      }
+      return true;
+    }
+    function clearOf(I, run, side, D) {
+      if (Math.hypot(I.x - cx1, I.y - cy) < roIpx + ro1 * sc + 0.4 * px) return false;
+      if (Math.hypot(I.x - cx2, I.y - cy) < roIpx + ro2 * sc + 0.4 * px) return false;
+      var g2 = geo(I, run);
+      return !!g2 && pathClear(g2, I, run);
+    }
+    // Push distance D that makes the chain exactly taut with the idler at this spot on this run and side.
+    function solve(run, side, f) {
+      var hi = 4 * ri + Lsp, lo = 0, g;
+      function ge(D) { g = geo(idlerAt(run, side, f, D), run); return !g || g.len >= Lchain; }
+      if (!ge(hi)) return { run: run, side: side, f: f, D: hi, ok: false };
+      for (var it = 0; it < 36; it++) { var mid = (lo + hi) / 2; if (ge(mid)) hi = mid; else lo = mid; }
+      var I = idlerAt(run, side, f, hi), ok = ePx > 0.05 && !!geo(I, run) && clearOf(I, run, side, hi);
+      return { run: run, side: side, f: f, D: hi, ok: ok, x: I.x, y: I.y };
+    }
+    var curves = {}, minY = Infinity, maxY = -Infinity, anyOk = false;
+    ["top", "bottom"].forEach(function (run) { [idSide].forEach(function (side) {
+      var arr = [];
+      for (var fi = 0.06; fi <= 0.941; fi += 0.02) {
+        var sm = solve(run, side, fi); arr.push(sm);
+        if (sm.ok) {
+          anyOk = true; var I2 = idlerAt(run, side, fi, sm.D);
+          minY = Math.min(minY, sm.y - roIpx - 2, I2.by + I2.my * sm.D - 0.5 * px - 2); maxY = Math.max(maxY, sm.y + roIpx + 2, I2.by + I2.my * sm.D + 0.5 * px + 2);
+        }
+      }
+      curves[run + side] = arr;
+    }); });
+    var hMax = Math.min(0.9 * Math.sqrt(3 * Lsp * ePx / 8), 0.8 * Math.min(r1, r2));
+    var botY = Math.max(cy + Math.max(r1, r2) + 0.5 * px + 2, q1y + 0.5 * px + 2 + hMax, q2y + 0.5 * px + 2 + hMax, maxY), vh = Math.ceil(botY + 18);
+    var G = null;
+    function firstOk(keys) { for (var a = 0; a < keys.length; a++) { var arr = curves[keys[a]], best = null; for (var b = 0; b < arr.length; b++) if (arr[b].ok && (!best || Math.abs(arr[b].f - idPl.f) < Math.abs(best.f - idPl.f))) best = arr[b]; if (best) return best; } return null; }
+    G = firstOk([idPl.run + idSide, (idPl.run === "top" ? "bottom" : "top") + idSide]);
+    if (!G) { G = solve(idPl.run, idSide, idPl.f); if (!(ePx > 0.05)) G.D = 0; G.fallback = true; }
+    idPl = { run: G.run, side: G.side, f: G.f };
     var odStroke = "var(--ink-soft)", dur = 9;
 
     function toothPath(N, r, rt) { return toothOutline(N, r, px); }
     function sprocketSvg(x, y, r, roPx, N, id) {
       var af = Math.min(0.5 * sc, (r - 0.31 * px) * 1.5), hr = af / Math.sqrt(3), hp = "";
       for (var k = 0; k < 6; k++) { var ha = (k * 60 + 30) * Math.PI / 180; hp += (k ? " L" : "M") + f(hr * Math.sin(ha), 2) + " " + f(-hr * Math.cos(ha), 2); }
-      return '<g' + (id ? ' id="' + id + '"' : "") + ' transform="translate(' + f(x, 2) + " " + f(y, 2) + ')"><circle r="' + f(roPx, 2) + '" fill="none" stroke="' + odStroke + '" stroke-width="1" stroke-dasharray="4 3" opacity="0.7"/>' +
-        '<path d="' + toothPath(N, r, roPx) + '" fill="none" stroke="var(--blue-deep)" stroke-width="1.3" stroke-linejoin="round"/><path d="' + hp + ' Z" fill="none" stroke="var(--blue-deep)" stroke-width="1.3" stroke-linejoin="round"/>' + (id ? '<text x="' + f(roPx + 8, 2) + '" y="-6" text-anchor="start" font-size="12" font-weight="500" fill="var(--ink)">Idler | ' + N + 'T</text>' : "") + '</g>';
+      return '<g' + (id ? ' id="' + id + '" style="cursor:grab;touch-action:none"' : "") + ' transform="translate(' + f(x, 2) + " " + f(y, 2) + ')"><circle r="' + f(roPx, 2) + '" fill="' + (id ? "transparent" : "none") + '" stroke="' + odStroke + '" stroke-width="1" stroke-dasharray="4 3" opacity="0.7"/>' +
+        '<path d="' + toothPath(N, r, roPx) + '" fill="none" stroke="var(--blue-deep)" stroke-width="1.3" stroke-linejoin="round" style="pointer-events:none"/><path d="' + hp + ' Z" fill="none" stroke="var(--blue-deep)" stroke-width="1.3" stroke-linejoin="round" style="pointer-events:none"/>' + (id ? '<text id="idLabT" x="' + f(roPx + 8, 2) + '" y="-6" text-anchor="start" font-size="12" font-weight="500" fill="var(--ink)" stroke="var(--blue-50)" stroke-width="3" paint-order="stroke" style="pointer-events:none">Idler | ' + N + 'T</text>' : "") + '</g>';
     }
     var defs = '<defs><g id="idO"><path d="' + PLATE_O + '" fill="var(--blue-100)" stroke="var(--blue-deep)" stroke-width="1.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>' +
         '<circle cx="-13.5" r="4.89" fill="var(--blue-50)" stroke="var(--blue-deep)" stroke-width="1.2" vector-effect="non-scaling-stroke"/><circle cx="13.5" r="4.89" fill="var(--blue-50)" stroke="var(--blue-deep)" stroke-width="1.2" vector-effect="non-scaling-stroke"/></g>' +
@@ -1017,39 +1120,41 @@ svg.draw text { font-family: var(--font); }
     var linkSvg = "";
     for (var q = 0; q < links; q += 2) linkSvg += '<g id="il' + q + '"><use href="#idO"/></g>';
     for (var q2 = 1; q2 < links; q2 += 2) linkSvg += '<g id="il' + q2 + '"><use href="#idI"/></g>';
-    var cW = W(uc, 0);
-    var out = defs + sprocketSvg(cx1, cy, r1, ro1 * sc, N1) + sprocketSvg(cx2, cy, r2, ro2 * sc, N2) + linkSvg + sprocketSvg(0, 0, ri, roI * sc, Ni, "idSpr");
-    function lab(cx, ro, txt) {
-      var half = txt.length * 3.4, x = Math.max(8 + half, Math.min(vw - 8 - half, cx)), top = cy - Math.max(r1, r2) * 0 - (ro * sc + 0);
-      return '<text x="' + f(x, 2) + '" y="' + f(Math.min(top, p1y - 0.5 * px - 2) - 12, 2) + '" text-anchor="middle" font-size="12" font-weight="500" fill="var(--ink)">' + esc(txt) + "</text>";
+    // Dashed guides showing every spot where the idler would actually take up the slack.
+    var ghost = "";
+    for (var ck in curves) {
+      var seg = [];
+      curves[ck].concat([{ ok: false }]).forEach(function (sm) {
+        if (sm.ok) seg.push(f(sm.x, 1) + "," + f(sm.y, 1));
+        else {
+          if (seg.length > 1) {
+            var pl = seg.join(" ");
+            ghost += '<polyline points="' + pl + '" fill="none" stroke="var(--blue)" stroke-width="1.6" stroke-dasharray="3 5" stroke-linecap="round" style="pointer-events:none"/>' +
+              '<polyline class="idHit" data-key="' + ck + '" points="' + pl + '" fill="none" stroke="transparent" stroke-width="16" stroke-linecap="round" style="cursor:pointer;pointer-events:stroke"/>';
+          }
+          seg = [];
+        }
+      });
     }
-    var labY = Math.min(cy - Math.max(r1, r2) - 0.5 * px - 2, p1y - 0.5 * px - 2, p2y - 0.5 * px - 2) - 12;
-    function lab2(cx, txt) { var half = txt.length * 3.4, x = Math.max(8 + half, Math.min(vw - 8 - half, cx)); return '<text x="' + f(x, 2) + '" y="' + f(labY, 2) + '" text-anchor="middle" font-size="12" font-weight="500" fill="var(--ink)">' + esc(txt) + "</text>"; }
-    out += lab2(cx1, "Sprocket 1 | " + N1 + "T (driver)") + lab2(cx2, "Sprocket 2 | " + N2 + "T");
-    var extra = Math.max(0, Math.ceil(16 - labY));
+    var labYBase = Math.min(cy - Math.max(r1, r2) - 0.5 * px - 2, p1y - 0.5 * px - 2, p2y - 0.5 * px - 2) - 12;
+    var out = defs + sprocketSvg(cx1, cy, r1, ro1 * sc, N1) + sprocketSvg(cx2, cy, r2, ro2 * sc, N2) + linkSvg +
+      '<g id="idGhost" opacity="0.4">' + ghost + "</g>" + sprocketSvg(0, 0, ri, roIpx, Ni, "idSpr") + '<g id="idDim" style="pointer-events:none" display="none"></g>' +
+      '<text id="idLab1" font-size="12" font-weight="500" fill="var(--ink)" text-anchor="middle"></text><text id="idLab2" font-size="12" font-weight="500" fill="var(--ink)" text-anchor="middle"></text>';
+    var topAll = Math.min(labYBase, isFinite(minY) ? minY - 14 : labYBase);
+    var extra = Math.max(0, Math.ceil(16 - topAll));
     svg.setAttribute("viewBox", "0 0 " + vw + " " + f(vh + extra, 0));
-    svg.innerHTML = '<rect x="0" y="0" width="' + vw + '" height="' + f(vh + extra, 0) + '" fill="var(--blue-50)"/><g transform="translate(0 ' + extra + ')">' + out + "</g>";
+    svg.innerHTML = '<rect x="0" y="0" width="' + vw + '" height="' + f(vh + extra, 0) + '" fill="var(--blue-50)"/><g id="idScene" transform="translate(0 ' + extra + ')">' + out + "</g>";
 
-    var th1 = Math.atan2(c, s), th2 = Math.atan2(-c, s);
-    function arcPts(cxs, rs, a0, a1) { var m = Math.max(6, Math.ceil(Math.abs(a1 - a0) / 0.12)), r = []; for (var i3 = 1; i3 <= m; i3++) { var a = a0 + (a1 - a0) * i3 / m; r.push([cxs + rs * Math.cos(a), cy + rs * Math.sin(a)]); } return r; }
     function ease(x) { return x * x * (3 - 2 * x); }
+    var clock = 0, last = 0, wasPaused = paused;
     function frame(sec) {
       var T = 1.0 + 2.6 + 1.6 + 1.6, tt = sec % T, fr;
       if (tt < 1) fr = 0; else if (tt < 3.6) fr = ease((tt - 1) / 2.6); else if (tt < 5.2) fr = 1; else fr = 1 - ease((tt - 5.2) / 1.6);
-      var D = fr * Dstar, w = wrap(D) || wrap(0), slack = Math.max(0, ePx - (D > 0 ? w.dL : 0));
-      var pts = [], ang = Math.atan2(p2y - p1y, p2x - p1x), ca = Math.cos(ang), sa = Math.sin(ang), hT = 0.9 * Math.sqrt(3 * Lsp * slack / 8);
-      hT = Math.min(hT, 0.8 * Math.min(r1, r2) * c);
-      for (var i = 0; i <= 40; i++) { var t = i / 40, bs = 4 * hT * t * (1 - t); pts.push([p1x + Lsp * t * ca - bs * sa, p1y + Lsp * t * sa + bs * ca]); }
-      pts = pts.concat(arcPts(cx2, r2, th2, th2 + 2 * th1));
-      if (D > 0.01) {
-        var pa = W(Lsp - 0, 0); pts.push(W(w.t2u, w.t1v));
-        var m = Math.max(8, Math.ceil((w.a1 - w.a2) / 0.1));
-        for (var j = 1; j < m; j++) { var a = w.a2 + (w.a1 - w.a2) * j / m; pts.push(W(uc + ri * Math.cos(a), w.vc + ri * Math.sin(a))); }
-        pts.push(W(w.t1u, w.t1v));
-      }
-      pts.push([q1x, q1y]);
-      pts = pts.concat(arcPts(cx1, r1, th1, th1 + 2 * Math.PI - 2 * th1));
-      var cum = [0];
+      if (idDrag || (paused && idPlaced)) fr = 1; // while paused after a drop, the idler stays where it was placed
+      var D = fr * G.D, I = idlerAt(G.run, G.side, G.f, D), g = geo(I, G.run) || geo(idlerAt(G.run, G.side, G.f, 0), G.run);
+      var hangI = G.run === "top" ? 2 : 0, slack = Math.max(0, Lchain - g.len);
+      var h = Math.min(0.9 * Math.sqrt(3 * g.T[hangI].L * slack / 8), 0.8 * Math.min(r1, r2));
+      var pts = pathPts(g, hangI, h), cum = [0];
       for (var i5 = 1; i5 < pts.length; i5++) cum.push(cum[i5 - 1] + Math.hypot(pts[i5][0] - pts[i5 - 1][0], pts[i5][1] - pts[i5 - 1][1]));
       var ds = cum[cum.length - 1] / links, seg = 1;
       for (var li = 0; li < links; li++) {
@@ -1059,24 +1164,92 @@ svg.draw text { font-family: var(--font); }
         var el = document.getElementById("il" + li);
         if (el) el.setAttribute("transform", "translate(" + f(xa + (xb - xa) * tf, 2) + " " + f(ya + (yb - ya) * tf, 2) + ") rotate(" + f(Math.atan2(yb - ya, xb - xa) * 180 / Math.PI, 2) + ") scale(" + f(ds / 27, 4) + ")");
       }
-      var ic = W(uc, w.vc), sp2 = document.getElementById("idSpr");
-      if (sp2) sp2.setAttribute("transform", "translate(" + f(ic[0], 2) + " " + f(ic[1], 2) + ")");
+      var sp2 = document.getElementById("idSpr");
+      if (sp2) sp2.setAttribute("transform", "translate(" + f(I.x, 2) + " " + f(I.y, 2) + ")");
     }
-    frame(0);
-    var clock = 0, last = 0;
-    function loop(now) { if (!last) last = now; if (!paused) clock += (now - last) / 1000; last = now; frame(clock); idRaf = requestAnimationFrame(loop); }
+    // Everything that depends on where the idler sits: labels, the X / Y dimension, the table and the note.
+    function refresh() {
+      var Ig = idlerAt(G.run, G.side, G.f, G.D), gT = geo(Ig, G.run), wrapDeg = 0;
+      if (gT) wrapDeg = gT.arcs[G.run === "top" ? 1 : 2].sw * 180 / Math.PI;
+      var topY = (G.run === "top" && G.side === "out") ? Math.min(labYBase, Ig.y - roIpx - 14) : labYBase;
+      var t1 = $("idLab1"), t2 = $("idLab2"), s1 = "Sprocket 1 | " + N1 + "T (Input)", s2 = "Sprocket 2 | " + N2 + "T (Output)";
+      function lx(cx, txt) { var half = txt.length * 3.4; return Math.max(8 + half, Math.min(vw - 8 - half, cx)); }
+      t1.textContent = s1; t1.setAttribute("x", f(lx(cx1, s1), 2)); t1.setAttribute("y", f(topY, 2));
+      t2.textContent = s2; t2.setAttribute("x", f(lx(cx2, s2), 2)); t2.setAttribute("y", f(topY, 2));
+      var lt = $("idLabT");
+      if (lt) {
+        // Put the label inside the hex bore if it fits, otherwise at whichever spot around the idler is furthest from the chain.
+        var hexW = 2 * Math.min(0.5 * sc, (ri - 0.31 * px) * 1.5) / Math.sqrt(3), txtW = ("Idler | " + Ni + "T").length * 6.6, bx = 0, by = 4;
+        if (hexW * 0.9 < txtW && gT) {
+          var cp0 = pathPts(gT, G.run === "top" ? 2 : 0, 0), cp = [cp0[0]], best = -1;
+          for (var kd = 1; kd < cp0.length; kd++) { var ddx = cp0[kd][0] - cp0[kd - 1][0], ddy = cp0[kd][1] - cp0[kd - 1][1], nn = Math.ceil(Math.hypot(ddx, ddy) / 4); for (var ke = 1; ke <= nn; ke++) cp.push([cp0[kd - 1][0] + ddx * ke / nn, cp0[kd - 1][1] + ddy * ke / nn]); }
+          var hw = txtW / 2 + 8 + 0.8 * px, hh = 10 + 0.8 * px;
+          for (var ka = 0; ka < 24; ka++) {
+            var an = ka * Math.PI / 12, ox = Math.cos(an) * (roIpx + 8 + txtW / 2 * Math.abs(Math.cos(an))), oy = Math.sin(an) * (roIpx + 8 + 9 * Math.abs(Math.sin(an))), tx2 = Ig.x + ox, ty2 = Ig.y + oy;
+            if (tx2 - txtW / 2 < 6 || tx2 + txtW / 2 > vw - 6 || ty2 - 11 < topAll || ty2 + 5 > vh - 2) continue;
+            var sc2 = Infinity;
+            for (var kp = 0; kp < cp.length; kp += 1) { var dxn = (cp[kp][0] - tx2) / hw, dyn = (cp[kp][1] - ty2) / hh, dd = Math.sqrt(dxn * dxn + dyn * dyn); if (dd < sc2) sc2 = dd; }
+            for (var kq = 0; kq < 2; kq++) { var sx = kq ? cx2 : cx1, dxn2 = (sx - tx2) / (hw + (kq ? ro2 : ro1) * sc), dyn2 = (cy - ty2) / (hh + (kq ? ro2 : ro1) * sc), dd2 = Math.sqrt(dxn2 * dxn2 + dyn2 * dyn2); if (dd2 < sc2) sc2 = dd2; }
+            if (sc2 > best) { best = sc2; bx = ox; by = oy + 4; }
+          }
+          if (best < 1) { bx = 0; by = 4; }
+        }
+        lt.setAttribute("x", f(bx, 2)); lt.setAttribute("y", f(by, 2)); lt.setAttribute("text-anchor", "middle");
+      }
+      var X = (Ig.x - cx1) / sc, Y = (cy - Ig.y) / sc, dim = $("idDim"), cc = Math.hypot(Ig.x - cx1, Ig.y - cy) / sc;
+      if (idPlaced && !idDrag && !G.fallback) {
+        var halo = ' stroke="var(--blue-50)" stroke-width="4" paint-order="stroke"', mx2 = (cx1 + Ig.x) / 2, my2 = (cy + Ig.y) / 2, ang2 = Math.atan2(Ig.y - cy, Ig.x - cx1) * 180 / Math.PI;
+        if (ang2 > 90) ang2 -= 180; else if (ang2 < -90) ang2 += 180;
+        var xlab = Y >= 0 ? cy + 16 : cy - 8, ylx = Ig.x + (Ig.x > vw - 120 ? -8 : 8), ln = ' stroke="var(--blue-deep)" stroke-width="1.2" stroke-dasharray="5 3"';
+        dim.innerHTML = '<line x1="' + f(cx1, 1) + '" y1="' + f(cy, 1) + '" x2="' + f(Ig.x, 1) + '" y2="' + f(cy, 1) + '"' + ln + '/>' +
+          '<line x1="' + f(Ig.x, 1) + '" y1="' + f(cy, 1) + '" x2="' + f(Ig.x, 1) + '" y2="' + f(Ig.y, 1) + '"' + ln + '/>' +
+          '<line x1="' + f(cx1, 1) + '" y1="' + f(cy, 1) + '" x2="' + f(Ig.x, 1) + '" y2="' + f(Ig.y, 1) + '" stroke="var(--blue-deep)" stroke-width="1.3"/>' +
+          '<circle cx="' + f(cx1, 1) + '" cy="' + f(cy, 1) + '" r="3" fill="var(--blue-deep)"/><circle cx="' + f(Ig.x, 1) + '" cy="' + f(Ig.y, 1) + '" r="3" fill="var(--blue-deep)"/>' +
+          '<text x="' + f((cx1 + Ig.x) / 2, 1) + '" y="' + f(xlab, 1) + '" text-anchor="middle" font-size="12" font-weight="600" fill="var(--blue-deep)"' + halo + ">X " + esc(signed(X)) + "</text>" +
+          '<text x="' + f(ylx, 1) + '" y="' + f(cy + (Ig.y - cy) * 0.18 + 4, 1) + '" text-anchor="' + (Ig.x > vw - 120 ? "end" : "start") + '" font-size="12" font-weight="600" fill="var(--blue-deep)"' + halo + ">Y " + esc(signed(Y)) + "</text>" +
+          '<text transform="translate(' + f(mx2, 1) + " " + f(my2, 1) + ") rotate(" + f(ang2, 1) + ')" y="-6" text-anchor="middle" font-size="12" font-weight="600" fill="var(--blue-deep)"' + halo + ">C-C " + esc(both(cc)) + "</text>";
+        dim.setAttribute("display", "");
+      } else dim.setAttribute("display", "none");
+      var rows = "";
+      rows += row("Idler Pitch Diameter", both(2 * Ri));
+      rows += row("Chain Length", links + " Links" + (links % 2 && radio("half") !== "1" ? ", odd count needs a half link" : ""));
+      rows += row("Slack Taken Up", eIn < 0.002 ? "None, chain is the exact length" : both(eIn));
+      rows += row("Idler Location", (G.run === "top" ? "Top" : "Bottom") + " run, " + (G.side === "in" ? "inside" : "outside") + " the chain path");
+      rows += row("Idler Push", both(G.D / sc));
+      rows += row("Center To Center", both(cc) + ", X " + signed(X) + " and Y " + signed(Y) + " from Sprocket 1 to the idler");
+      rows += row("Idler Wrap", f(wrapDeg, 0) + "°, " + f(wrapDeg / 360 * Ni, 1) + " teeth in mesh", wrapDeg < 90 && G.D > 0);
+      $("idRows").innerHTML = rows;
+      $("drawNote").textContent = "Drawn to scale. Drag the idler along the dashed paths, or click one to send it there. These are the only spots where an idler on the " + (idSide === "in" ? "inside" : "outside") + " of the chain takes up the slack. " +
+        (eIn < 0.002 ? "The chain is the exact length, so there is no slack for an idler to take up." : !anyOk ? "This idler cannot take up the slack anywhere on the runs, so try a different tooth count." : "At the end of the move it takes up " + both(eIn) + " so the chain pulls straight.");
+    }
+    refresh(); frame(0);
+    function loop(now) { if (!last) last = now; if (wasPaused && !paused && idPlaced) clock = 5.2; wasPaused = paused; if (!paused) clock += (now - last) / 1000; last = now; frame(clock); idRaf = requestAnimationFrame(loop); }
     idRaf = requestAnimationFrame(loop);
     applyPlay();
-
-    var meshDeg = wst ? (wst.a1 - wst.a2) * 180 / Math.PI : 0, rows = "";
-    rows += row("Idler Pitch Diameter", both(2 * Ri));
-    rows += row("Slack Taken Up", eIn < 0.002 ? "None, chain is the exact length" : both(eIn));
-    rows += row("Idler Push", both(Dstar / sc));
-    rows += row("Idler Wrap", f(meshDeg, 0) + "°, " + f(meshDeg / 360 * Ni, 1) + " teeth in mesh", meshDeg < 90 && Dstar > 0);
-    $("idRows").innerHTML = rows;
-    var fitBad = wst ? (W(uc, wst.vc)[1] - roI * sc) < ((p1y + p2y) / 2 + 0.5 * px + 2) : false;
-    $("drawNote").textContent = "Drawn to scale. The idler is a plain sprocket pressed into the slack bottom run from inside the loop. It starts loose with the top run hanging, then pushes " + both(Dstar / sc) + " to take up " + (eIn < 0.002 ? "no slack" : both(eIn)) + " so the chain pulls straight." +
-      (reached ? "" : " This idler is too small to take up all of the slack, so the top run stays loose.") + (fitBad ? " This idler is large for the space between the runs, so it would hit the top run." : "");
+    // Drag: the idler jumps to the nearest spot on a dashed path, so it can only ever sit where it actually tightens the chain.
+    var handle = $("idSpr"), scene = $("idScene");
+    function toScene(ev) { var pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY; var m = scene.getScreenCTM(); return m ? pt.matrixTransform(m.inverse()) : null; }
+    handle.addEventListener("pointerdown", function (ev) {
+      if (!anyOk) return;
+      ev.preventDefault(); try { handle.setPointerCapture(ev.pointerId); } catch (e) {}
+      idDrag = true; handle.style.cursor = "grabbing"; $("idGhost").setAttribute("opacity", "0.95"); refresh();
+    });
+    handle.addEventListener("pointermove", function (ev) {
+      if (!idDrag) return;
+      var q = toScene(ev); if (!q) return;
+      var best = null, bd = Infinity;
+      for (var key in curves) curves[key].forEach(function (sm) { if (!sm.ok) return; var d2 = (sm.x - q.x) * (sm.x - q.x) + (sm.y - q.y) * (sm.y - q.y); if (d2 < bd) { bd = d2; best = sm; } });
+      if (best) { G = best; idPl = { run: G.run, side: G.side, f: G.f }; refresh(); }
+    });
+    $("idGhost").addEventListener("click", function (ev) {
+      var t = ev.target; if (!t || !t.getAttribute || t.getAttribute("class") !== "idHit") return;
+      var q = toScene(ev), arr = curves[t.getAttribute("data-key")] || [], best = null, bd = Infinity;
+      if (!q) return;
+      arr.forEach(function (sm) { if (!sm.ok) return; var d2 = (sm.x - q.x) * (sm.x - q.x) + (sm.y - q.y) * (sm.y - q.y); if (d2 < bd) { bd = d2; best = sm; } });
+      if (best) { G = best; idPl = { run: G.run, side: G.side, f: G.f }; idPlaced = true; clock = 3.6; idHold = paused; refresh(); }
+    });
+    function drop() { if (!idDrag) return; idDrag = false; idPlaced = true; handle.style.cursor = "grab"; $("idGhost").setAttribute("opacity", "0.4"); clock = 3.6; idHold = paused; refresh(); }
+    handle.addEventListener("pointerup", drop); handle.addEventListener("pointercancel", drop);
   }
 
   // ---------- main calculation ----------
@@ -1238,7 +1411,7 @@ svg.draw text { font-family: var(--font); }
     renderAll();
   }
 
-  ["t1", "t2", "cd", "ex", "lk", "idt"].forEach(function (id) { $(id).addEventListener("input", calc); });
+  ["t1", "t2", "cd", "ex", "lk", "idt", "idx"].forEach(function (id) { $(id).addEventListener("input", calc); });
   var lastUnit = "in";
   function onUnit() {
     var u = radio("unit") === "mm" ? "mm" : "in";
