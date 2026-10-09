@@ -3,6 +3,9 @@
 <style>
 /* Layout: rounded light-blue shell holding a blue header card, then full-width white cards stacked: chain inputs, result, top view, sprockets, saved parts. Fixed light theme, white and blue only, matching the belt and motor spacer calculators. */
 :root {
+  --dimc: #c2185b;
+  --dimx: #1b8a3a;
+  --dimy: #7b3fb8;
   --white: #ffffff;
   --blue: #0075c9;
   --blue-deep: #005a9c;
@@ -107,9 +110,13 @@ main > section:first-child .fld { gap: 4px; }
 .tile { border: 1px solid var(--blue-100); background: var(--blue-50); border-radius: 12px; padding: 12px 8px; text-align: center; }
 .tile .count { font-size: 24px; font-weight: 700; line-height: 1.15; color: var(--blue); }
 .tile .size { font-size: 13px; font-weight: 500; color: var(--ink-soft); }
+.tiles.two .tile[data-pick] { cursor: pointer; }
 .tile.hl { background: var(--blue-100); border-color: var(--blue-soft); }
 .tile .pn { font-size: 12px; font-weight: 500; color: var(--blue-deep); margin-top: 2px; }
 .tile .pn.dim { color: var(--ink-soft); }
+.tile.low { background: color-mix(in srgb, #FE9A00 10%, #fff); border-color: color-mix(in srgb, #FE9A00 45%, #fff); }
+.tile.low .count { color: #b86e00; }
+.tile .pn.caution { color: #8a5200; font-weight: 600; font-size: 12px; line-height: 1.35; margin-top: 4px; }
 .tile .pn.warn { color: var(--alert); font-weight: 700; }
 .sub-h { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
 
@@ -118,8 +125,32 @@ table { width: 100%; border-collapse: collapse; font-size: 14px; }
 td { padding: 8px 0; border-top: 1px solid var(--line); }
 tr:first-child td { border-top: 0; }
 td.num { text-align: right; padding-left: 12px; color: var(--ink-soft); }
+td.num .cpv, .idc .cpv { user-select: all; }
+.idcopy { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 10px; }
+.idc-h { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); margin-right: 2px; }
+.idc { --k: #c2185b; --kb: #f0bdd2; --kf: #fdeff5; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--kb); background: var(--kf); border-radius: 10px; padding: 3px 4px 3px 10px; font-size: 14px; color: var(--k); }
+.idc-x { --k: #1b8a3a; --kb: #b7dfc3; --kf: #eef8f1; }
+.idc-y { --k: #7b3fb8; --kb: #d9c7ee; --kf: #f5eefb; }
+.idc-l { font-weight: 700; }
+.idc .cpv { font-weight: 600; font-variant-numeric: tabular-nums; }
+.idc .cpb { margin-left: 2px; border-color: var(--kb); background: #fff; color: var(--k); }
+.idc .cpb:hover { background: var(--kf); }
+.idc .cpb.ok { background: var(--k); color: #fff; }
+.cpb { margin-left: 8px; width: 26px; height: 26px; padding: 0; vertical-align: middle; border: 1px solid var(--blue-100); background: var(--blue-50); color: var(--blue); border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.cpb:hover { background: var(--blue-100); }
+.cpb.ok { background: var(--blue); color: #fff; }
 td.num.warn { color: var(--alert); font-weight: 700; }
-.note { font-size: 13px; color: var(--ink-soft); margin: 0; }
+.hb { --hc: #346DDB; display: flex; width: 100%; box-sizing: border-box; gap: 12px; align-items: flex-start; padding: 12px 16px; border-radius: 10px; font-size: 14px; line-height: 1.45; font-weight: 400; color: var(--ink); background: color-mix(in srgb, var(--hc) 8%, #fff); border: 1px solid color-mix(in srgb, var(--hc) 20%, #fff); margin: 0; }
+.hb:empty { display: none; }
+.hb::before { content: "i"; flex: 0 0 auto; width: 18px; height: 18px; margin-top: 1px; box-sizing: border-box; border: 1.6px solid var(--hc); border-radius: 50%; color: var(--hc); font-size: 11px; font-weight: 700; line-height: 14.5px; text-align: center; font-family: Georgia, serif; }
+.hb.success { --hc: #00C950; }
+.hb.success::before { content: "\2713"; font-family: inherit; font-size: 10px; }
+.hb.warning { --hc: #FE9A00; }
+.hb.warning::before { content: "!"; font-family: inherit; }
+.hb.danger { --hc: #FB2C36; }
+.hb.danger::before { content: "!"; font-family: inherit; }
+.hb a { color: var(--blue-deep); }
+.note:not(.hb) { font-size: 13px; color: var(--ink-soft); margin: 0; }
 
 /* top view */
 .draw-wrap { background: var(--blue-50); border: 1px solid var(--blue-100); border-radius: 12px; overflow: hidden; }
@@ -167,7 +198,7 @@ svg.draw text { font-family: var(--font); }
 
 <div class="shell">
 <header class="banner">
-  <span class="ver">v1.12.10</span>
+  <span class="ver">v1.12.30</span>
   <h1>Chain Calculator</h1>
   <p>Chain length and center distance for a two-sprocket chain drive</p>
 </header>
@@ -189,7 +220,7 @@ svg.draw text { font-family: var(--font); }
         <div class="grp fld-row">
           <span class="lbl" id="tensLbl">Tensioner</span>
           <div class="seg-group inline" id="tens" role="radiogroup" aria-labelledby="tensLbl"></div>
-          <span class="hint" id="tensHint"></span>
+          <span class="hint hb info" id="tensHint"></span>
         </div>
       </div>
 
@@ -223,7 +254,7 @@ svg.draw text { font-family: var(--font); }
             <span class="unit-field"><input class="field" id="ex" type="number" inputmode="decimal" step="any" min="0" value="0"><span class="usfx">in</span></span>
           </div>
         </div>
-        <span class="hint">Extra center is added to the desired center before the chain is sized, for slack or a tensioning range.</span>
+        <span class="hint hb info">Extra center is added to the desired center before the chain is sized, for slack or a tensioning range.</span>
         <div class="fld-row">
           <span class="lbl">Allow half links</span>
           <div class="toggle" role="radiogroup" aria-label="Allow half links">
@@ -231,13 +262,13 @@ svg.draw text { font-family: var(--font); }
             <input type="radio" name="half" id="h1" value="1"><label for="h1">On</label>
           </div>
         </div>
-        <span class="hint">Off keeps the link count even, so the master link closes the loop. On allows odd counts, which need a half link.</span>
+        <span class="hint hb info">Off keeps the link count even, so the master link closes the loop. On allows odd counts, which need a half link.</span>
       </div>
 
       <div class="fld" id="lkFields" hidden>
         <label for="lk">Chain Links</label>
         <span class="unit-field"><input class="field" id="lk" type="number" inputmode="numeric" step="1" min="1" value="104"><span>Links</span></span>
-        <span class="hint">Enter the link count of the chain you have.</span>
+        <span class="hint hb info">Enter the link count of the chain you have.</span>
       </div>
     </div>
   </section>
@@ -251,7 +282,7 @@ svg.draw text { font-family: var(--font); }
           <input type="radio" name="idm" id="idOff" value="0" checked><label for="idOff">None</label>
           <input type="radio" name="idm" id="idOn" value="1"><label for="idOn">Use idler</label>
         </div>
-        <span id="idOpts" style="display:none;align-items:center;gap:8px 16px;flex-wrap:wrap">
+        <span id="idOpts" style="display:none;align-items:center;gap:8px 16px;flex-wrap:wrap;flex-basis:100%">
         <div class="toggle" role="radiogroup" aria-label="Idler side">
           <input type="radio" name="idside" id="idsIn" value="in" checked><label for="idsIn">Inside</label>
           <input type="radio" name="idside" id="idsOut" value="out"><label for="idsOut">Outside</label>
@@ -259,31 +290,32 @@ svg.draw text { font-family: var(--font); }
         <span class="unit-field" id="idSize" style="width:150px"><input class="field" id="idt" type="number" inputmode="numeric" step="1" min="6" value="16" aria-label="Idler teeth"><span>Teeth</span></span>
         <span class="unit-field" id="idxBox" style="width:210px;white-space:nowrap"><input class="field" id="idx" type="number" inputmode="numeric" step="1" min="0" value="0" aria-label="Additional links"><span>Extra Links</span></span>
         </span>
-        <span class="hint" id="idHint" style="flex-basis:100%">Pushes into the slack run to take up extra chain.</span>
+        <span class="hint hb info" id="idHint" style="flex-basis:100%">Pushes into the slack run to take up extra chain.</span>
       </div>
       <div class="draw-wrap">
         <svg class="draw" id="draw" viewBox="0 0 640 220" role="img" aria-label="Top view of the chain drive"></svg>
         <div class="empty" id="drawEmpty" hidden>Fix the inputs above to see the drive.</div>
       </div>
+      <div id="idCopy" class="idcopy" hidden></div>
       <div id="idBox" class="card-sub" hidden>
         <div class="table-wrap"><table><tbody id="idRows"></tbody></table></div>
       </div>
-      <p class="note" id="drawNote"></p>
+      <p class="note hb info" id="drawNote"></p>
     </div>
   </section>
 
   <section aria-labelledby="out-h">
     <div class="card">
       <h2 id="out-h">Result</h2>
-      <div class="hero" id="status" aria-live="polite"></div>
-      <div class="tiles" id="tiles"></div>
-      <div class="table-wrap"><table><tbody id="rows"></tbody></table></div>
-      <div class="card-sub" id="actions" hidden></div>
       <div class="card-sub" id="opts" hidden>
         <h3 class="sub-h">Chain options</h3>
         <div class="tiles two" id="optTiles"></div>
       </div>
-      <p class="note">Wrap under 120&deg; on the small sprocket is a common rule-of-thumb limit for roller chain, and so is keeping the sprockets at least 1/8" apart. These numbers are estimates, so check the fit on your own drive.</p>
+      <div class="hero" id="status" aria-live="polite"></div>
+      <div class="tiles" id="tiles"></div>
+      <div class="table-wrap"><table><tbody id="rows"></tbody></table></div>
+      <div id="warns" style="display:grid;gap:8px"></div>
+      <div class="card-sub" id="actions" hidden></div>
     </div>
   </section>
 
@@ -291,7 +323,7 @@ svg.draw text { font-family: var(--font); }
     <div class="card">
       <h2 id="sp-h">WCP sprockets</h2>
       <div id="sprBody"></div>
-      <span class="hint">Sprockets listed here match the chain type and tooth counts above. Pick a style and bore, then save it.</span>
+      <span class="hint hb info">Sprockets listed here match the chain type and tooth counts above. Pick a style and bore, then save it.</span>
     </div>
   </section>
 
@@ -300,7 +332,7 @@ svg.draw text { font-family: var(--font); }
       <div class="card-head"><h2 id="sv-h">Saved parts</h2><button type="button" class="rm" id="clearAll">Clear All</button></div>
       <ul class="slist" id="savedList"></ul>
       <a class="btn" id="addAll" href="https://wcproducts.com/cart/" target="_blank" rel="noopener"><svg viewBox="0 0 576 512" width="16" height="16" aria-hidden="true" fill="currentColor"><path d="M0 24C0 10.7 10.7 0 24 0H69.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1-96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/></svg>Add To Cart</a>
-      <span class="hint" id="cartHint">Opens wcproducts.com in a new tab with every saved part in your cart.</span>
+      <span class="hint hb info" id="cartHint">Opens wcproducts.com in a new tab with every saved part in your cart.</span>
     </div>
   </section>
 </main>
@@ -466,9 +498,31 @@ svg.draw text { font-family: var(--font); }
     el.className = "hero" + (bad ? " bad" : "");
     el.innerHTML = (label ? '<div class="lab">' + esc(label) + "</div>" : "") + '<div class="big">' + esc(big) + "</div>" + (sub ? '<div class="sub">' + esc(sub) + "</div>" : "");
   }
-  function tile(value, label, sub, hl, extra) {
-    return '<div class="tile' + (hl ? " hl" : "") + '"><div class="count">' + esc(value) + '</div><div class="size">' + esc(label) + '</div>' + (sub ? '<div class="pn">' + esc(sub) + "</div>" : "") + (extra || "") + "</div>";
+  function tile(value, label, sub, hl, extra, attrs) {
+    return '<div class="tile' + (hl ? " hl" : "") + '"' + (attrs || "") + '><div class="count">' + esc(value) + '</div><div class="size">' + esc(label) + '</div>' + (sub ? '<div class="pn">' + esc(sub) + "</div>" : "") + (extra || "") + "</div>";
   }
+  // Row with a value shown to 3 decimals; copy button and text selection give the full-precision number.
+  function cpChip(label, v, sg, k) {
+    var mm = radio("unit") === "mm", u = mm ? " mm" : "\"", shown = Math.abs(v) < 0.0005 ? "0" : (sg ? (v > 0 ? "+" : "−") : "") + Math.abs(v).toFixed(3), full = Math.abs(v) < 0.0005 ? "0" : String(+v.toFixed(10));
+    return '<span class="idc idc-' + k + '"><span class="idc-l">' + esc(label) + '</span><span class="cpv" data-full="' + esc(full) + '">' + esc(shown + u) + '</span><button type="button" class="cpb" data-full="' + esc(full) + '" aria-label="Copy ' + esc(label) + '" title="Copy full value"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5V9A1.5 1.5 0 0 0 4 10.5h1.5"/></svg></button></span>';
+  }
+  function copyText(t, btn) {
+    function done() { if (!btn) return; btn.classList.add("ok"); btn.title = "Copied"; setTimeout(function () { btn.classList.remove("ok"); btn.title = "Copy full value"; }, 1200); }
+    function fb() { try { var ta = document.createElement("textarea"); ta.value = t; ta.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta); done(); } catch (e) {} }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, fb); else fb();
+  }
+  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest(".cpb"); if (b) copyText(b.getAttribute("data-full"), b); });
+  document.addEventListener("copy", function (e) {
+    var sel = window.getSelection(); if (!sel || sel.isCollapsed || !sel.anchorNode) return;
+    var n = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentNode, el = n && n.closest ? n.closest(".cpv") : null;
+    if (el && e.clipboardData) { e.clipboardData.setData("text/plain", el.getAttribute("data-full")); e.preventDefault(); }
+  });
+  // Tile for one sprocket's wrap. Under 120 degrees the tile turns to the warning color and says more wrap is recommended.
+  function wrapTile(label, deg, N) {
+    var low = deg < 120, t = tile(f(deg, 0) + "\u00b0", label, f(deg / 360 * N, 0) + " teeth in mesh", false, low ? '<div class="pn caution">More wrap is recommended. Under 120\u00b0 the chain may skip.</div>' : "");
+    return low ? t.replace('class="tile"', 'class="tile low"') : t;
+  }
+  function showWrapWarn() {}
   function row(label, text, warn) { return "<tr><td>" + esc(label) + '</td><td class="num' + (warn ? " warn" : "") + '">' + esc(text) + "</td></tr>"; }
 
   // ---------- saved parts and cart ----------
@@ -575,9 +629,14 @@ svg.draw text { font-family: var(--font); }
   });
   $("clearAll").addEventListener("click", function () { saved = []; renderSaved(); });
 
+  var selN = null;
   function onSave(e) {
     var b = e.target.closest ? e.target.closest("[data-act]") : null;
-    if (!b) return;
+    if (!b) {
+      var tl = e.target.closest ? e.target.closest(".tile[data-pick]") : null;
+      if (tl && e.currentTarget.id === "optTiles") { selN = parseInt(tl.getAttribute("data-pick"), 10); calc(); }
+      return;
+    }
     var act = b.getAttribute("data-act");
     if (act === "chain") addSaved(chainItem(parseInt(b.getAttribute("data-links"), 10), b.getAttribute("data-inline") === "1"));
     else if (act === "half") addSaved(halfItem());
@@ -604,7 +663,7 @@ svg.draw text { font-family: var(--font); }
           return '<option value="' + i + '">' + esc(s.style + " | " + s.bore) + "</option>";
         }).join("") + '</select><button type="button" class="btn" data-which="' + w + '">Save Sprocket</button>';
       } else {
-        html += '<div class="hint sp-none">No ' + N + ' tooth sprocket is listed here yet. <a href="' + SPROCKET_PAGE[fam] + '" target="_blank" rel="noopener">Browse WCP sprockets</a></div>';
+        html += '<div class="hint sp-none hb warning">No ' + N + ' tooth sprocket is listed here yet. <a href="' + SPROCKET_PAGE[fam] + '" target="_blank" rel="noopener">Browse WCP sprockets</a></div>';
       }
       html += "</div>";
     });
@@ -625,7 +684,7 @@ svg.draw text { font-family: var(--font); }
     var svg = $("draw");
     if (raf) { cancelAnimationFrame(raf); raf = 0; } tickFn = null;
     if (idRaf) { cancelAnimationFrame(idRaf); idRaf = 0; }
-    if (cur && tview === "idler") { $("idBox").hidden = false; $("viewSeg").hidden = true; drawIdler(); return; }
+    if (cur && tview === "idler") { $("idBox").hidden = true; $("viewSeg").hidden = true; drawIdler(); return; }
     $("viewSeg").hidden = false;
     $("idBox").hidden = true;
     if (!cur) { svg.innerHTML = ""; svg.hidden = true; $("drawEmpty").hidden = false; $("drawNote").textContent = ""; return; }
@@ -946,7 +1005,7 @@ svg.draw text { font-family: var(--font); }
       raf = requestAnimationFrame(loop);
     }
     applyPlay();
-    $("drawNote").textContent = "Drawn to scale. " + (tight
+    $("drawNote").className = "note hb info"; $("drawNote").textContent = "Drawn to scale. " + (tight
       ? (gap < 0 ? "The sprocket outside diameters overlap at this center distance." : "The sprockets are less than 1/8\" apart at this center distance.")
       : "The dashed rings are the sprocket outside diameters, " + both(gap) + " apart.") +
       (tighten ? tightNote : rev ? " The tensioner cannot go around a sprocket, so the chain runs back and forth and reverses before the tensioner would touch one. Drag the arrow on the degree arc, or the tensioner itself, to move it yourself." : art ? " The tensioner is too long to fit on the straight run between the sprockets, so it is drawn without motion." : " Sprocket 1 drives, and the chain speed matches the tooth counts.");
@@ -957,7 +1016,7 @@ svg.draw text { font-family: var(--font); }
     $("playBtn").textContent = paused ? "Play" : "Pause";
     $("playBtn").setAttribute("aria-pressed", paused ? "true" : "false");
   }
-  function syncIdler() { var on = $("idOn").checked; $("idOpts").style.display = on ? "inline-flex" : "none"; tview = on ? "idler" : "run"; drawDrive(); }
+  function syncIdler() { var on = $("idOn").checked; $("idOpts").style.display = on ? "flex" : "none"; tview = on ? "idler" : "run"; calc(); }
   $("idsIn").addEventListener("change", function () { drawDrive(); }); $("idsOut").addEventListener("change", function () { drawDrive(); });
   $("idOff").addEventListener("change", syncIdler); $("idOn").addEventListener("change", syncIdler);
   $("vRun").addEventListener("click", function () { if (tview !== "run") { tview = "run"; drawDrive(); } });
@@ -976,7 +1035,7 @@ svg.draw text { font-family: var(--font); }
     var svg = $("draw");
     svg.hidden = false; $("drawEmpty").hidden = true;
     $("vRun").setAttribute("aria-pressed", "false"); $("vTight").setAttribute("aria-pressed", "false"); $("vIdler").setAttribute("aria-pressed", "true");
-    $("idRows").innerHTML = "";
+    $("idRows").innerHTML = ""; $("idCopy").hidden = true;
     var Ni = Math.round(parseFloat($("idt").value));
     if (!(Ni >= 6)) { svg.innerHTML = ""; $("drawNote").textContent = "Enter an idler with at least 6 teeth."; return; }
     var C = cur.C, P = cur.P, N1 = cur.N1, N2 = cur.N2, links = cur.links;
@@ -986,7 +1045,7 @@ svg.draw text { font-family: var(--font); }
       var Cd = (radio("unit") === "mm" ? (cdv + exv) / 25.4 : cdv + exv);
       if (Cd > Math.abs(pitchDia(P, N2) - pitchDia(P, N1)) / 2 + 0.01) {
         var Lx = linksFor(Cd, P, N1, N2);
-        if (isFinite(Lx) && Lx > 0) { C = Cd; var xl = Math.max(0, Math.round(parseFloat($("idx").value) || 0)); links = Math.max(2, Math.ceil(Lx / 2 - 1e-9) * 2) + xl; idSlackIn = (links - Lx) * P; }
+        if (isFinite(Lx) && Lx > 0) { C = Cd; var xl = Math.max(0, Math.round(parseFloat($("idx").value) || 0)); var stI = radio("half") === "1" ? 1 : 2; links = Math.max(2, Math.ceil(Lx / stI - 1e-9) * stI) + xl; idSlackIn = (links - Lx) * P; }
       }
     }
     var R1 = pitchDia(P, N1) / 2, R2 = pitchDia(P, N2) / 2, ro1 = odRadius(P, N1), ro2 = odRadius(P, N2), Ri = pitchDia(P, Ni) / 2, roI = odRadius(P, Ni);
@@ -1171,55 +1230,97 @@ svg.draw text { font-family: var(--font); }
     function refresh() {
       var Ig = idlerAt(G.run, G.side, G.f, G.D), gT = geo(Ig, G.run), wrapDeg = 0;
       if (gT) wrapDeg = gT.arcs[G.run === "top" ? 1 : 2].sw * 180 / Math.PI;
-      var topY = (G.run === "top" && G.side === "out") ? Math.min(labYBase, Ig.y - roIpx - 14) : labYBase;
-      var t1 = $("idLab1"), t2 = $("idLab2"), s1 = "Sprocket 1 | " + N1 + "T (Input)", s2 = "Sprocket 2 | " + N2 + "T (Output)";
-      function lx(cx, txt) { var half = txt.length * 3.4; return Math.max(8 + half, Math.min(vw - 8 - half, cx)); }
-      t1.textContent = s1; t1.setAttribute("x", f(lx(cx1, s1), 2)); t1.setAttribute("y", f(topY, 2));
-      t2.textContent = s2; t2.setAttribute("x", f(lx(cx2, s2), 2)); t2.setAttribute("y", f(topY, 2));
-      var lt = $("idLabT");
-      if (lt) {
-        // Put the label inside the hex bore if it fits, otherwise at whichever spot around the idler is furthest from the chain.
-        var hexW = 2 * Math.min(0.5 * sc, (ri - 0.31 * px) * 1.5) / Math.sqrt(3), txtW = ("Idler | " + Ni + "T").length * 6.6, bx = 0, by = 4;
-        if (hexW * 0.9 < txtW && gT) {
-          var cp0 = pathPts(gT, G.run === "top" ? 2 : 0, 0), cp = [cp0[0]], best = -1;
-          for (var kd = 1; kd < cp0.length; kd++) { var ddx = cp0[kd][0] - cp0[kd - 1][0], ddy = cp0[kd][1] - cp0[kd - 1][1], nn = Math.ceil(Math.hypot(ddx, ddy) / 4); for (var ke = 1; ke <= nn; ke++) cp.push([cp0[kd - 1][0] + ddx * ke / nn, cp0[kd - 1][1] + ddy * ke / nn]); }
-          var hw = txtW / 2 + 8 + 0.8 * px, hh = 10 + 0.8 * px;
-          for (var ka = 0; ka < 24; ka++) {
-            var an = ka * Math.PI / 12, ox = Math.cos(an) * (roIpx + 8 + txtW / 2 * Math.abs(Math.cos(an))), oy = Math.sin(an) * (roIpx + 8 + 9 * Math.abs(Math.sin(an))), tx2 = Ig.x + ox, ty2 = Ig.y + oy;
-            if (tx2 - txtW / 2 < 6 || tx2 + txtW / 2 > vw - 6 || ty2 - 11 < topAll || ty2 + 5 > vh - 2) continue;
-            var sc2 = Infinity;
-            for (var kp = 0; kp < cp.length; kp += 1) { var dxn = (cp[kp][0] - tx2) / hw, dyn = (cp[kp][1] - ty2) / hh, dd = Math.sqrt(dxn * dxn + dyn * dyn); if (dd < sc2) sc2 = dd; }
-            for (var kq = 0; kq < 2; kq++) { var sx = kq ? cx2 : cx1, dxn2 = (sx - tx2) / (hw + (kq ? ro2 : ro1) * sc), dyn2 = (cy - ty2) / (hh + (kq ? ro2 : ro1) * sc), dd2 = Math.sqrt(dxn2 * dxn2 + dyn2 * dyn2); if (dd2 < sc2) sc2 = dd2; }
-            if (sc2 > best) { best = sc2; bx = ox; by = oy + 4; }
-          }
-          if (best < 1) { bx = 0; by = 4; }
-        }
-        lt.setAttribute("x", f(bx, 2)); lt.setAttribute("y", f(by, 2)); lt.setAttribute("text-anchor", "middle");
+      if (gT && !G.fallback) {
+        // The wrap on each sprocket comes straight from the chain path around the idler.
+        wrapMsgs = [];
+        var wA = gT.arcs[0].sw * 180 / Math.PI, wB = gT.arcs[G.run === "top" ? 2 : 1].sw * 180 / Math.PI, rt = N2 >= N1 ? N2 / N1 : N1 / N2;
+        $("tiles").innerHTML = wrapTile("Sprocket 1 Wrap", wA, N1) + wrapTile("Sprocket 2 Wrap", wB, N2) + tile(f(rt, 2) + " : 1", "Ratio", ""); showWrapWarn();
       }
-      var X = (Ig.x - cx1) / sc, Y = (cy - Ig.y) / sc, dim = $("idDim"), cc = Math.hypot(Ig.x - cx1, Ig.y - cy) / sc;
-      if (idPlaced && !idDrag && !G.fallback) {
-        var halo = ' stroke="var(--blue-50)" stroke-width="4" paint-order="stroke"', mx2 = (cx1 + Ig.x) / 2, my2 = (cy + Ig.y) / 2, ang2 = Math.atan2(Ig.y - cy, Ig.x - cx1) * 180 / Math.PI;
+      var t1 = $("idLab1"), t2 = $("idLab2"), lt = $("idLabT"), s1 = "Sprocket 1 | " + N1 + "T (Input)", s2 = "Sprocket 2 | " + N2 + "T (Output)";
+      var X = (Ig.x - cx1) / sc, Y = (cy - Ig.y) / sc, dim = $("idDim"), cc = Math.hypot(Ig.x - cx1, Ig.y - cy) / sc, showDim = idPlaced && !idDrag && !G.fallback;
+      t1.textContent = s1; t2.textContent = s2;
+      function tw(el, txt, fs) { var w = 0; try { w = el.getComputedTextLength(); } catch (e) {} return w > 0 ? w : txt.length * fs * 0.56; }
+      // ---- label placement: every label goes to the free spot nearest its preferred spot, away from the chain, sprockets, idler and dimension lines ----
+      var cp = [];
+      if (gT) { var cp0 = pathPts(gT, 0, 0); cp = [cp0[0]]; for (var kd = 1; kd < cp0.length; kd++) { var ddx = cp0[kd][0] - cp0[kd - 1][0], ddy = cp0[kd][1] - cp0[kd - 1][1], nn = Math.ceil(Math.hypot(ddx, ddy) / 4); for (var ke = 1; ke <= nn; ke++) cp.push([cp0[kd - 1][0] + ddx * ke / nn, cp0[kd - 1][1] + ddy * ke / nn]); } }
+      var circ = [{ x: cx1, y: cy, r: ro1 * sc }, { x: cx2, y: cy, r: ro2 * sc }, { x: Ig.x, y: Ig.y, r: roIpx, id: "I" }], segs = [], rects = [], bTop = topAll - 6;
+      if (showDim) { segs.push({ x1: cx1, y1: cy, x2: Ig.x, y2: cy, id: "x" }, { x1: Ig.x, y1: cy, x2: Ig.x, y2: Ig.y, id: "y" }, { x1: cx1, y1: cy, x2: Ig.x, y2: Ig.y, id: "c" }); circ.push({ x: cx1, y: cy, r: 5, id: "d" }); }
+      function hits(r, skip) {
+        var n = 0, pad = 0.5 * px + 2, i, c, e;
+        for (i = 0; i < cp.length; i++) { if (cp[i][0] > r.x0 - pad && cp[i][0] < r.x1 + pad && cp[i][1] > r.y0 - pad && cp[i][1] < r.y1 + pad) { n++; break; } }
+        for (i = 0; i < circ.length; i++) { c = circ[i]; if (c.id === skip) continue; if (Math.hypot(Math.max(r.x0 - c.x, 0, c.x - r.x1), Math.max(r.y0 - c.y, 0, c.y - r.y1)) < c.r + 2) n++; }
+        for (i = 0; i < segs.length; i++) { e = segs[i]; if (e.id === skip) continue; var L = Math.hypot(e.x2 - e.x1, e.y2 - e.y1), m = Math.max(1, Math.ceil(L / 4)); for (var j = 0; j <= m; j++) { var qx = e.x1 + (e.x2 - e.x1) * j / m, qy = e.y1 + (e.y2 - e.y1) * j / m; if (qx > r.x0 - 2 && qx < r.x1 + 2 && qy > r.y0 - 2 && qy < r.y1 + 2) { n++; break; } } }
+        for (i = 0; i < rects.length; i++) { e = rects[i]; if (r.x0 < e.x1 + 2 && r.x1 > e.x0 - 2 && r.y0 < e.y1 + 2 && r.y1 > e.y0 - 2) n++; }
+        return n;
+      }
+      function place(w, h, cands, skip) {
+        cands.sort(function (p, q) { return p.cost - q.cost; });
+        var best = null, bs = Infinity;
+        for (var i = 0; i < cands.length; i++) {
+          var c = cands[i], r = { x0: c.x - w / 2, y0: c.y - h / 2, x1: c.x + w / 2, y1: c.y + h / 2 };
+          if (r.x0 < 3 || r.x1 > vw - 3 || r.y0 < bTop || r.y1 > vh - 2) continue;
+          var sc3 = hits(r, skip) * 1000 + c.cost;
+          if (sc3 < bs) { bs = sc3; best = c; best.r = r; if (bs < 1000) break; }
+        }
+        if (!best) best = cands[0];
+        if (best.r) rects.push(best.r);
+        return best;
+      }
+      function grid(ax, ay, w, h) { var out = []; for (var gx = w / 2 + 4; gx <= vw - w / 2 - 4; gx += 8) for (var gy = bTop + h / 2; gy <= vh - h / 2 - 3; gy += 6) out.push({ x: gx, y: gy, cost: Math.abs(gx - ax) * 0.5 + Math.abs(gy - ay) * 1.5 }); return out; }
+      var w1 = tw(t1, s1, 12) + 8, w2 = tw(t2, s2, 12) + 8, hh = 17;
+      var topY = (G.run === "top" && G.side === "out") ? Math.min(labYBase, Ig.y - roIpx - 14) : labYBase;
+      var p1 = place(w1, hh, grid(Math.max(w1 / 2 + 4, Math.min(vw - w1 / 2 - 4, cx1)), topY - 4, w1, hh)), p2 = place(w2, hh, grid(Math.max(w2 / 2 + 4, Math.min(vw - w2 / 2 - 4, cx2)), topY - 4, w2, hh));
+      t1.setAttribute("text-anchor", "middle"); t1.setAttribute("x", f(p1.x, 1)); t1.setAttribute("y", f(p1.y + 4, 1));
+      t2.setAttribute("text-anchor", "middle"); t2.setAttribute("x", f(p2.x, 1)); t2.setAttribute("y", f(p2.y + 4, 1));
+      if (showDim) {
+        var halo = ' stroke="#fff" stroke-width="4" paint-order="stroke"', ang2 = Math.atan2(Ig.y - cy, Ig.x - cx1) * 180 / Math.PI, ar = ang2 * Math.PI / 180;
         if (ang2 > 90) ang2 -= 180; else if (ang2 < -90) ang2 += 180;
-        var xlab = Y >= 0 ? cy + 16 : cy - 8, ylx = Ig.x + (Ig.x > vw - 120 ? -8 : 8), ln = ' stroke="var(--blue-deep)" stroke-width="1.2" stroke-dasharray="5 3"';
-        dim.innerHTML = '<line x1="' + f(cx1, 1) + '" y1="' + f(cy, 1) + '" x2="' + f(Ig.x, 1) + '" y2="' + f(cy, 1) + '"' + ln + '/>' +
-          '<line x1="' + f(Ig.x, 1) + '" y1="' + f(cy, 1) + '" x2="' + f(Ig.x, 1) + '" y2="' + f(Ig.y, 1) + '"' + ln + '/>' +
-          '<line x1="' + f(cx1, 1) + '" y1="' + f(cy, 1) + '" x2="' + f(Ig.x, 1) + '" y2="' + f(Ig.y, 1) + '" stroke="var(--blue-deep)" stroke-width="1.3"/>' +
-          '<circle cx="' + f(cx1, 1) + '" cy="' + f(cy, 1) + '" r="3" fill="var(--blue-deep)"/><circle cx="' + f(Ig.x, 1) + '" cy="' + f(Ig.y, 1) + '" r="3" fill="var(--blue-deep)"/>' +
-          '<text x="' + f((cx1 + Ig.x) / 2, 1) + '" y="' + f(xlab, 1) + '" text-anchor="middle" font-size="12" font-weight="600" fill="var(--blue-deep)"' + halo + ">X " + esc(signed(X)) + "</text>" +
-          '<text x="' + f(ylx, 1) + '" y="' + f(cy + (Ig.y - cy) * 0.18 + 4, 1) + '" text-anchor="' + (Ig.x > vw - 120 ? "end" : "start") + '" font-size="12" font-weight="600" fill="var(--blue-deep)"' + halo + ">Y " + esc(signed(Y)) + "</text>" +
-          '<text transform="translate(' + f(mx2, 1) + " " + f(my2, 1) + ") rotate(" + f(ang2, 1) + ')" y="-6" text-anchor="middle" font-size="12" font-weight="600" fill="var(--blue-deep)"' + halo + ">C-C " + esc(both(cc)) + "</text>";
+        var lnx = ' stroke="var(--dimx)" stroke-width="1.8" stroke-dasharray="6 3"', lny = ' stroke="var(--dimy)" stroke-width="1.8" stroke-dasharray="6 3"', tx = ' text-anchor="middle" font-size="13" font-weight="700"', lw = 22, lh = 16, cxs = [], cys = [], cc2 = [], t, sd;
+        for (var ko = 0; ko < 4; ko++) {
+          var eo = ko * 9;
+          for (t = 0.08; t <= 0.921; t += 0.04) for (sd = -1; sd <= 1; sd += 2) {
+            cxs.push({ x: cx1 + (Ig.x - cx1) * t, y: cy + sd * (lh / 2 + 4 + eo), cost: Math.abs(t - 0.5) * 60 + (sd < 0 ? 0 : 2) + ko * 25 });
+            cys.push({ x: Ig.x + sd * (lw / 2 + 5 + eo), y: cy + (Ig.y - cy) * t, cost: Math.abs(t - 0.3) * 60 + (sd > 0 ? 0 : 2) + ko * 25 });
+          }
+        }
+        var nxv = -Math.sin(ar), nyv = Math.cos(ar), ccW = 34, aw = Math.abs(Math.cos(ar)) * ccW + Math.abs(Math.sin(ar)) * lh, ah = Math.abs(Math.sin(ar)) * ccW + Math.abs(Math.cos(ar)) * lh;
+        for (ko = 0; ko < 4; ko++) for (t = 0.12; t <= 0.881; t += 0.04) for (sd = -1; sd <= 1; sd += 2) {
+          var off = sd * (lh / 2 + 4 + ko * 9);
+          cc2.push({ x: cx1 + (Ig.x - cx1) * t + nxv * off, y: cy + (Ig.y - cy) * t + nyv * off, cost: Math.abs(t - 0.4) * 60 + (sd < 0 ? 0 : 2) + ko * 25 });
+        }
+        var px1 = place(lw, lh, cxs, "x"), py1 = place(lw, lh, cys, "y"), pc1 = place(aw, ah, cc2, "c");
+        dim.innerHTML = '<line x1="' + f(cx1, 1) + '" y1="' + f(cy, 1) + '" x2="' + f(Ig.x, 1) + '" y2="' + f(cy, 1) + '"' + lnx + '/>' +
+          '<line x1="' + f(Ig.x, 1) + '" y1="' + f(cy, 1) + '" x2="' + f(Ig.x, 1) + '" y2="' + f(Ig.y, 1) + '"' + lny + '/>' +
+          '<line x1="' + f(cx1, 1) + '" y1="' + f(cy, 1) + '" x2="' + f(Ig.x, 1) + '" y2="' + f(Ig.y, 1) + '" stroke="var(--dimc)" stroke-width="1.8"/>' +
+          '<circle cx="' + f(cx1, 1) + '" cy="' + f(cy, 1) + '" r="3.5" fill="var(--dimc)"/><circle cx="' + f(Ig.x, 1) + '" cy="' + f(Ig.y, 1) + '" r="3.5" fill="var(--dimc)"/>' +
+          '<text x="' + f(px1.x, 1) + '" y="' + f(px1.y + 4.5, 1) + '"' + tx + ' fill="var(--dimx)"' + halo + ">X</text>" +
+          '<text x="' + f(py1.x, 1) + '" y="' + f(py1.y + 4.5, 1) + '"' + tx + ' fill="var(--dimy)"' + halo + ">Y</text>" +
+          '<text transform="translate(' + f(pc1.x, 1) + " " + f(pc1.y, 1) + ") rotate(" + f(ang2, 1) + ')" y="4.5"' + tx + ' fill="var(--dimc)"' + halo + ">C-C</text>";
         dim.setAttribute("display", "");
       } else dim.setAttribute("display", "none");
+      if (lt) {
+        var txtW = tw(lt, "Idler | " + Ni + "T", 12) + 8, hexW = 2 * Math.min(0.5 * sc, (ri - 0.31 * px) * 1.5) / Math.sqrt(3), ic = [];
+        if (hexW * 0.9 >= txtW) ic.push({ x: Ig.x, y: Ig.y, cost: showDim ? 40 : -5 });
+        for (var ka = 0; ka < 24; ka++) for (var kr = 0; kr < 3; kr++) {
+          var an = ka * Math.PI / 12, ca = Math.cos(an), sa = Math.sin(an), rr = roIpx + 6 + kr * 10;
+          var da = Math.abs(((an - Math.PI / 2 + 3 * Math.PI) % (2 * Math.PI)) - Math.PI);
+          ic.push({ x: Ig.x + ca * (rr + txtW / 2 * Math.abs(ca)), y: Ig.y + sa * (rr + 9 * Math.abs(sa)), cost: da * 6 + kr * 8 });
+        }
+        var pI = place(txtW, 17, ic, "I");
+        lt.setAttribute("x", f(pI.x - Ig.x, 1)); lt.setAttribute("y", f(pI.y - Ig.y + 4, 1)); lt.setAttribute("text-anchor", "middle");
+      }
       var rows = "";
       rows += row("Idler Pitch Diameter", both(2 * Ri));
       rows += row("Chain Length", links + " Links" + (links % 2 && radio("half") !== "1" ? ", odd count needs a half link" : ""));
       rows += row("Slack Taken Up", eIn < 0.002 ? "None, chain is the exact length" : both(eIn));
       rows += row("Idler Location", (G.run === "top" ? "Top" : "Bottom") + " run, " + (G.side === "in" ? "inside" : "outside") + " the chain path");
       rows += row("Idler Push", both(G.D / sc));
-      rows += row("Center To Center", both(cc) + ", X " + signed(X) + " and Y " + signed(Y) + " from Sprocket 1 to the idler");
+      var uk = radio("unit") === "mm" ? 25.4 : 1;
+      var ic = $("idCopy");
+      if (idPlaced && !G.fallback) { ic.innerHTML = '<span class="idc-h">Idler from Sprocket 1</span>' + cpChip("C-C", cc * uk, false, "c") + cpChip("X", X * uk, true, "x") + cpChip("Y", Y * uk, true, "y"); ic.hidden = false; } else { ic.innerHTML = ""; ic.hidden = true; }
       rows += row("Idler Wrap", f(wrapDeg, 0) + "°, " + f(wrapDeg / 360 * Ni, 1) + " teeth in mesh", wrapDeg < 90 && G.D > 0);
       $("idRows").innerHTML = rows;
-      $("drawNote").textContent = "Drawn to scale. Drag the idler along the dashed paths, or click one to send it there. These are the only spots where an idler on the " + (idSide === "in" ? "inside" : "outside") + " of the chain takes up the slack. " +
+      $("drawNote").className = "note hb " + ((eIn < 0.002 || !anyOk) ? "warning" : "info"); $("drawNote").textContent = "Drawn to scale. Drag the idler along the dashed paths, or click one to send it there. These are the only spots where an idler on the " + (idSide === "in" ? "inside" : "outside") + " of the chain takes up the slack. " +
         (eIn < 0.002 ? "The chain is the exact length, so there is no slack for an idler to take up." : !anyOk ? "This idler cannot take up the slack anywhere on the runs, so try a different tooth count." : "At the end of the move it takes up " + both(eIn) + " so the chain pulls straight.");
     }
     refresh(); frame(0);
@@ -1283,7 +1384,7 @@ svg.draw text { font-family: var(--font); }
 
     function bad(msg) {
       setStatus(true, "Check inputs", msg);
-      $("tiles").innerHTML = ""; $("rows").innerHTML = ""; $("rows").closest(".table-wrap").hidden = true; $("opts").hidden = true;
+      $("tiles").innerHTML = ""; $("warns").innerHTML = ""; $("rows").innerHTML = ""; $("rows").closest(".table-wrap").hidden = true; $("opts").hidden = true;
       cur = null; renderAll();
     }
     if (!(N1 >= 6) || !(N2 >= 6)) { bad("Enter a tooth count of 6 or more for both sprockets."); return; }
@@ -1296,7 +1397,7 @@ svg.draw text { font-family: var(--font); }
     var rows = "";
     function driveRows(C, links) {
       var w = wrap(C, P, N1, N2), low = w.deg < 120, gap = gapBetween(C, P, N1, N2), gb = gap < MIN_GAP;
-      var out = row("Small Sprocket Wrap", f(w.deg, 0) + "°, " + f(w.teeth, 0) + " teeth in mesh" + (low ? ". Low, chain may skip." : ""), low);
+      var out = row("Small Sprocket Wrap", f(w.deg, 0) + "°, " + f(w.teeth, 0) + " teeth in mesh" + (low ? ". Low, chain may skip." : ""));
       out += row("Gap Between Sprockets", gap < 0 ? "Sprockets overlap by " + both(-gap) : both(gap) + (gb ? ". Tight." : ""), gb);
       var ten = Math.max(1, Math.ceil(links * P / LENGTH_IN - 1e-9));
       out += row("Chain To Order", ten + " x 10 ft length (master link included)");
@@ -1331,9 +1432,18 @@ svg.draw text { font-family: var(--font); }
         }
         rows += driveRows(cM, nI);
         $("actions").innerHTML = saveBtn("chain", 'data-links="' + nI + '" data-inline="1"', "Save Chain") +
-          '<div class="hint">Both chain ends attach to the tensioner, so no master link is needed.</div>';
+          '<div class="hint hb info">Both chain ends attach to the tensioner, so no master link is needed.</div>';
         $("actions").hidden = false;
         cur = { C: cM, P: P, N1: N1, N2: N2, links: Math.max(1, Math.round(loopMid)), opt: null, tens: { key: T.key, n: nI } };
+      } else if ($("idOn").checked && !T && isFinite(L) && L > 0) {
+        // With an idler the center stays exactly where you asked for it. The chain is the next whole link count up (even when half links are off), plus any extra links, and the idler takes up the slack.
+        var stepI = radio("half") === "1" ? 1 : 2, xlI = Math.max(0, Math.round(parseFloat($("idx").value) || 0)), baseI = Math.max(2, Math.ceil(L / stepI - 1e-9) * stepI), nIdl = baseI + xlI;
+        setStatus(false, linkWord(nIdl), "Runs at your " + both(C) + " center, with an idler taking up " + both((nIdl - L) * P) + " of slack. Base chain is " + linkWord(baseI) + (xlI ? ", plus " + xlI + " extra" : "") + ".", "Chain With Idler");
+        var oddI = nIdl % 2 !== 0;
+        $("actions").innerHTML = saveBtn("chain", 'data-links="' + nIdl + '"', "Save Chain") + (oddI ? saveBtn("half", "", "Save Half Link") + '<div class="hint hb warning">Odd count, so it needs a half link.</div>' : "");
+        $("actions").hidden = false;
+        rows += driveRows(C, nIdl);
+        cur = { C: C, P: P, N1: N1, N2: N2, links: nIdl, opt: null };
       } else {
         var step = radio("half") === "1" ? 1 : 2;
         var lo = Math.floor(L / step + 1e-9) * step, hi = lo + step;
@@ -1342,13 +1452,14 @@ svg.draw text { font-family: var(--font); }
         var best = dLo <= dHi ? "lo" : "hi";
         // A cam only takes slack out, so prefer the chain whose center is at or past the desired center.
         if (cam && cHi !== null) best = "hi";
+        if (selN === lo && cLo !== null) best = "lo"; else if (selN === hi && cHi !== null) best = "hi";
         var bestN = best === "lo" ? lo : hi, bestC = best === "lo" ? cLo : cHi;
         if (bestC === null) { bad("These sprockets are too large for a chain this short at this center distance."); return; }
 
         var oddNote = bestN % 2 !== 0 ? " Odd count, so it needs a half link." : "";
         var camNote = cam ? " The cam adjusts from " + both(bestC - T.travel) + " to " + both(bestC) + " center." : "";
-        setStatus(false, f(L, 2) + " Links", "Closest chain is " + linkWord(bestN) + " at " + both(bestC) + " center." + oddNote + camNote, "Chain Length Needed");
-        rows += row("Chain Length Needed", both(L * P));
+        setStatus(false, linkWord(bestN), "Runs at " + both(bestC) + " center, " + signed(bestC - C) + " from your desired center." + oddNote + camNote, (selN === bestN ? "Selected Chain" : "Recommended Chain"));
+        rows += row("Exact Length (not a real chain size)", f(L, 2) + " links, " + both(L * P));
         if (ex > 0) rows += row("Center Distance Used", both(C) + " (desired + extra)");
         rows += driveRows(bestC, bestN);
         if (cam) {
@@ -1367,7 +1478,7 @@ svg.draw text { font-family: var(--font); }
           }
           var btns = saveBtn("chain", 'data-links="' + n + '"', "Save Chain");
           if (n % 2 !== 0) { extra += '<div class="pn warn">Odd count, needs a half link</div>'; btns += saveBtn("half", "", "Save Half Link"); }
-          return tile(linkWord(n), label, "Center " + both(cc), hl, extra + btns);
+          return tile(linkWord(n), label, "Center " + both(cc), hl, extra + btns, ' data-pick="' + n + '" tabindex="0"');
         };
         $("optTiles").innerHTML = opt(lo, cLo, "Smaller Chain", best === "lo") + opt(hi, cHi, "Larger Chain", best === "hi");
         $("opts").hidden = false;
@@ -1388,7 +1499,7 @@ svg.draw text { font-family: var(--font); }
         if (!fixed2) rows += row("Center Range With Tensioner", both(kA) + " to " + both(kB));
         rows += driveRows(kM, n);
         $("actions").innerHTML = saveBtn("chain", 'data-links="' + n + '" data-inline="1"', "Save Chain") +
-          '<div class="hint">Both chain ends attach to the tensioner, so no master link is needed.</div>';
+          '<div class="hint hb info">Both chain ends attach to the tensioner, so no master link is needed.</div>';
         $("actions").hidden = false;
         cur = { C: kM, P: P, N1: N1, N2: N2, links: Math.max(1, Math.round(lM)), opt: null, tens: { key: T.key, n: n } };
       } else {
@@ -1400,14 +1511,22 @@ svg.draw text { font-family: var(--font); }
         rows += tensRow();
         rows += driveRows(cc, n);
         var act = saveBtn("chain", 'data-links="' + n + '"', "Save Chain");
-        if (n % 2 !== 0) act += '<div class="hint">Odd link count: the chain needs one half link to close the loop.</div>' + saveBtn("half", "", "Save Half Link");
+        if (n % 2 !== 0) act += '<div class="hint hb warning">Odd link count: the chain needs one half link to close the loop.</div>' + saveBtn("half", "", "Save Half Link");
         $("actions").innerHTML = act; $("actions").hidden = false;
         cur = { C: cc, P: P, N1: N1, N2: N2, links: n, opt: null };
       }
     }
-    $("tiles").innerHTML = tiles;
-    $("rows").innerHTML = rows;
-    $("rows").closest(".table-wrap").hidden = !rows;
+    wrapMsgs = [];
+    if (cur && cur.C > 0) {
+      var wr = wrap(cur.C, P, N1, N2), wSmall = wr.deg, wBig = 360 - wr.deg, w1 = N1 <= N2 ? wSmall : wBig, w2 = N1 <= N2 ? wBig : wSmall;
+      tiles = wrapTile("Sprocket 1 Wrap", w1, N1) + wrapTile("Sprocket 2 Wrap", w2, N2) + tile(f(ratio, 2) + " : 1", "Ratio", "");
+    }
+    $("tiles").innerHTML = tiles; showWrapWarn();
+    // Only warnings are kept in the details table; the rest of the detail rows are not shown.
+    rows = (rows.match(/<tr>(?:(?!<\/tr>).)*class="num warn"(?:(?!<\/tr>).)*<\/tr>/g) || []).join("");
+    $("warns").innerHTML = (rows.match(/<tr>.*?<\/tr>/g) || []).map(function (r) { var m = r.match(/<td>(.*?)<\/td><td[^>]*>(.*?)<\/td>/); return m ? '<div class="hb warning"><span><b>' + m[1] + ":</b> " + m[2] + "</span></div>" : ""; }).join("");
+    $("rows").innerHTML = "";
+    $("rows").closest(".table-wrap").hidden = true;
     renderAll();
   }
 
