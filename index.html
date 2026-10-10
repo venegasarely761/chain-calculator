@@ -62,7 +62,7 @@ main > section:first-child .fld { gap: 4px; }
 
 .toggle { position: relative; display: inline-flex; gap: 6px; }
 .toggle input { position: absolute; opacity: 0; pointer-events: none; }
-.toggle label { display: inline-flex; align-items: center; font-size: 12.5px; padding: 6px 14px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--blue-50); cursor: pointer; font-weight: 500; }
+.toggle label { display: inline-flex; align-items: center; font-size: 12.5px; padding: 7px 14px 5px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--blue-50); cursor: pointer; font-weight: 500; }
 .toggle input:checked + label { border-color: var(--blue); background: var(--blue-100); color: var(--blue-deep); }
 .toggle input:focus-visible + label { outline: 3px solid var(--blue-soft); outline-offset: 2px; }
 
@@ -80,14 +80,14 @@ main > section:first-child .fld { gap: 4px; }
 .seg-group.inline label { display: inline-flex; align-items: center; padding: 6px 8px; white-space: nowrap; }
 .seg-group.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .seg-group input { position: absolute; opacity: 0; pointer-events: none; }
-.seg-group label { display: grid; gap: 2px; padding: 6px 10px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--blue-50); cursor: pointer; font-weight: 500; font-size: 12.5px; }
+.seg-group label { display: grid; gap: 2px; padding: 7px 10px 5px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--blue-50); cursor: pointer; font-weight: 500; font-size: 12.5px; }
 .seg-group input:checked + label { border-color: var(--blue); background: var(--blue-100); color: var(--blue-deep); }
 .seg-group input:focus-visible + label { outline: 3px solid var(--blue-soft); outline-offset: 2px; }
 
-.btn { display: inline-flex; align-items: center; padding: 10px 18px; border-radius: 10px; background: var(--blue); color: var(--white); font-weight: 500; text-decoration: none; border: 0; font: 700 15px var(--font); cursor: pointer; justify-content: center; width: 100%; }
+.btn { display: inline-flex; align-items: center; padding: 9px 16px; border-radius: 10px; background: var(--blue); color: var(--white); font-weight: 500; text-decoration: none; border: 0; font: 700 13.5px var(--font); cursor: pointer; justify-content: center; width: 100%; }
 .btn:hover { background: var(--blue-deep); }
 .btn:focus-visible, .pill:focus-visible { outline: 3px solid var(--blue-soft); outline-offset: 2px; }
-.btn.save { margin-top: 8px; padding: 7px 10px; font-size: 13px; }
+.btn.save { margin-top: 8px; }
 .btn.save.on { background: var(--blue-100); color: var(--blue-deep); }
 .btn.off { opacity: 0.45; pointer-events: none; }
 #addAll { gap: 8px; }
@@ -102,7 +102,15 @@ main > section:first-child .fld { gap: 4px; }
 .hero .lab { font-size: 11px; line-height: 1.3; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; }
 .hero .big { font-size: 24px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; }
 .hero .sub { font-size: 13px; opacity: 0.92; }
-.hero.bad { background: var(--alert-bg); color: var(--alert); }
+.hero.bad { background: repeating-linear-gradient(45deg, #fdeeed 0 10px, #fbe1df 10px 20px); color: var(--alert); border: 2px dashed var(--alert); }
+.card.bad { border: 2px dashed var(--alert); background: repeating-linear-gradient(45deg, #fdeeed 0 10px, #fbe1df 10px 20px); }
+.card.bad h2 { color: var(--alert); }
+.card.bad .hero.bad { background: transparent; border: 0; padding: 0; }
+.card.bad .hero.bad .big { font-size: 26px; }
+.card.bad .draw-wrap { background: transparent; border: 0; }
+.card.bad #idGrp, .card.bad .card-head > :not(h2) { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
+.card.bad .empty:has(.hero) { padding: 0; }
+.hb[hidden] { display: none; }
 .hero.bad .sub { opacity: 1; }
 
 .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
@@ -140,22 +148,22 @@ td.num .cpv, .idc .cpv { user-select: all; }
 .cpb:hover { background: var(--blue-100); }
 .cpb.ok { background: var(--blue); color: #fff; }
 td.num.warn { color: var(--alert); font-weight: 700; }
-.hb { --hc: #346DDB; display: flex; width: 100%; box-sizing: border-box; gap: 12px; align-items: flex-start; padding: 12px 16px; border-radius: 10px; font-size: 14px; line-height: 1.45; font-weight: 400; color: var(--ink); background: color-mix(in srgb, var(--hc) 8%, #fff); border: 1px solid color-mix(in srgb, var(--hc) 20%, #fff); margin: 0; }
+.hb { --hc: #0075c9; display: flex; width: 100%; box-sizing: border-box; gap: 12px; align-items: flex-start; padding: 12px 16px; border-radius: 10px; font-size: 14px; line-height: 1.45; font-weight: 400; color: var(--ink); background: color-mix(in srgb, var(--hc) 8%, #fff); border: 1px solid color-mix(in srgb, var(--hc) 20%, #fff); margin: 0; }
 .hb:empty { display: none; }
-.hb::before { content: "i"; flex: 0 0 auto; width: 18px; height: 18px; margin-top: 1px; box-sizing: border-box; border: 1.6px solid var(--hc); border-radius: 50%; color: var(--hc); font-size: 11px; font-weight: 700; line-height: 14.5px; text-align: center; font-family: Georgia, serif; }
-.hb.success { --hc: #00C950; }
-.hb.success::before { content: "\2713"; font-family: inherit; font-size: 10px; }
-.hb.warning { --hc: #FE9A00; }
-.hb.warning::before { content: "!"; font-family: inherit; }
-.hb.danger { --hc: #FB2C36; }
-.hb.danger::before { content: "!"; font-family: inherit; }
+.hb { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2018%2018%27%3E%3Ccircle%20cx=%279%27%20cy=%279%27%20r=%278.1%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%271.6%27/%3E%3Ccircle%20cx=%279%27%20cy=%275.1%27%20r=%271.1%27/%3E%3Crect%20x=%278.1%27%20y=%277.5%27%20width=%271.8%27%20height=%276.5%27%20rx=%270.6%27/%3E%3C/svg%3E"); }
+.hb::before { content: ""; flex: 0 0 auto; width: 18px; height: 18px; margin-top: 1px; background: var(--hc); -webkit-mask: var(--ic) center / 100% 100% no-repeat; mask: var(--ic) center / 100% 100% no-repeat; }
+.hb.success { --hc: #00C950; --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2018%2018%27%3E%3Ccircle%20cx=%279%27%20cy=%279%27%20r=%278.1%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%271.6%27/%3E%3Cpath%20d=%27M5.2%209.3%20L8%2012%20L12.9%206.4%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%271.7%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27/%3E%3C/svg%3E"); }
+.hb.warning { --hc: #FE9A00; --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2018%2018%27%3E%3Ccircle%20cx=%279%27%20cy=%279%27%20r=%278.1%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%271.6%27/%3E%3Crect%20x=%278.1%27%20y=%274%27%20width=%271.8%27%20height=%276.4%27%20rx=%270.6%27/%3E%3Ccircle%20cx=%279%27%20cy=%2712.9%27%20r=%271.1%27/%3E%3C/svg%3E"); }
+.hb.danger { --hc: #FB2C36; --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2018%2018%27%3E%3Ccircle%20cx=%279%27%20cy=%279%27%20r=%278.1%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%271.6%27/%3E%3Crect%20x=%278.1%27%20y=%274%27%20width=%271.8%27%20height=%276.4%27%20rx=%270.6%27/%3E%3Ccircle%20cx=%279%27%20cy=%2712.9%27%20r=%271.1%27/%3E%3C/svg%3E"); }
 .hb a { color: var(--blue-deep); }
 .note:not(.hb) { font-size: 13px; color: var(--ink-soft); margin: 0; }
 
 /* top view */
 .draw-wrap { background: var(--blue-50); border: 1px solid var(--blue-100); border-radius: 12px; overflow: hidden; }
+svg.draw[hidden] { display: none; }
 svg.draw { display: block; width: 100%; height: auto; max-width: 100%; }
 svg.draw text { font-family: var(--font); }
+.empty:has(.hero) { padding: 12px; text-align: left; }
 .empty { padding: 28px 12px; text-align: center; color: var(--ink-soft); font-size: 13px; }
 
 /* saved parts */
@@ -177,7 +185,7 @@ svg.draw text { font-family: var(--font); }
 .sp-row:first-child { border-top: 0; }
 .sp-row .who strong { display: block; }
 .sp-row .who span { font-size: 12px; color: var(--ink-soft); }
-.sp-row .btn { width: auto; margin: 0; padding: 8px 16px; font-size: 13px; }
+.sp-row .btn { width: auto; margin: 0; }
 .sp-none { grid-column: 2 / -1; }
 
 @media (max-width: 520px) {
@@ -192,13 +200,24 @@ svg.draw text { font-family: var(--font); }
   .sp-row { grid-template-columns: minmax(0, 1fr); }
   .sp-none { grid-column: 1; }
   .sp-row .btn { width: 100%; }
+  /* Idler options stack on phones: side, then teeth, then extra links. */
+  #idOpts { flex-direction: column !important; align-items: stretch !important; }
+  #idOpts #idSize, #idOpts #idxBox { width: 100% !important; }
+  #idOpts .toggle { align-self: flex-start; }
+  /* Tensioner buttons: two per row, all the same width. */
+  #tens { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+  #tens label { justify-content: center; text-align: center; white-space: normal; }
+  /* Idler position chips: one per row. */
+  .idcopy .idc { width: 100%; justify-content: space-between; }
+  .idcopy .idc .cpb { margin-left: auto; }
+  .idc-h { flex-basis: 100%; }
 }
 @media (prefers-reduced-motion: no-preference) { .unit-field, .seg-group label, .toggle label { transition: background 0.15s ease, border-color 0.15s ease; } }
 </style>
 
 <div class="shell">
 <header class="banner">
-  <span class="ver">v1.12.32</span>
+  <span class="ver">v1.12.33</span>
   <h1>Chain Calculator</h1>
   <p>Chain length and center distance for a two-sprocket chain drive</p>
 </header>
@@ -244,17 +263,13 @@ svg.draw text { font-family: var(--font); }
       </div>
 
       <div id="cdFields" class="card-sub">
-        <div class="fields">
+        <div class="fields" style="grid-template-columns:minmax(0,1fr)">
           <div class="fld">
             <label for="cd">Desired Center</label>
             <span class="unit-field"><input class="field" id="cd" type="number" inputmode="decimal" step="any" min="0" value="6"><span class="mini" role="radiogroup" aria-label="Units"><input type="radio" name="unit" id="u-in" value="in" checked><label for="u-in">in</label><input type="radio" name="unit" id="u-mm" value="mm"><label for="u-mm">mm</label></span></span>
           </div>
-          <div class="fld">
-            <label for="ex">Extra Center</label>
-            <span class="unit-field"><input class="field" id="ex" type="number" inputmode="decimal" step="any" min="0" value="0"><span class="usfx">in</span></span>
-          </div>
         </div>
-        <span class="hint hb info">Extra center is added to the desired center before the chain is sized, for slack or a tensioning range.</span>
+        <div class="hb danger" id="inputWarn"></div>
         <div class="fld-row">
           <span class="lbl">Allow half links</span>
           <div class="toggle" role="radiogroup" aria-label="Allow half links">
@@ -290,7 +305,7 @@ svg.draw text { font-family: var(--font); }
         <span class="unit-field" id="idSize" style="width:150px"><input class="field" id="idt" type="number" inputmode="numeric" step="1" min="6" value="16" aria-label="Idler teeth"><span>Teeth</span></span>
         <span class="unit-field" id="idxBox" style="width:210px;white-space:nowrap"><input class="field" id="idx" type="number" inputmode="numeric" step="1" min="0" value="0" aria-label="Additional links"><span>Extra Links</span></span>
         </span>
-        <span class="hint hb info" id="idHint" style="flex-basis:100%">Pushes into the slack run to take up extra chain.</span>
+        <span class="hint hb info" id="idHint" style="flex-basis:100%">Idlers sit on the inside or outside of the chain loop to give a sprocket more contact with the chain. An idler does not change the ratio.</span>
       </div>
       <div class="draw-wrap">
         <svg class="draw" id="draw" viewBox="0 0 640 220" role="img" aria-label="Top view of the chain drive"></svg>
@@ -323,7 +338,7 @@ svg.draw text { font-family: var(--font); }
     <div class="card">
       <h2 id="sp-h">WCP sprockets</h2>
       <div id="sprBody"></div>
-      <span class="hint hb info">Sprockets listed here match the chain type and tooth counts above. Pick a style and bore, then save it.</span>
+      <span class="hint hb info">Listed sprockets match your chain and teeth. Pick a style and bore.</span>
     </div>
   </section>
 
@@ -426,7 +441,7 @@ svg.draw text { font-family: var(--font); }
   var saved = [];          // saved parts, in memory only
   var paused = false;
   try { paused = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
-  var sprSig = "";
+  var sprSig = "", lastBad = "";
 
   // Link plate outlines taken from the WCP roller chain drawing (outer and inner plate, pitch = 27 units, centered on the plate).
   var PLATE_O = "M-9.96 12.24 L-13.29 12.74 L-16.63 12.36 L-19.75 11.11 L-22.44 9.09 L-24.50 6.43 L-25.80 3.33 L-26.25 0.00 L-25.80 -3.33 L-24.50 -6.43 L-22.44 -9.09 L-19.75 -11.11 L-16.63 -12.36 L-13.29 -12.74 L-9.96 -12.24 L-7.52 -11.63 L-5.03 -11.19 L-2.52 -10.92 L-0.00 -10.83 L2.52 -10.92 L5.03 -11.19 L7.51 -11.63 L9.96 -12.24 L13.29 -12.74 L16.63 -12.36 L19.75 -11.11 L22.44 -9.09 L24.50 -6.43 L25.80 -3.33 L26.25 0.00 L25.80 3.33 L24.50 6.43 L22.44 9.09 L19.75 11.11 L16.63 12.36 L13.29 12.74 L9.96 12.24 L7.51 11.63 L5.03 11.19 L2.52 10.92 L-0.00 10.83 L-2.52 10.92 L-5.03 11.19 L-7.52 11.63 L-9.96 12.24 Z";
@@ -496,10 +511,37 @@ svg.draw text { font-family: var(--font); }
   // Gap between the two sprocket outside diameters. Negative means they overlap.
   function gapBetween(C, P, N1, N2) { return C - odRadius(P, N1) - odRadius(P, N2); }
   var MIN_GAP = 0.125;
+  // Does the tensioner fit on the straight run between the two sprockets at center C? Same test the drawing uses, in inches.
+  function tensFits(art, P, N1, N2, C) {
+    var R1 = pitchDia(P, N1) / 2, R2 = pitchDia(P, N2) / 2, ro1 = odRadius(P, N1), ro2 = odRadius(P, N2);
+    var s = (R1 - R2) / C, c = Math.sqrt(1 - s * s), p1x = R1 * s, p1y = -R1 * c, p2x = C + R2 * s, p2y = -R2 * c;
+    var Ls = Math.hypot(p2x - p1x, p2y - p1y), ux = (p2x - p1x) / Ls, uy = (p2y - p1y) / Ls, hw = art.y, pad = 0.02, rear = art.x0, front = art.x1;
+    function clear(off, edge, cxs, rad) {
+      for (var sg = -1; sg <= 1; sg += 2) {
+        var qx = p1x + ux * (off + edge) - uy * hw * sg, qy = p1y + uy * (off + edge) + ux * hw * sg;
+        if ((qx - cxs) * (qx - cxs) + qy * qy < (rad + pad) * (rad + pad)) return false;
+      }
+      return true;
+    }
+    var lo = -rear; while (lo < Ls && !clear(lo, rear, 0, ro1)) lo += 0.01;
+    var hi = Ls - front; while (hi > lo && !clear(hi, front, C, ro2)) hi -= 0.01;
+    return hi - lo > 0.01;
+  }
+  // Smallest center where the sprockets do not overlap and, if a tensioner is picked, it also fits between them.
+  function minCenter(P, N1, N2, T) {
+    var base = odRadius(P, N1) + odRadius(P, N2), art = T ? TENS_ART[T.key] : null;
+    if (!art || tensFits(art, P, N1, N2, base)) return Math.ceil(base * 1000) / 1000;
+    var lo = base, hi = base + 1, n = 0;
+    while (!tensFits(art, P, N1, N2, hi) && n++ < 12) { lo = hi; hi *= 2; }
+    for (var i = 0; i < 30; i++) { var m = (lo + hi) / 2; if (tensFits(art, P, N1, N2, m)) hi = m; else lo = m; }
+    return Math.ceil(hi * 1000) / 1000;
+  }
 
   function setStatus(bad, big, sub, label) {
     var el = $("status");
     el.className = "hero" + (bad ? " bad" : "");
+    var rc = el.closest(".card"); if (rc) rc.classList.toggle("bad", !!bad);
+    var tc = $("draw") && $("draw").closest(".card"); if (tc) tc.classList.toggle("bad", !!bad); // the Top View card matches the Result card when there is no solution
     el.innerHTML = (label ? '<div class="lab">' + esc(label) + "</div>" : "") + '<div class="big">' + esc(big) + "</div>" + (sub ? '<div class="sub">' + esc(sub) + "</div>" : "");
   }
   function tile(value, label, sub, hl, extra, attrs) {
@@ -564,7 +606,7 @@ svg.draw text { font-family: var(--font); }
     if (lock && $("idOn").checked) { $("idOff").checked = true; $("idOpts").style.display = "none"; if (tview === "idler") tview = "run"; }
     ["idOff", "idOn", "idt", "idsIn", "idsOut"].forEach(function (i) { $(i).disabled = lock; });
     $("idGrp").style.opacity = lock ? "0.45" : "";
-    $("idHint").textContent = lock ? "Not available while a chain tensioner is selected." : "Pushes into the slack run to take up extra chain.";
+    $("idHint").textContent = lock ? "Not available while a chain tensioner is selected." : "Idlers sit on the inside or outside of the chain loop to give a sprocket more contact with the chain. An idler does not change the ratio.";
     syncTens();
   }
   // The selected tensioner is added to the saved parts automatically, and swapped out when the selection changes.
@@ -650,9 +692,10 @@ svg.draw text { font-family: var(--font); }
   $("actions").addEventListener("click", onSave);
 
   // ---------- sprocket picker ----------
+  var MQ_PHONE = window.matchMedia ? window.matchMedia("(max-width: 520px)") : { matches: false };
   function renderSprockets() {
     var body = $("sprBody");
-    if (!cur) { sprSig = ""; body.innerHTML = '<div class="empty">Enter valid tooth counts to see matching sprockets.</div>'; return; }
+    if (!cur) { sprSig = ""; body.innerHTML = '<div class="empty">Fix the inputs above to see matching sprockets.</div>'; return; }
     var k = chainKey(), fam = CHAIN_TYPES[k].spr;
     var sig = fam + "|" + cur.N1 + "|" + cur.N2;
     if (sig === sprSig) return;
@@ -691,12 +734,19 @@ svg.draw text { font-family: var(--font); }
     if (cur && tview === "idler") { $("idBox").hidden = true; $("viewSeg").hidden = true; drawIdler(); return; }
     $("viewSeg").hidden = false;
     $("idBox").hidden = true;
-    if (!cur) { svg.innerHTML = ""; svg.hidden = true; $("drawEmpty").hidden = false; $("drawNote").textContent = ""; return; }
-    svg.hidden = false; $("drawEmpty").hidden = true;
+    if (!cur) {
+      svg.innerHTML = ""; svg.style.display = "none"; $("drawNote").textContent = "";
+      $("drawEmpty").innerHTML = '<div class="hero bad"><div class="big">Check inputs</div><div class="sub">' + esc(lastBad || "Fix the inputs above to see the drive.") + "</div></div>"; $("drawEmpty").hidden = false;
+      return;
+    }
+    svg.style.display = ""; $("drawEmpty").hidden = true;
+    $("idCopy").innerHTML = ""; $("idCopy").hidden = true; $("idRows").innerHTML = "";
     var C = cur.C, P = cur.P, N1 = cur.N1, N2 = cur.N2, links = cur.links;
     var R1 = pitchDia(P, N1) / 2, R2 = pitchDia(P, N2) / 2, ro1 = odRadius(P, N1), ro2 = odRadius(P, N2);
-    var vw = 640, pad = 36, labelH = 26, maxro = Math.max(ro1, ro2), total = C + ro1 + ro2;
+    var vw = 640, FS = labelFs(vw), pad = 36, labelH = Math.max(26, Math.round(FS * 2.1)), maxro = Math.max(ro1, ro2), total = C + ro1 + ro2;
     var rsv = (cur.tens && TENS_ART[cur.tens.key]) ? 70 : 0; // room on the right for the range-of-motion callout
+    if (rsv && FS > 14) rsv = Math.max(rsv, Math.ceil(0.6 * 11 * FS) + 40); // on phones the angle text is drawn larger, so keep it inside the drawing
+    var kU = FS / MIN_LABEL; // drawing units per rendered pixel
     var sc = Math.min((vw - 2 * pad - rsv) / total, (380 - 2 * pad - labelH - (rsv ? 44 : 0)) / (2 * maxro));
     var degR = rsv ? Math.max(ro2 * sc, (R2 + 0.5 * P) * sc) + 14 : 0, maxD = Math.max(maxro * sc, degR + 13); // radius of the range-of-motion arc
     var vh = Math.max(170, Math.min(380, 2 * maxD + 2 * pad + labelH));
@@ -785,14 +835,14 @@ svg.draw text { font-family: var(--font); }
       }
       return best;
     }
-    function clampX(cx, txt) { var half = txt.length * 3.4; return Math.max(8 + half, Math.min(vw - 8 - half, cx)); }
+    function clampX(cx, txt) { var half = txt.length * 0.283 * FS; return Math.max(8 + half, Math.min(vw - 8 - half, cx)); }
     function labelY(cx, txt) {
-      var half = txt.length * 3.4, top = cy; cx = clampX(cx, txt);
+      var half = txt.length * 0.283 * FS, top = cy; cx = clampX(cx, txt);
       for (var i = 0; i <= 12; i++) top = Math.min(top, topAt(cx - half + 2 * half * i / 12));
       return top - 12;
     }
     function label(cx, y, txt) {
-      return '<text x="' + f(clampX(cx, txt), 2) + '" y="' + f(y, 2) + '" text-anchor="middle" font-size="12" font-weight="500" fill="var(--ink)">' + esc(txt) + "</text>";
+      return '<text x="' + f(clampX(cx, txt), 2) + '" y="' + f(y, 2) + '" text-anchor="middle" font-size="' + f(FS, 2) + '" font-weight="500" fill="var(--ink)">' + esc(txt) + "</text>";
     }
 
     var out = "";
@@ -815,8 +865,8 @@ svg.draw text { font-family: var(--font); }
         '<line x1="0" y1="' + f(-rA + 4, 2) + '" x2="0" y2="' + f(-rA - 5, 2) + '" stroke="var(--blue)" stroke-width="1.4"/>' +
         '<g transform="rotate(' + f(sw > 360 ? sw % 360 : swc, 2) + ')"><line x1="0" y1="' + f(-rA + 4, 2) + '" x2="0" y2="' + f(-rA - 5, 2) + '" stroke="' + (sw > 360 ? REVC[Math.floor(sw / 360) % REVC.length] : "var(--blue)") + '" stroke-width="2"/></g>' +
         '<g><animateTransform attributeName="transform" type="rotate" values="0;' + f(sw, 2) + ';0" dur="' + f(revDur, 2) + 's" repeatCount="indefinite"' + SPL + '/>' +
-        '<g id="degHandle" style="cursor:grab;touch-action:none"><circle cx="0" cy="' + f(-rA - 3, 2) + '" r="13" fill="transparent"/><path id="degMark" d="M0 ' + f(-rA, 2) + ' l-5 -11 h10 z" fill="var(--blue)"/></g></g>' +
-        '<text id="degTxt" x="' + f(tx, 2) + '" y="' + f(ty, 2) + '" text-anchor="' + (side > 0 ? "start" : "end") + '" font-size="12" font-weight="600" fill="var(--blue-deep)">0° / ' + f(sw, 0) + '°</text></g>';
+        '<g id="degHandle" style="cursor:grab;touch-action:none"><circle cx="0" cy="' + f(-rA - 3, 2) + '" r="' + f(Math.max(13, 24 * kU), 2) + '" fill="transparent"/><path id="degMark" d="M0 ' + f(-rA, 2) + ' l' + f(-5 * Math.max(1, kU * 0.8), 2) + ' ' + f(-11 * Math.max(1, kU * 0.8), 2) + ' h' + f(10 * Math.max(1, kU * 0.8), 2) + ' z" fill="var(--blue)"/></g></g>' +
+        '<text id="degTxt" x="' + f(tx, 2) + '" y="' + f(ty, 2) + '" text-anchor="' + (side > 0 ? "start" : "end") + '" font-size="' + f(FS, 2) + '" font-weight="600" fill="var(--blue-deep)">0° / ' + f(sw, 0) + '°</text></g>';
     }
     // Roller chain links built from the vector outlines in the WCP roller chain drawing: outer plates, inner plates and pin holes,
     // each link placed along the chain path and moved with SMIL motion. Inner plates sit on top of outer plates, as in the drawing.
@@ -838,7 +888,7 @@ svg.draw text { font-family: var(--font); }
       var linkSvg = "";
       oIdx.forEach(function (q) { linkSvg += '<g id="lk' + q + '"><use href="#chO"/></g>'; });
       iIdx.forEach(function (q) { linkSvg += '<g id="lk' + q + '"><use href="#chI"/></g>'; });
-      var st = 'fill="none" stroke="var(--ink)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"';
+      var st = 'fill="none" stroke="var(--ink)" stroke-width="' + f(1.2 / sc, 4) + '" stroke-linejoin="round" stroke-linecap="round"';
       out += plateDefs + linkSvg;
       // TurnBuckle threads slide into the lock nuts and body, so they are clipped at the outer faces of the fixed part instead of drawing over it.
       var cx0 = 99, cx1b = -99;
@@ -904,36 +954,52 @@ svg.draw text { font-family: var(--font); }
       var frac = (sB + (li + 0.5) * ds) / pathPx, motion;
       if (moves) {
         var f0 = frac / 2, f1 = f0 + (rev ? travel : 0) / (2 * pathPx);
-        motion = '<animateMotion path="' + dTwice + '" rotate="auto" dur="' + f(revDur, 2) + 's" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.45 0 0.55 1;0.45 0 0.55 1" keyPoints="' + f(f0, 5) + ";" + f(f1, 5) + ";" + f(f0, 5) + '"/>';
+        motion = "";
       } else {
         motion = '<animateMotion path="' + dLoop + '" rotate="auto" dur="' + f(cycle, 3) + 's" begin="' + f(-frac * cycle, 3) + 's" repeatCount="indefinite"/>';
       }
-      var one = "<g>" + motion + '<use href="#' + (li % 2 ? "chI" : "chO") + '" transform="scale(' + f(kk, 4) + ')"/></g>';
+      var one = '<g' + (moves ? ' class="mvk" data-a="' + f(f0, 6) + '" data-b="' + f(f1, 6) + '"' : "") + ">" + motion + '<use href="#' + (li % 2 ? "chI" : "chO") + '" transform="scale(' + f(kk, 4) + ')"/></g>';
       if (li % 2) innerLinks += one; else outerLinks += one;
     }
-    out += plateDefs + outerLinks + innerLinks;
+    out += plateDefs + (moves ? '<path id="mvPath" d="' + dTwice + '" fill="none" stroke="none"/>' : "") + outerLinks + innerLinks;
     if (art) {
       // Tensioner drawn from the vector views in the WCP drawings (holes at x = 0 and x = len, units in inches), on the top run.
       var ang = Math.atan2(p2y - p1y, p2x - p1x) * 180 / Math.PI;
       out += '<g id="tenRun" transform="translate(' + f(p1x, 2) + " " + f(p1y, 2) + ") rotate(" + f(ang, 2) + ')"><g transform="translate(' + f(lo, 2) + ' 0)">' +
         (rev ? '<animateTransform attributeName="transform" type="translate" values="' + f(lo, 2) + ' 0;' + f(lo + travel, 2) + ' 0;' + f(lo, 2) + ' 0" dur="' + f(revDur, 2) + 's" repeatCount="indefinite"' + SPL + "/>" : "") +
-        (rev ? '<rect id="tenHandle" x="' + f(art.x0 * sc, 2) + '" y="' + f(-art.y * sc, 2) + '" width="' + f((art.x1 - art.x0) * sc, 2) + '" height="' + f(2 * art.y * sc, 2) + '" fill="transparent" style="cursor:grab;touch-action:none"/>' : "") +
+        (rev ? '<rect id="tenHandle" x="' + f(art.x0 * sc, 2) + '" y="' + f(-Math.max(art.y * sc, 18 * kU), 2) + '" width="' + f((art.x1 - art.x0) * sc, 2) + '" height="' + f(2 * Math.max(art.y * sc, 18 * kU), 2) + '" fill="transparent" style="cursor:grab;touch-action:none"/>' : "") +
         '<g transform="scale(' + f(sc, 3) + ')" style="pointer-events:none">' +
-        '<path d="' + art.d + '" fill="none" stroke="var(--ink)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>' +
+        '<path d="' + art.d + '" fill="none" stroke="var(--ink)" stroke-width="' + f(1.2 / sc, 4) + '" stroke-linejoin="round" stroke-linecap="round"/>' +
         "</g></g></g>";
     }
     }
-    var lt1 = "Sprocket 1 | " + N1 + "T (Input)", lt2 = "Sprocket 2 | " + N2 + "T (Output)", ly1 = labelY(cx1, lt1), ly2 = labelY(rev ? cx2 - 10 - lt2.length * 3.3 : cx2, lt2);
+    var lt1 = "Sprocket 1 | " + N1 + "T (Input)", lt2 = "Sprocket 2 | " + N2 + "T (Output)", ly1 = labelY(cx1, lt1), ly2 = labelY(rev ? cx2 - 10 - lt2.length * 0.275 * FS : cx2, lt2);
+    var lx2 = rev ? cx2 - 10 - lt2.length * 0.275 * FS : cx2; // keep the label left of the range-of-motion arc, which starts at the top of sprocket 2
+    // On narrow screens the two labels can run into each other, so the second one moves up a row.
+    var w1 = lt1.length * 0.56 * FS, w2 = lt2.length * 0.56 * FS, x1c = clampX(cx1, lt1), x2c = clampX(lx2, lt2);
+    if (Math.abs(x1c - x2c) < (w1 + w2) / 2 + 6 && Math.abs(ly1 - ly2) < FS * 1.15) { ly2 = Math.min(ly1, ly2) - FS * 1.2; }
     var extra = Math.max(0, Math.ceil(16 - Math.min(ly1, ly2)));
-    var lx2 = rev ? cx2 - 10 - lt2.length * 3.3 : cx2; // keep the label left of the range-of-motion arc, which starts at the top of sprocket 2
     out += label(cx1, ly1, lt1) + label(lx2, ly2, lt2);
     var dy = cy + maxD + 16 + botExtra;
     out += '<line x1="' + f(cx1, 2) + '" y1="' + f(dy, 2) + '" x2="' + f(cx2, 2) + '" y2="' + f(dy, 2) + '" stroke="var(--blue-soft)" stroke-width="1"/>' +
       '<line x1="' + f(cx1, 2) + '" y1="' + f(dy - 4, 2) + '" x2="' + f(cx1, 2) + '" y2="' + f(dy + 4, 2) + '" stroke="var(--blue-soft)" stroke-width="1"/>' +
       '<line x1="' + f(cx2, 2) + '" y1="' + f(dy - 4, 2) + '" x2="' + f(cx2, 2) + '" y2="' + f(dy + 4, 2) + '" stroke="var(--blue-soft)" stroke-width="1"/>' +
-      '<text x="' + f((cx1 + cx2) / 2, 2) + '" y="' + f(dy + 16, 2) + '" text-anchor="middle" font-size="12" font-weight="500" fill="var(--ink)">Center ' + esc(both(C)) + "</text>";
+      '<text x="' + f((cx1 + cx2) / 2, 2) + '" y="' + f(dy + Math.max(16, 6 + FS), 2) + '" text-anchor="middle" font-size="' + f(FS, 2) + '" font-weight="500" fill="var(--ink)">Center ' + esc(both(C)) + "</text>";
     svg.setAttribute("viewBox", "0 0 " + vw + " " + f(vh + extra + botExtra, 0));
     svg.innerHTML = '<rect x="0" y="0" width="' + vw + '" height="' + f(vh + extra + botExtra, 0) + '" fill="var(--blue-50)"/><g transform="translate(0 ' + extra + ')">' + out + "</g>";
+    // Links that ride the run are placed from script on every frame, so they are in the right spot the instant the drawing appears.
+    var mvEls = svg.querySelectorAll ? svg.querySelectorAll(".mvk") : [], mvP = $("mvPath"), mvL = 0, mvA = [], mvB = [];
+    if (mvEls.length && mvP) { try { mvL = mvP.getTotalLength(); } catch (e) { mvL = 0; } for (var mi = 0; mi < mvEls.length; mi++) { mvA.push(parseFloat(mvEls[mi].getAttribute("data-a"))); mvB.push(parseFloat(mvEls[mi].getAttribute("data-b"))); } }
+    var easeNow = function () { var t = 0; try { t = svg.getCurrentTime(); } catch (e) {} var ph = (t % revDur) / revDur, u = ph < 0.5 ? ph * 2 : (1 - ph) * 2, lo3 = 0, hi3 = 1, tt = 0.5; for (var k3 = 0; k3 < 24; k3++) { var u2 = 1 - tt, xx = 3 * u2 * u2 * tt * 0.45 + 3 * u2 * tt * tt * 0.55 + tt * tt * tt; if (xx < u) lo3 = tt; else hi3 = tt; tt = (lo3 + hi3) / 2; } var v3 = 1 - tt; return 3 * v3 * tt * tt + tt * tt * tt; };
+    var placeLinks = function () {
+      if (!mvL) return;
+      var e3 = rev ? easeNow() : 0;
+      for (var m2 = 0; m2 < mvEls.length; m2++) {
+        var sl = (mvA[m2] + (mvB[m2] - mvA[m2]) * e3) * mvL, p0 = mvP.getPointAtLength(sl), p3 = mvP.getPointAtLength(Math.min(mvL, sl + 0.6)), p4 = mvP.getPointAtLength(Math.max(0, sl - 0.6));
+        mvEls[m2].setAttribute("transform", "translate(" + f(p0.x, 2) + " " + f(p0.y, 2) + ") rotate(" + f(Math.atan2(p3.y - p4.y, p3.x - p4.x) * 180 / Math.PI, 2) + ")");
+      }
+    };
+    placeLinks();
     if (degLive && $("degTxt")) {
       var dDone = $("degDone"), dProg = $("degProg"), dMark = $("degMark"), dT = $("degTxt"), dSw = swing2, dDur = revDur, dSvg = svg;
       var bez = function (x) { var lo2 = 0, hi2 = 1, t = 0.5; for (var k = 0; k < 24; k++) { var u = 1 - t, xx = 3 * u * u * t * 0.45 + 3 * u * t * t * 0.55 + t * t * t; if (xx < x) lo2 = t; else hi2 = t; t = (lo2 + hi2) / 2; } var v = 1 - t; return 3 * v * v * t * 0 + 3 * v * t * t * 1 + t * t * t; };
@@ -941,7 +1007,7 @@ svg.draw text { font-family: var(--font); }
         var t = 0; try { t = dSvg.getCurrentTime(); } catch (e) {}
         var ph = (t % dDur) / dDur, u = ph < 0.5 ? ph * 2 : (1 - ph) * 2;
         var angNow = dSw * bez(u);
-        dT.textContent = f(angNow, 0) + "° / " + f(dSw, 0) + "°";
+        dT.textContent = f(angNow, 0) + "° / " + f(dSw, 0) + "°"; placeLinks();
         if (dSw > 360 && dProg && dMark) {
           // A new colour for every full revolution; the coloured arc shows how far round the current turn has gone.
           var rv = Math.floor(angNow / 360), col = REVC[rv % REVC.length], aa = (angNow - rv * 360) * Math.PI / 180;
@@ -1011,8 +1077,8 @@ svg.draw text { font-family: var(--font); }
     applyPlay();
     $("drawNote").className = "note hb info"; $("drawNote").textContent = "Drawn to scale. " + (tight
       ? (gap < 0 ? "The sprocket outside diameters overlap at this center distance." : "The sprockets are less than 1/8\" apart at this center distance.")
-      : "The dashed rings are the sprocket outside diameters, " + both(gap) + " apart.") +
-      (tighten ? tightNote : rev ? " The tensioner cannot go around a sprocket, so the chain runs back and forth and reverses before the tensioner would touch one. Drag the arrow on the degree arc, or the tensioner itself, to move it yourself." : art ? " The tensioner is too long to fit on the straight run between the sprockets, so it is drawn without motion." : " Sprocket 1 drives, and the chain speed matches the tooth counts.");
+      : "The dashed rings are the sprocket outside diameters.") +
+      (tighten ? tightNote : rev ? " The tensioner cannot go around a sprocket, so the chain runs back and forth and reverses before the tensioner would touch one. Drag the arrow on the degree arc, or the tensioner itself, to move it yourself." : art ? " The tensioner is too long to fit on the straight run between the sprockets, so it is drawn without motion. Use a center of at least " + both(minCenter(cur.P, cur.N1, cur.N2, TT)) + " for it to fit." : "");
   }
   function applyPlay() {
     var svg = $("draw");
@@ -1037,14 +1103,14 @@ svg.draw text { font-family: var(--font); }
   function drawIdler() {
     idSlackIn = 0; idDrag = false; idHold = paused && idPlaced; var idSide = radio("idside") === "out" ? "out" : "in";
     var svg = $("draw");
-    svg.hidden = false; $("drawEmpty").hidden = true;
+    svg.style.display = ""; $("drawEmpty").hidden = true;
     $("vRun").setAttribute("aria-pressed", "false"); $("vTight").setAttribute("aria-pressed", "false"); $("vIdler").setAttribute("aria-pressed", "true");
     $("idRows").innerHTML = ""; $("idCopy").hidden = true;
     var Ni = Math.round(parseFloat($("idt").value));
     if (!(Ni >= 6)) { svg.innerHTML = ""; $("drawNote").textContent = "Enter an idler with at least 6 teeth."; return; }
     var C = cur.C, P = cur.P, N1 = cur.N1, N2 = cur.N2, links = cur.links;
     // With an idler the center stays where you asked for it and the chain is the next even link count up, so the leftover length is slack.
-    var cdv = parseFloat($("cd").value), exv = parseFloat($("ex").value); if (!(exv > 0)) exv = 0;
+    var cdv = parseFloat($("cd").value), exv = 0;
     if (cdv > 0 && radio("mode") === "1") {
       var Cd = (radio("unit") === "mm" ? (cdv + exv) / 25.4 : cdv + exv);
       if (Cd > Math.abs(pitchDia(P, N2) - pitchDia(P, N1)) / 2 + 0.01) {
@@ -1053,7 +1119,7 @@ svg.draw text { font-family: var(--font); }
       }
     }
     var R1 = pitchDia(P, N1) / 2, R2 = pitchDia(P, N2) / 2, ro1 = odRadius(P, N1), ro2 = odRadius(P, N2), Ri = pitchDia(P, Ni) / 2, roI = odRadius(P, Ni);
-    var vw = 640, pad = 36, labelH = 26, maxro = Math.max(ro1, ro2), total = C + ro1 + ro2;
+    var vw = 640, FS = labelFs(vw), pad = 36, labelH = Math.max(26, Math.round(FS * 2.1)), maxro = Math.max(ro1, ro2), total = C + ro1 + ro2;
     var sc = Math.min((vw - 2 * pad) / total, (380 - 2 * pad - labelH) / (2 * maxro));
     var px = P * sc, r1 = R1 * sc, r2 = R2 * sc, ri = Ri * sc;
     var cy = pad + maxro * sc + 14, cx1 = (vw - total * sc) / 2 + ro1 * sc, cx2 = cx1 + C * sc;
@@ -1148,33 +1214,38 @@ svg.draw text { font-family: var(--font); }
       var I = idlerAt(run, side, f, hi), ok = ePx > 0.05 && !!geo(I, run) && clearOf(I, run, side, hi);
       return { run: run, side: side, f: f, D: hi, ok: ok, x: I.x, y: I.y };
     }
-    var curves = {}, minY = Infinity, maxY = -Infinity, anyOk = false;
+    var curves = {}, minY = Infinity, maxY = -Infinity, anyOk = false, i0r = { top: { min: Infinity, max: -Infinity }, bottom: { min: Infinity, max: -Infinity } };
     ["top", "bottom"].forEach(function (run) { [idSide].forEach(function (side) {
       var arr = [];
       for (var fi = 0.06; fi <= 0.941; fi += 0.02) {
         var sm = solve(run, side, fi); arr.push(sm);
         if (sm.ok) {
-          anyOk = true; var I2 = idlerAt(run, side, fi, sm.D);
+          anyOk = true; var I2 = idlerAt(run, side, fi, sm.D), I0 = idlerAt(run, side, fi, 0); // I0 is where the idler starts before it pushes in, so the box has to fit that for the run it is placed on
+          i0r[run].min = Math.min(i0r[run].min, I0.y - roIpx - 14); i0r[run].max = Math.max(i0r[run].max, I0.y + roIpx + 14);
           minY = Math.min(minY, sm.y - roIpx - 2, I2.by + I2.my * sm.D - 0.5 * px - 2); maxY = Math.max(maxY, sm.y + roIpx + 2, I2.by + I2.my * sm.D + 0.5 * px + 2);
         }
       }
       curves[run + side] = arr;
     }); });
     var hMax = Math.min(0.9 * Math.sqrt(3 * Lsp * ePx / 8), 0.8 * Math.min(r1, r2));
-    var botY = Math.max(cy + Math.max(r1, r2) + 0.5 * px + 2, q1y + 0.5 * px + 2 + hMax, q2y + 0.5 * px + 2 + hMax, maxY), vh = Math.ceil(botY + 18);
     var G = null;
     function firstOk(keys) { for (var a = 0; a < keys.length; a++) { var arr = curves[keys[a]], best = null; for (var b = 0; b < arr.length; b++) if (arr[b].ok && (!best || Math.abs(arr[b].f - idPl.f) < Math.abs(best.f - idPl.f))) best = arr[b]; if (best) return best; } return null; }
     G = firstOk([idPl.run + idSide, (idPl.run === "top" ? "bottom" : "top") + idSide]);
     if (!G) { G = solve(idPl.run, idSide, idPl.f); if (!(ePx > 0.05)) G.D = 0; G.fallback = true; }
+    // Make room for where the idler starts on the run it ended up on, before it pushes in.
+    if (i0r[G.run]) { minY = Math.min(minY, i0r[G.run].min); maxY = Math.max(maxY, i0r[G.run].max); }
+    // When the idler cannot take up the slack anywhere, there is no solved path, so fit the start and end of its move directly.
+    if (G.fallback) [0, G.D].forEach(function (dd) { var Iq = idlerAt(G.run, G.side, G.f, dd); minY = Math.min(minY, Iq.y - roIpx - 14); maxY = Math.max(maxY, Iq.y + roIpx + 14); });
+    var botY = Math.max(cy + Math.max(r1, r2) + 0.5 * px + 2, q1y + 0.5 * px + 2 + hMax, q2y + 0.5 * px + 2 + hMax, maxY), vh = Math.ceil(botY + 18);
     idPl = { run: G.run, side: G.side, f: G.f };
     var odStroke = "var(--ink-soft)", dur = 9;
 
     function toothPath(N, r, rt) { return toothOutline(N, r, px); }
-    function sprocketSvg(x, y, r, roPx, N, id) {
+    function sprocketSvg(x, y, r, roPx, N, id, rid) {
       var af = Math.min(0.5 * sc, (r - 0.31 * px) * 1.5), hr = af / Math.sqrt(3), hp = "";
       for (var k = 0; k < 6; k++) { var ha = (k * 60 + 30) * Math.PI / 180; hp += (k ? " L" : "M") + f(hr * Math.sin(ha), 2) + " " + f(-hr * Math.cos(ha), 2); }
       return '<g' + (id ? ' id="' + id + '" style="cursor:grab;touch-action:none"' : "") + ' transform="translate(' + f(x, 2) + " " + f(y, 2) + ')"><circle r="' + f(roPx, 2) + '" fill="' + (id ? "transparent" : "none") + '" stroke="' + odStroke + '" stroke-width="1" stroke-dasharray="4 3" opacity="0.7"/>' +
-        '<path d="' + toothPath(N, r, roPx) + '" fill="none" stroke="var(--blue-deep)" stroke-width="1.3" stroke-linejoin="round" style="pointer-events:none"/><path d="' + hp + ' Z" fill="none" stroke="var(--blue-deep)" stroke-width="1.3" stroke-linejoin="round" style="pointer-events:none"/>' + (id ? '<text id="idLabT" x="' + f(roPx + 8, 2) + '" y="-6" text-anchor="start" font-size="12" font-weight="500" fill="var(--ink)" stroke="var(--blue-50)" stroke-width="3" paint-order="stroke" style="pointer-events:none">Idler | ' + N + 'T</text>' : "") + '</g>';
+        '<g' + (rid ? ' id="' + rid + '"' : "") + '><path d="' + toothPath(N, r, roPx) + '" fill="none" stroke="var(--blue-deep)" stroke-width="1.3" stroke-linejoin="round" style="pointer-events:none"/><path d="' + hp + ' Z" fill="none" stroke="var(--blue-deep)" stroke-width="1.3" stroke-linejoin="round" style="pointer-events:none"/></g>' + (id ? '<text id="idLabT" x="' + f(roPx + 8, 2) + '" y="-6" text-anchor="start" font-size="' + f(FS, 2) + '" font-weight="500" fill="var(--ink)" stroke="var(--blue-50)" stroke-width="3" paint-order="stroke" style="pointer-events:none">Idler | ' + N + 'T</text>' : "") + '</g>';
     }
     var defs = '<defs><g id="idO"><path d="' + PLATE_O + '" fill="var(--blue-100)" stroke="var(--blue-deep)" stroke-width="1.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>' +
         '<circle cx="-13.5" r="4.89" fill="var(--blue-50)" stroke="var(--blue-deep)" stroke-width="1.2" vector-effect="non-scaling-stroke"/><circle cx="13.5" r="4.89" fill="var(--blue-50)" stroke="var(--blue-deep)" stroke-width="1.2" vector-effect="non-scaling-stroke"/></g>' +
@@ -1200,11 +1271,11 @@ svg.draw text { font-family: var(--font); }
       });
     }
     var labYBase = Math.min(cy - Math.max(r1, r2) - 0.5 * px - 2, p1y - 0.5 * px - 2, p2y - 0.5 * px - 2) - 12;
-    var out = defs + sprocketSvg(cx1, cy, r1, ro1 * sc, N1) + sprocketSvg(cx2, cy, r2, ro2 * sc, N2) + linkSvg +
-      '<g id="idGhost" opacity="0.4">' + ghost + "</g>" + sprocketSvg(0, 0, ri, roIpx, Ni, "idSpr") + '<g id="idDim" style="pointer-events:none" display="none"></g>' +
-      '<text id="idLab1" font-size="12" font-weight="500" fill="var(--ink)" text-anchor="middle"></text><text id="idLab2" font-size="12" font-weight="500" fill="var(--ink)" text-anchor="middle"></text>';
+    var out = defs + sprocketSvg(cx1, cy, r1, ro1 * sc, N1, null, "idRot1") + sprocketSvg(cx2, cy, r2, ro2 * sc, N2, null, "idRot2") + linkSvg +
+      '<g id="idGhost" opacity="0.4">' + ghost + "</g>" + sprocketSvg(0, 0, ri, roIpx, Ni, "idSpr", "idRot3") + '<g id="idDim" style="pointer-events:none" display="none"></g>' +
+      '<text id="idLab1" font-size="' + f(FS, 2) + '" font-weight="500" fill="var(--ink)" text-anchor="middle"></text><text id="idLab2" font-size="' + f(FS, 2) + '" font-weight="500" fill="var(--ink)" text-anchor="middle"></text>';
     var topAll = Math.min(labYBase, isFinite(minY) ? minY - 14 : labYBase);
-    var extra = Math.max(0, Math.ceil(16 - topAll));
+    var extra = Math.max(0, Math.ceil(Math.max(16, FS + 6) - topAll));
     svg.setAttribute("viewBox", "0 0 " + vw + " " + f(vh + extra, 0));
     svg.innerHTML = '<rect x="0" y="0" width="' + vw + '" height="' + f(vh + extra, 0) + '" fill="var(--blue-50)"/><g id="idScene" transform="translate(0 ' + extra + ')">' + out + "</g>";
 
@@ -1219,14 +1290,27 @@ svg.draw text { font-family: var(--font); }
       var h = Math.min(0.9 * Math.sqrt(3 * g.T[hangI].L * slack / 8), 0.8 * Math.min(r1, r2));
       var pts = pathPts(g, hangI, h), cum = [0];
       for (var i5 = 1; i5 < pts.length; i5++) cum.push(cum[i5 - 1] + Math.hypot(pts[i5][0] - pts[i5 - 1][0], pts[i5][1] - pts[i5 - 1][1]));
-      var ds = cum[cum.length - 1] / links, seg = 1;
+      var ds = cum[cum.length - 1] / links, seg = 1, pins = [];
       for (var li = 0; li < links; li++) {
         var sp = (li + 0.5) * ds;
         while (seg < cum.length - 1 && cum[seg] < sp) seg++;
         var segL = cum[seg] - cum[seg - 1] || 1, tf = (sp - cum[seg - 1]) / segL, xa = pts[seg - 1][0], ya = pts[seg - 1][1], xb = pts[seg][0], yb = pts[seg][1];
         var el = document.getElementById("il" + li);
         if (el) el.setAttribute("transform", "translate(" + f(xa + (xb - xa) * tf, 2) + " " + f(ya + (yb - ya) * tf, 2) + ") rotate(" + f(Math.atan2(yb - ya, xb - xa) * 180 / Math.PI, 2) + ") scale(" + f(ds / 27, 4) + ")");
+        var lx = xa + (xb - xa) * tf, ly = ya + (yb - ya) * tf, lc = (xb - xa) / segL, ls = (yb - ya) / segL;
+        pins.push([lx - lc * ds / 2, ly - ls * ds / 2], [lx + lc * ds / 2, ly + ls * ds / 2]);
       }
+      // Turn each sprocket so its tooth gaps line up with the rollers that sit on it. The pins on the wrapped arc are fit to the tooth spacing.
+      function seatSprocket(rid, X, Y, rad, Nt) {
+        var c = 0, sn = 0, k = 0, node = document.getElementById(rid);
+        if (!node) return;
+        for (var q = 0; q < pins.length; q++) {
+          var ddx = pins[q][0] - X, ddy = pins[q][1] - Y;
+          if (Math.abs(Math.hypot(ddx, ddy) - rad) < 0.09 * px) { var an = Nt * Math.atan2(ddx, -ddy) - Math.PI; c += Math.cos(an); sn += Math.sin(an); k++; }
+        }
+        node.setAttribute("transform", "rotate(" + (k ? f(Math.atan2(sn, c) / Nt * 180 / Math.PI, 3) : "0") + ")");
+      }
+      seatSprocket("idRot1", cx1, cy, r1, N1); seatSprocket("idRot2", cx2, cy, r2, N2); seatSprocket("idRot3", I.x, I.y, ri, Ni);
       var sp2 = document.getElementById("idSpr");
       if (sp2) sp2.setAttribute("transform", "translate(" + f(I.x, 2) + " " + f(I.y, 2) + ")");
     }
@@ -1271,7 +1355,7 @@ svg.draw text { font-family: var(--font); }
         return best;
       }
       function grid(ax, ay, w, h) { var out = []; for (var gx = w / 2 + 4; gx <= vw - w / 2 - 4; gx += 8) for (var gy = bTop + h / 2; gy <= vh - h / 2 - 3; gy += 6) out.push({ x: gx, y: gy, cost: Math.abs(gx - ax) * 0.5 + Math.abs(gy - ay) * 1.5 }); return out; }
-      var w1 = tw(t1, s1, 12) + 8, w2 = tw(t2, s2, 12) + 8, hh = 17;
+      var w1 = tw(t1, s1, FS) + 8, w2 = tw(t2, s2, FS) + 8, hh = Math.round(FS * 1.45);
       var topY = (G.run === "top" && G.side === "out") ? Math.min(labYBase, Ig.y - roIpx - 14) : labYBase;
       var p1 = place(w1, hh, grid(Math.max(w1 / 2 + 4, Math.min(vw - w1 / 2 - 4, cx1)), topY - 4, w1, hh)), p2 = place(w2, hh, grid(Math.max(w2 / 2 + 4, Math.min(vw - w2 / 2 - 4, cx2)), topY - 4, w2, hh));
       t1.setAttribute("text-anchor", "middle"); t1.setAttribute("x", f(p1.x, 1)); t1.setAttribute("y", f(p1.y + 4, 1));
@@ -1279,7 +1363,7 @@ svg.draw text { font-family: var(--font); }
       if (showDim) {
         var halo = ' stroke="#fff" stroke-width="4" paint-order="stroke"', ang2 = Math.atan2(Ig.y - cy, Ig.x - cx1) * 180 / Math.PI, ar = ang2 * Math.PI / 180;
         if (ang2 > 90) ang2 -= 180; else if (ang2 < -90) ang2 += 180;
-        var lnx = ' stroke="var(--dimx)" stroke-width="1.8" stroke-dasharray="6 3"', lny = ' stroke="var(--dimy)" stroke-width="1.8" stroke-dasharray="6 3"', tx = ' text-anchor="middle" font-size="13" font-weight="700"', lw = 22, lh = 16, cxs = [], cys = [], cc2 = [], t, sd;
+        var lnx = ' stroke="var(--dimx)" stroke-width="1.8" stroke-dasharray="6 3"', lny = ' stroke="var(--dimy)" stroke-width="1.8" stroke-dasharray="6 3"', tx = ' text-anchor="middle" font-size="' + f(13 * FS / 12, 2) + '" font-weight="700"', lw = 22 * FS / 12, lh = 16 * FS / 12, cxs = [], cys = [], cc2 = [], t, sd;
         for (var ko = 0; ko < 4; ko++) {
           var eo = ko * 9;
           for (t = 0.08; t <= 0.921; t += 0.04) for (sd = -1; sd <= 1; sd += 2) {
@@ -1287,7 +1371,7 @@ svg.draw text { font-family: var(--font); }
             cys.push({ x: Ig.x + sd * (lw / 2 + 5 + eo), y: cy + (Ig.y - cy) * t, cost: Math.abs(t - 0.3) * 60 + (sd > 0 ? 0 : 2) + ko * 25 });
           }
         }
-        var nxv = -Math.sin(ar), nyv = Math.cos(ar), ccW = 34, aw = Math.abs(Math.cos(ar)) * ccW + Math.abs(Math.sin(ar)) * lh, ah = Math.abs(Math.sin(ar)) * ccW + Math.abs(Math.cos(ar)) * lh;
+        var nxv = -Math.sin(ar), nyv = Math.cos(ar), ccW = 34 * FS / 12, aw = Math.abs(Math.cos(ar)) * ccW + Math.abs(Math.sin(ar)) * lh, ah = Math.abs(Math.sin(ar)) * ccW + Math.abs(Math.cos(ar)) * lh;
         for (ko = 0; ko < 4; ko++) for (t = 0.12; t <= 0.881; t += 0.04) for (sd = -1; sd <= 1; sd += 2) {
           var off = sd * (lh / 2 + 4 + ko * 9);
           cc2.push({ x: cx1 + (Ig.x - cx1) * t + nxv * off, y: cy + (Ig.y - cy) * t + nyv * off, cost: Math.abs(t - 0.4) * 60 + (sd < 0 ? 0 : 2) + ko * 25 });
@@ -1303,15 +1387,16 @@ svg.draw text { font-family: var(--font); }
         dim.setAttribute("display", "");
       } else dim.setAttribute("display", "none");
       if (lt) {
-        var txtW = tw(lt, "Idler | " + Ni + "T", 12) + 8, hexW = 2 * Math.min(0.5 * sc, (ri - 0.31 * px) * 1.5) / Math.sqrt(3), ic = [];
+        var txtW = tw(lt, "Idler | " + Ni + "T", FS) + 8, hexW = 2 * Math.min(0.5 * sc, (ri - 0.31 * px) * 1.5) / Math.sqrt(3), ic = [];
         if (hexW * 0.9 >= txtW) ic.push({ x: Ig.x, y: Ig.y, cost: showDim ? 40 : -5 });
         for (var ka = 0; ka < 24; ka++) for (var kr = 0; kr < 3; kr++) {
-          var an = ka * Math.PI / 12, ca = Math.cos(an), sa = Math.sin(an), rr = roIpx + 6 + kr * 10;
+          var an = ka * Math.PI / 12, ca = Math.cos(an), sa = Math.sin(an), rr = roIpx + 6 + kr * Math.max(10, FS * 0.8);
           var da = Math.abs(((an - Math.PI / 2 + 3 * Math.PI) % (2 * Math.PI)) - Math.PI);
-          ic.push({ x: Ig.x + ca * (rr + txtW / 2 * Math.abs(ca)), y: Ig.y + sa * (rr + 9 * Math.abs(sa)), cost: da * 6 + kr * 8 });
+          ic.push({ x: Ig.x + ca * (rr + txtW / 2 * Math.abs(ca)), y: Ig.y + sa * (rr + Math.max(9, FS * 0.6) * Math.abs(sa)), cost: da * 6 + kr * 8 });
         }
-        var pI = place(txtW, 17, ic, "I");
-        lt.setAttribute("x", f(pI.x - Ig.x, 1)); lt.setAttribute("y", f(pI.y - Ig.y + 4, 1)); lt.setAttribute("text-anchor", "middle");
+        var pI = place(txtW, Math.max(17, FS * 1.3), ic, "I");
+        lt.setAttribute("x", f(pI.x - Ig.x, 1)); lt.setAttribute("y", f(pI.y - Ig.y + Math.max(4, FS * 0.35), 1)); lt.setAttribute("text-anchor", "middle");
+        lt.setAttribute("stroke", "var(--blue-50)"); lt.setAttribute("stroke-width", f(Math.max(3, FS * 0.3), 1)); lt.setAttribute("paint-order", "stroke"); lt.setAttribute("stroke-linejoin", "round");
       }
       var rows = "";
       rows += row("Idler Pitch Diameter", both(2 * Ri));
@@ -1325,7 +1410,7 @@ svg.draw text { font-family: var(--font); }
       rows += row("Idler Wrap", f(wrapDeg, 0) + "°, " + f(wrapDeg / 360 * Ni, 1) + " teeth in mesh", wrapDeg < 90 && G.D > 0);
       $("idRows").innerHTML = rows;
       $("drawNote").className = "note hb " + ((eIn < 0.002 || !anyOk) ? "warning" : "info"); $("drawNote").textContent = "Drawn to scale. Drag the idler along the dashed paths, or click one to send it there. These are the only spots where an idler on the " + (idSide === "in" ? "inside" : "outside") + " of the chain takes up the slack. " +
-        (eIn < 0.002 ? "The chain is the exact length, so there is no slack for an idler to take up." : !anyOk ? "This idler cannot take up the slack anywhere on the runs, so try a different tooth count." : "At the end of the move it takes up " + both(eIn) + " so the chain pulls straight.");
+        (eIn < 0.002 ? "The chain is the exact length, so there is no slack for an idler to take up." : !anyOk ? "This idler cannot take up the slack anywhere on the runs, so try a different tooth count." : "");
     }
     refresh(); frame(0);
     function loop(now) { if (!last) last = now; if (wasPaused && !paused && idPlaced) clock = 5.2; wasPaused = paused; if (!paused) clock += (now - last) / 1000; last = now; frame(clock); idRaf = requestAnimationFrame(loop); }
@@ -1358,7 +1443,21 @@ svg.draw text { font-family: var(--font); }
   }
 
   // ---------- main calculation ----------
-  function renderAll() { drawDrive(); renderSprockets(); }
+  // Keep drawing labels readable: the SVG scales down with the screen, so grow the label size until it renders at least MIN_LABEL px.
+  var MIN_LABEL = MQ_PHONE.matches ? 13 : 11;
+  function labelFs(vw) { var w = 0; try { w = $("draw").getBoundingClientRect().width; } catch (e) {} return w > 0 ? Math.max(12, MIN_LABEL * vw / w) : 12; }
+  function fitSvgText() {
+    var svg = $("draw"), vb = svg.viewBox && svg.viewBox.baseVal, w = svg.getBoundingClientRect().width;
+    if (!vb || !vb.width || !w) return;
+    var k = vb.width / w;
+    svg.querySelectorAll("text").forEach(function (t) {
+      var base = t.getAttribute("data-fs");
+      if (base === null) { base = t.getAttribute("font-size") || "12"; t.setAttribute("data-fs", base); }
+      t.setAttribute("font-size", f(Math.max(parseFloat(base), MIN_LABEL * k), 2));
+    });
+  }
+  function renderAll() { drawDrive(); renderSprockets(); fitSvgText(); }
+  if (window.ResizeObserver) { try { new ResizeObserver(function () { fitSvgText(); }).observe($("draw")); } catch (e) {} }
 
   function calc() {
     var mode = radio("mode") === "2" ? 2 : 1;
@@ -1386,12 +1485,30 @@ svg.draw text { font-family: var(--font); }
     var toIn = function (v) { return unit === "mm" ? v / 25.4 : v; };
     var N1 = parseInt($("t1").value, 10), N2 = parseInt($("t2").value, 10);
 
+    var warnEl = $("inputWarn");
+    warnEl.textContent = "";
+    // Keep the warning right under the field that caused it.
+    var warnHost = mode === 1 ? $("cdFields").querySelector(".fields") : $("lk").closest(".unit-field");
+    if (warnHost && warnEl.previousElementSibling !== warnHost) warnHost.after(warnEl);
     function bad(msg) {
+      warnEl.textContent = msg; lastBad = msg;
       setStatus(true, "Check inputs", msg);
       $("tiles").innerHTML = ""; $("warns").innerHTML = ""; $("rows").innerHTML = ""; $("rows").closest(".table-wrap").hidden = true; $("opts").hidden = true;
       cur = null; renderAll();
     }
     if (!(N1 >= 6) || !(N2 >= 6)) { bad("Enter a tooth count of 6 or more for both sprockets."); return; }
+    // The sprockets cannot physically overlap, so a center that puts their outside diameters into each other is treated as an input error.
+    function overlaps(cc) { return cc !== null && gapBetween(cc, P, N1, N2) < -1e-9; }
+    // Smallest desired center that clears the sprockets and, if one is picked, the tensioner once the chain is rounded to whole links.
+    function recCenter() {
+      var base = Math.ceil(minCenter(P, N1, N2, T) * 1000) / 1000;
+      if (!(T && TENS_ART[T.key])) return base;
+      var tArt = TENS_ART[T.key], tMid = (T.min + T.max) / 2;
+      var okD = function (Dc) { var Lx = linksFor(Dc, P, N1, N2), nx = Math.max(1, Math.round((Lx * P - tMid) / P)), cc = centerFor((nx * P + tMid) / P, P, N1, N2); return cc !== null && isFinite(cc) && tensFits(tArt, P, N1, N2, cc); };
+      for (var it = 0; it < 400 && !okD(base); it++) base = Math.round((base + 0.005) * 1000) / 1000;
+      return base;
+    }
+    function overlapBad() { bad("These sprockets would overlap at this center. Use a center of at least " + both(recCenter()) + "."); }
 
     var D1 = pitchDia(P, N1), D2 = pitchDia(P, N2);
     var ratio = N2 >= N1 ? N2 / N1 : N1 / N2;
@@ -1411,10 +1528,10 @@ svg.draw text { font-family: var(--font); }
     if (mode === 1) {
       var c = parseFloat($("cd").value);
       if (!(c > 0)) { bad("Enter a center distance greater than 0."); return; }
-      var ex = parseFloat($("ex").value); if (!(ex > 0)) ex = 0;
-      var C = toIn(c + ex);
+      var C = toIn(c);
       if (C <= Math.abs(D2 - D1) / 2) { bad("Center distance is too small for these sprockets. The chain cannot wrap them."); return; }
       var L = linksFor(C, P, N1, N2);
+      if (overlaps(C) && !inl && $("idOn").checked && !T) { overlapBad(); return; }
 
       if (inl) {
         // The tensioner sits in the loop: loop length = chain links x pitch + tensioner length.
@@ -1422,6 +1539,7 @@ svg.draw text { font-family: var(--font); }
         var loopLo = (nI * P + T.min) / P, loopHi = (nI * P + T.max) / P, loopMid = (nI * P + mid) / P;
         var cA = centerFor(loopLo, P, N1, N2), cB = centerFor(loopHi, P, N1, N2), cM = centerFor(loopMid, P, N1, N2);
         if (cA === null || cB === null || cM === null) { bad("These sprockets are too large for a chain this short at this center distance."); return; }
+        if (overlaps(cA)) { overlapBad(); return; }
         var inRange = C >= cA - 1e-6 && C <= cB + 1e-6;
         var fixedT = T.max - T.min < 1e-9;
         setStatus(false, linkWord(nI), "Plus the " + T.name + ". " + (fixedT ? "Center comes out at " + both(cM) + "." : "The drive can run from " + both(cA) + " to " + both(cB) + " center."), "Chain Length Needed");
@@ -1452,11 +1570,13 @@ svg.draw text { font-family: var(--font); }
         var step = radio("half") === "1" ? 1 : 2;
         var lo = Math.floor(L / step + 1e-9) * step, hi = lo + step;
         var cLo = centerFor(lo, P, N1, N2), cHi = centerFor(hi, P, N1, N2);
-        var dLo = cLo === null ? Infinity : Math.abs(cLo - C), dHi = cHi === null ? Infinity : Math.abs(cHi - C);
+        var ovLo = overlaps(cLo), ovHi = overlaps(cHi);
+        if ((ovLo || ovHi) && (cLo === null || ovLo) && (cHi === null || ovHi)) { overlapBad(); return; }
+        var dLo = (cLo === null || ovLo) ? Infinity : Math.abs(cLo - C), dHi = (cHi === null || ovHi) ? Infinity : Math.abs(cHi - C);
         var best = dLo <= dHi ? "lo" : "hi";
         // A cam only takes slack out, so prefer the chain whose center is at or past the desired center.
-        if (cam && cHi !== null) best = "hi";
-        if (selN === lo && cLo !== null) best = "lo"; else if (selN === hi && cHi !== null) best = "hi";
+        if (cam && cHi !== null && !ovHi) best = "hi";
+        if (selN === lo && cLo !== null && !ovLo) best = "lo"; else if (selN === hi && cHi !== null && !ovHi) best = "hi";
         var bestN = best === "lo" ? lo : hi, bestC = best === "lo" ? cLo : cHi;
         if (bestC === null) { bad("These sprockets are too large for a chain this short at this center distance."); return; }
 
@@ -1464,7 +1584,6 @@ svg.draw text { font-family: var(--font); }
         var camNote = cam ? " The cam adjusts from " + both(bestC - T.travel) + " to " + both(bestC) + " center." : "";
         setStatus(false, linkWord(bestN), "Runs at " + both(bestC) + " center, " + signed(bestC - C) + " from your desired center." + oddNote + camNote, (selN === bestN ? "Selected Chain" : "Recommended Chain"));
         rows += row("Exact Length (not a real chain size)", f(L, 2) + " links, " + both(L * P));
-        if (ex > 0) rows += row("Center Distance Used", both(C) + " (desired + extra)");
         rows += driveRows(bestC, bestN);
         if (cam) {
           var fits = C >= bestC - T.travel - 1e-6 && C <= bestC + 1e-6;
@@ -1475,6 +1594,7 @@ svg.draw text { font-family: var(--font); }
 
         var opt = function (n, cc, label, hl) {
           if (cc === null) return tile(linkWord(n), label, "too short for these sprockets", hl, "");
+          if (overlaps(cc)) return tile(linkWord(n), label, "sprockets would overlap", hl, "");
           var extra = '<div class="pn dim">' + esc(signed(cc - C) + " from desired") + "</div>";
           if (cam) {
             var ok = C >= cc - T.travel - 1e-6 && C <= cc + 1e-6;
@@ -1496,6 +1616,7 @@ svg.draw text { font-family: var(--font); }
         var lA = (n * P + T.min) / P, lB = (n * P + T.max) / P, lM = (n * P + mid2) / P;
         var kA = centerFor(lA, P, N1, N2), kB = centerFor(lB, P, N1, N2), kM = centerFor(lM, P, N1, N2);
         if (kA === null || kB === null || kM === null) { bad("This chain is too short to wrap both sprockets."); return; }
+        if (overlaps(kA)) { bad("This chain is too short, so the sprockets would overlap."); return; }
         var fixed2 = T.max - T.min < 1e-9;
         setStatus(false, both(kM), fixed2 ? "With the " + T.name + "." : "With the " + T.name + ", the center can run from " + both(kA) + " to " + both(kB) + ".", "Center Distance");
         rows += row("Chain Length", (radio("unit") === "mm" ? f(n * P * 25.4, 2) + " mm" : f(n * P, 3) + "\"") + " of Chain");
@@ -1509,6 +1630,7 @@ svg.draw text { font-family: var(--font); }
       } else {
         var cc = centerFor(n, P, N1, N2);
         if (cc === null) { bad("This chain is too short to wrap both sprockets."); return; }
+        if (overlaps(cc)) { bad("This chain is too short, so the sprockets would overlap. Use more links."); return; }
         setStatus(false, both(cc), (n % 2 !== 0 ? "An odd link count needs a half link. " : "") + (cam ? "The cam adjusts from " + both(cc - T.travel) + " to " + both(cc) + "." : ""), "Center Distance");
         rows += row("Chain Length", both(n * P));
         if (cam) rows += row("Cam Center Range", both(cc - T.travel) + " to " + both(cc) + " (" + both(T.travel) + " of travel)");
@@ -1519,6 +1641,20 @@ svg.draw text { font-family: var(--font); }
         $("actions").innerHTML = act; $("actions").hidden = false;
         cur = { C: cc, P: P, N1: N1, N2: N2, links: n, opt: null };
       }
+    }
+    if (cur && T && TENS_ART[T.key] && cur.C > 0 && !tensFits(TENS_ART[T.key], P, N1, N2, cur.C)) {
+      var tArt = TENS_ART[T.key], tMid = (T.min + T.max) / 2;
+      var okAt = function (cc) { return cc !== null && isFinite(cc) && tensFits(tArt, P, N1, N2, cc); };
+      var cmFromN = function (nn) { return centerFor((nn * P + tMid) / P, P, N1, N2); };
+      var cmFromD = function (Dc) { var Lx = linksFor(Dc, P, N1, N2), nx = Math.max(1, Math.round((Lx * P - tMid) / P)); return cmFromN(nx); };
+      if (mode === 1) {
+        var Dr = recCenter();
+        bad("The " + T.short + " does not fit between the sprockets at this center. Use a center of at least " + both(Dr) + ".");
+      } else {
+        var nr = n; while (nr < n + 400 && !okAt(cmFromN(nr))) nr++;
+        bad("The " + T.short + " does not fit between the sprockets with this chain. Use at least " + nr + " links.");
+      }
+      return;
     }
     wrapMsgs = [];
     if (cur && cur.C > 0) {
@@ -1534,12 +1670,12 @@ svg.draw text { font-family: var(--font); }
     renderAll();
   }
 
-  ["t1", "t2", "cd", "ex", "lk", "idt", "idx"].forEach(function (id) { $(id).addEventListener("input", calc); });
+  ["t1", "t2", "cd", "lk", "idt", "idx"].forEach(function (id) { $(id).addEventListener("input", calc); });
   var lastUnit = "in";
   function onUnit() {
     var u = radio("unit") === "mm" ? "mm" : "in";
     if (u !== lastUnit) {
-      ["cd", "ex"].forEach(function (id) {
+      ["cd"].forEach(function (id) {
         var v = parseFloat($(id).value);
         if (v > 0) $(id).value = +(u === "mm" ? v * 25.4 : v / 25.4).toFixed(u === "mm" ? 2 : 3);
       });
