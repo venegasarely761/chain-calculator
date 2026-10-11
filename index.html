@@ -160,19 +160,32 @@ td.num.warn { color: var(--alert); font-weight: 700; }
 
 /* top view */
 .fsb { display: none; }
-.card.bad .fsb { display: none !important; }
+.card.bad .draw-wrap:not(.fs-on) .fsb { display: none !important; }
 .fsbar { display: none; }
 .draw-wrap.fs-on { position: fixed; inset: 0; z-index: 2147483000; border-radius: 0; border: 0; overflow: auto; background: var(--blue-50); display: flex; flex-direction: column; align-items: stretch; padding: 8px 10px 14px; }
 .draw-wrap.fs-on .fsbar { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
 .draw-wrap.fs-on .fsbar .hd-r { justify-content: flex-start; }
 .draw-wrap.fs-on svg.draw { flex: 0 0 auto; }
 .fsrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.draw-wrap.fs-on .fsb { position: static; align-self: auto; display: inline-flex; }
-.fshint { display: none; font-size: 13px; color: var(--ink-soft); }
-@media (orientation: portrait) { .draw-wrap.fs-on .fshint { display: block; } }
-@media (max-width: 520px) {
+.draw-wrap.fs-on .fsb { position: static; align-self: auto; display: inline-flex; width: 36px; height: 36px; padding: 0; }
+.fsb svg { display: block; }
+.draw-wrap.fs-on svg.draw { max-width: none; margin: 0 auto; }
+.draw-wrap.fs-on.fs-rot { inset: auto; top: 0; left: 100%; width: 100vh; width: 100dvh; height: 100vw; height: 100dvw; transform-origin: 0 0; transform: rotate(90deg); }
+.fstools { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.fstools .pill { min-width: 36px; height: 36px; padding: 0 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; line-height: 1; }
+.fstools .pill[aria-pressed="true"] { background: var(--blue); color: #fff; }
+.fstools .pill:disabled { opacity: .4; }
+.fstools .pill.txt { font-size: 14px; }
+.fspanel { background: var(--white); border: 1px solid var(--blue-100); border-radius: 12px; padding: 8px 10px; max-height: 50%; overflow: auto; }
+.fspanel[hidden] { display: none; }
+.fspanel #idGrp { margin: 0 !important; }
+.draw-wrap.fs-on .idcopy, .draw-wrap.fs-on .card-sub { margin-top: 8px; }
+.draw-wrap.fs-on .idcopy { flex-wrap: nowrap; gap: 6px; }
+.draw-wrap.fs-on .idcopy .idc { width: auto !important; flex: 0 0 auto !important; font-size: 13px; white-space: nowrap; }
+.draw-wrap.fs-on .idcopy .idc-h { white-space: nowrap; }
+@media (max-width: 520px), (pointer: coarse) {
   .draw-wrap { position: relative; }
-  .fsb { display: inline-flex; position: absolute; right: 8px; bottom: 8px; z-index: 2; padding: 6px 12px; font-size: 13px; }
+  .fsb { display: inline-flex; align-items: center; justify-content: center; position: absolute; right: 6px; top: 6px; z-index: 2; width: 32px; height: 32px; padding: 0; }
 }
 .draw-wrap { background: var(--blue-50); border: 1px solid var(--blue-100); border-radius: 12px; overflow: hidden; }
 svg.draw[hidden] { display: none; }
@@ -234,7 +247,7 @@ svg.draw text { font-family: var(--font); }
 
 <div class="shell">
 <header class="banner">
-  <span class="ver">v1.12.35</span>
+  <span class="ver">v1.12.36</span>
   <h1>Chain Calculator</h1>
   <p>Chain length and center distance for a two-sprocket chain drive</p>
 </header>
@@ -325,7 +338,7 @@ svg.draw text { font-family: var(--font); }
         <span class="hint hb info" id="idHint" style="flex-basis:100%">Idlers sit on the inside or outside of the chain loop to give a sprocket more contact with the chain. An idler does not change the ratio.</span>
       </div>
       <div class="draw-wrap" id="drawWrap">
-        <button type="button" class="pill fsb" id="fsBtn" aria-label="Full screen view of the animation">Full screen</button>
+        <button type="button" class="pill fsb" id="fsBtn" aria-label="Full screen view of the animation" title="Full screen"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M4 4l6 6M20 9V4h-5M20 4l-6 6M4 15v5h5M4 20l6-6M20 15v5h-5M20 20l-6-6"/></svg></button>
         <svg class="draw" id="draw" viewBox="0 0 640 220" role="img" aria-label="Top view of the chain drive"></svg>
         <div class="empty" id="drawEmpty" hidden>Fix the inputs above to see the drive.</div>
       </div>
@@ -763,11 +776,10 @@ svg.draw text { font-family: var(--font); }
     var C = cur.C, P = cur.P, N1 = cur.N1, N2 = cur.N2, links = cur.links;
     var R1 = pitchDia(P, N1) / 2, R2 = pitchDia(P, N2) / 2, ro1 = odRadius(P, N1), ro2 = odRadius(P, N2);
     var vw = 640, FS = labelFs(vw), pad = 36, labelH = Math.max(26, Math.round(FS * 2.1)), maxro = Math.max(ro1, ro2), total = C + ro1 + ro2;
-    var rsv = (cur.tens && TENS_ART[cur.tens.key]) ? 70 : 0; // room on the right for the range-of-motion callout
-    if (rsv && FS > 14) rsv = Math.max(rsv, Math.ceil(0.6 * 7 * FS) + 36); // on phones the angle text is drawn larger, so keep it inside the drawing
+    var arcOn = !!(cur.tens && TENS_ART[cur.tens.key]), rsv = 0; // the angle readout sits in the bottom row, so nothing is reserved on the right and the drawing stays centred
     var kU = FS / MIN_LABEL; // drawing units per rendered pixel
-    var sc = Math.min((vw - 2 * pad - rsv) / total, (380 - 2 * pad - labelH - (rsv ? 44 : 0)) / (2 * maxro));
-    var degR = rsv ? Math.max(ro2 * sc, (R2 + 0.5 * P) * sc) + 14 : 0, maxD = Math.max(maxro * sc, degR + 13); // radius of the range-of-motion arc
+    var sc = Math.min((vw - 2 * pad - rsv) / total, (380 - 2 * pad - labelH - (arcOn ? 44 : 0)) / (2 * maxro));
+    var degR = arcOn ? Math.max(ro2 * sc, (R2 + 0.5 * P) * sc) + 14 : 0, maxD = Math.max(maxro * sc, degR + 13); // radius of the range-of-motion arc
     var vh = Math.max(170, Math.min(380, 2 * maxD + 2 * pad + labelH));
     var cy = (vh - labelH) / 2, drawW = total * sc, cx1 = (vw - rsv - drawW) / 2 + ro1 * sc, cx2 = cx1 + C * sc;
     var r1 = R1 * sc, r2 = R2 * sc, px = P * sc;
@@ -853,7 +865,8 @@ svg.draw text { font-family: var(--font); }
       }
       return best;
     }
-    function clampX(cx, txt) { var half = txt.length * 0.283 * FS; return Math.max(8 + half, Math.min(vw - 8 - half, cx)); }
+    var ctlU = (lastDrawW > 0 && lastDrawW < 520 && !$("drawWrap").classList.contains("fs-on")) ? Math.round(44 * vw / lastDrawW) : 0; // room for the full screen icon in the top right corner
+    function clampX(cx, txt) { var half = txt.length * 0.283 * FS; return Math.max(8 + half, Math.min(vw - 8 - ctlU - half, cx)); }
     function labelY(cx, txt) {
       var half = txt.length * 0.283 * FS, top = cy; cx = clampX(cx, txt);
       for (var i = 0; i <= 12; i++) top = Math.min(top, topAt(cx - half + 2 * half * i / 12));
@@ -884,7 +897,7 @@ svg.draw text { font-family: var(--font); }
         '<g transform="rotate(' + f(sw > 360 ? sw % 360 : swc, 2) + ')"><line x1="0" y1="' + f(-rA + 4, 2) + '" x2="0" y2="' + f(-rA - 5, 2) + '" stroke="' + (sw > 360 ? REVC[Math.floor(sw / 360) % REVC.length] : "var(--blue)") + '" stroke-width="2"/></g>' +
         '<g class="ar" data-sw="' + f(sw, 2) + '">' +
         '<g id="degHandle" style="cursor:grab;touch-action:none"><circle cx="0" cy="' + f(-rA - 3, 2) + '" r="' + f(Math.max(13, 24 * kU), 2) + '" fill="transparent"/><path id="degMark" d="M0 ' + f(-rA, 2) + ' l' + f(-5 * Math.max(1, kU * 0.8), 2) + ' ' + f(-11 * Math.max(1, kU * 0.8), 2) + ' h' + f(10 * Math.max(1, kU * 0.8), 2) + ' z" fill="var(--blue)"/></g></g>' +
-        '<text id="degTxt" x="' + f(tx, 2) + '" y="' + f(ty, 2) + '" text-anchor="' + (side > 0 ? "start" : "end") + '" font-size="' + f(FS, 2) + '" font-weight="600" fill="var(--blue-deep)">' + (FS > 14 ? '<tspan id="degA" x="' + f(tx, 2) + '">0°</tspan><tspan id="degB" x="' + f(tx, 2) + '" dy="' + f(FS * 1.15, 2) + '">/ ' + f(sw, 0) + '°</tspan>' : '0° / ' + f(sw, 0) + '°') + '</text></g>';
+        '</g>';
     }
     // Roller chain links built from the vector outlines in the WCP roller chain drawing: outer plates, inner plates and pin holes,
     // each link placed along the chain path and moved with SMIL motion. Inner plates sit on top of outer plates, as in the drawing.
@@ -997,13 +1010,20 @@ svg.draw text { font-family: var(--font); }
     if (Math.abs(x1c - x2c) < (w1 + w2) / 2 + 6 && Math.abs(ly1 - ly2) < FS * 1.15) { ly2 = Math.min(ly1, ly2) - FS * 1.2; }
     var extra = Math.max(0, Math.ceil(Math.max(16, FS * 0.95 + 4) - Math.min(ly1, ly2)));
     out += label(cx1, ly1, lt1) + label(lx2, ly2, lt2);
-    var dy = cy + maxD + 16 + botExtra;
+    var dy = cy + maxD + 16 + botExtra, rdExtra = 0;
     out += '<line x1="' + f(cx1, 2) + '" y1="' + f(dy, 2) + '" x2="' + f(cx2, 2) + '" y2="' + f(dy, 2) + '" stroke="var(--blue-soft)" stroke-width="1"/>' +
       '<line x1="' + f(cx1, 2) + '" y1="' + f(dy - 4, 2) + '" x2="' + f(cx1, 2) + '" y2="' + f(dy + 4, 2) + '" stroke="var(--blue-soft)" stroke-width="1"/>' +
       '<line x1="' + f(cx2, 2) + '" y1="' + f(dy - 4, 2) + '" x2="' + f(cx2, 2) + '" y2="' + f(dy + 4, 2) + '" stroke="var(--blue-soft)" stroke-width="1"/>' +
       '<text x="' + f((cx1 + cx2) / 2, 2) + '" y="' + f(dy + Math.max(16, 6 + FS), 2) + '" text-anchor="middle" font-size="' + f(FS, 2) + '" font-weight="500" fill="var(--ink)">Center ' + esc(both(C)) + "</text>";
-    svg.setAttribute("viewBox", "0 0 " + vw + " " + f(vh + extra + botExtra, 0));
-    svg.innerHTML = '<rect x="0" y="0" width="' + vw + '" height="' + f(vh + extra + botExtra, 0) + '" fill="var(--blue-50)"/><g transform="translate(0 ' + extra + ')">' + out + "</g>";
+    if (degLive) {
+      // One-line angle readout in the bottom row under sprocket 2, well outside the arc, so the moving arrow can never touch it.
+      var rdStr = "000\u00b0 / " + f(swing2, 0) + "\u00b0", wR = rdStr.length * 0.58 * FS, rxc = Math.max(8 + wR / 2, Math.min(vw - 8 - wR / 2, cx2));
+      var wC = ("Center " + both(C)).length * 0.56 * FS, yC = dy + Math.max(16, 6 + FS), yRd = yC;
+      if ((cx1 + cx2) / 2 + wC / 2 + 12 > rxc - wR / 2) { yRd = yC + Math.round(FS * 1.35); rdExtra = Math.ceil(FS * 1.35); }
+      out += '<text id="degTxt" x="' + f(rxc, 2) + '" y="' + f(yRd, 2) + '" text-anchor="middle" font-size="' + f(FS, 2) + '" font-weight="600" fill="var(--blue-deep)">0\u00b0 / ' + f(swing2, 0) + '\u00b0</text>';
+    }
+    svg.setAttribute("viewBox", "0 0 " + vw + " " + f(vh + extra + botExtra + rdExtra, 0));
+    svg.innerHTML = '<rect x="0" y="0" width="' + vw + '" height="' + f(vh + extra + botExtra + rdExtra, 0) + '" fill="var(--blue-50)"/><g transform="translate(0 ' + extra + ')">' + out + "</g>";
     // Links that ride the run are placed from script on every frame, so they are in the right spot the instant the drawing appears.
     var mvEls = svg.querySelectorAll ? svg.querySelectorAll(".mvk") : [], mvP = $("mvPath"), mvL = 0, mvA = [], mvB = [];
     if (mvEls.length && mvP) { try { mvL = mvP.getTotalLength(); } catch (e) { mvL = 0; } for (var mi = 0; mi < mvEls.length; mi++) { mvA.push(parseFloat(mvEls[mi].getAttribute("data-a"))); mvB.push(parseFloat(mvEls[mi].getAttribute("data-b"))); } }
@@ -1372,12 +1392,14 @@ svg.draw text { font-family: var(--font); }
         for (i = 0; i < rects.length; i++) { e = rects[i]; if (r.x0 < e.x1 + 2 && r.x1 > e.x0 - 2 && r.y0 < e.y1 + 2 && r.y1 > e.y0 - 2) n++; }
         return n;
       }
+      var ctlI = (lastDrawW > 0 && lastDrawW < 520 && !$("drawWrap").classList.contains("fs-on")) ? Math.round(46 * vw / lastDrawW) : 0;
       function place(w, h, cands, skip) {
         cands.sort(function (p, q) { return p.cost - q.cost; });
         var best = null, bs = Infinity;
         for (var i = 0; i < cands.length; i++) {
           var c = cands[i], r = { x0: c.x - w / 2, y0: c.y - h / 2, x1: c.x + w / 2, y1: c.y + h / 2 };
           if (r.x0 < 3 || r.x1 > vw - 3 || r.y0 < bTop || r.y1 > vh - 2) continue;
+          if (ctlI && r.x1 > vw - ctlI && r.y0 < ctlI) continue; // keep clear of the full screen icon in the top right corner
           var sc3 = hits(r, skip) * 1000 + c.cost;
           if (sc3 < bs) { bs = sc3; best = c; best.r = r; if (bs < 1000) break; }
         }
@@ -1475,11 +1497,12 @@ svg.draw text { font-family: var(--font); }
 
   // ---------- main calculation ----------
   // Keep drawing labels readable: the SVG scales down with the screen, so grow the label size until it renders at least MIN_LABEL px.
-  var MIN_LABEL = MQ_PHONE.matches ? 13 : 11;
+  var MIN_LABEL = (MQ_PHONE.matches || (window.matchMedia && matchMedia("(pointer: coarse)").matches)) ? 13 : 11;
   var lastDrawW = 0;
-  function labelFs(vw) { var w = 0; try { w = $("draw").getBoundingClientRect().width; } catch (e) {} lastDrawW = w; return w > 0 ? Math.max(12, MIN_LABEL * vw / w) : 12; }
+  function drawPx() { var sv = $("draw"), w = parseFloat(sv.style.width); if (w > 0) return w; try { w = sv.clientWidth || 0; if (!w) w = sv.getBoundingClientRect().width; } catch (e) { w = 0; } return w; }
+  function labelFs(vw) { var w = drawPx(); lastDrawW = w; return w > 0 ? Math.max(12, MIN_LABEL * vw / w) : 12; }
   function fitSvgText() {
-    var svg = $("draw"), vb = svg.viewBox && svg.viewBox.baseVal, w = svg.getBoundingClientRect().width;
+    var svg = $("draw"), vb = svg.viewBox && svg.viewBox.baseVal, w = drawPx();
     if (!vb || !vb.width || !w) return;
     var k = vb.width / w;
     svg.querySelectorAll("text").forEach(function (t) {
@@ -1489,7 +1512,7 @@ svg.draw text { font-family: var(--font); }
     });
   }
   function renderAll() { drawDrive(); renderSprockets(); fitSvgText(); }
-  if (window.ResizeObserver) { try { var roT = 0; new ResizeObserver(function () { var w2 = $("draw").getBoundingClientRect().width; if (cur && w2 > 0 && Math.abs(w2 - lastDrawW) > 2) { if (roT) cancelAnimationFrame(roT); roT = requestAnimationFrame(function () { roT = 0; drawDrive(); fitSvgText(); }); } else fitSvgText(); }).observe($("draw")); } catch (e) {} }
+  if (window.ResizeObserver) { try { var roT = 0; new ResizeObserver(function () { var w2 = drawPx(); if (cur && w2 > 0 && Math.abs(w2 - lastDrawW) > 2) { if (roT) cancelAnimationFrame(roT); roT = requestAnimationFrame(function () { roT = 0; drawDrive(); fitSvgText(); if (window.__fsFit) window.__fsFit(); }); } else fitSvgText(); }).observe($("draw")); } catch (e) {} }
 
   function calc() {
     var mode = radio("mode") === "2" ? 2 : 1;
@@ -1720,29 +1743,79 @@ svg.draw text { font-family: var(--font); }
   ["c25", "c25h", "c35", "m1", "m2", "h0", "h1"].forEach(function (id) { $(id).addEventListener("change", calc); });
   $("tens").addEventListener("change", calc);
   // Full screen view of the animation: native full screen where the browser allows it, otherwise the card fills the page.
+  // It turns to landscape on its own (orientation lock where supported, otherwise the view is rotated), has zoom, and carries the idler controls and chips.
   (function () {
-    var wrap = $("drawWrap"), btn = $("fsBtn"), hd = null, hdParent = null, hdNext = null, bar = null, on = false;
+    var wrap = $("drawWrap"), btn = $("fsBtn"), sv = $("draw"), on = false, zoom = 1, rotPref = true, lockOk = false, fitN = 0;
+    var bar = null, panel = null, bZin = null, bZout = null, moved = [];
+    var I_OPEN = btn.innerHTML;
+    var I_CLOSE = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>';
+    var I_ROT = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg>';
+    function el(tag, cls) { var e = document.createElement(tag); e.className = cls; return e; }
+    function mvTo(node, parent) { if (!node) return; moved.push({ el: node, parent: node.parentNode, next: node.nextSibling }); parent.appendChild(node); }
+    function restore() { for (var i = moved.length - 1; i >= 0; i--) { var m = moved[i]; m.parent.insertBefore(m.el, m.next && m.next.parentNode === m.parent ? m.next : null); } moved = []; }
+    function mkBtn(html, label, fn, cls) { var b = el("button", "pill" + (cls ? " " + cls : "")); b.type = "button"; b.innerHTML = html; b.setAttribute("aria-label", label); b.title = label; b.addEventListener("click", fn); return b; }
+    function fit() {
+      if (!on) { sv.style.width = ""; return; }
+      var vb = (sv.getAttribute("viewBox") || "").split(/\s+/), asp = parseFloat(vb[2]) / parseFloat(vb[3]);
+      if (!(asp > 0)) return;
+      var cs = getComputedStyle(wrap), aw = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      var ah = wrap.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - (bar ? bar.offsetHeight + 8 : 0);
+      var chips = $("idCopy"); if (chips && !chips.hidden) ah -= chips.offsetHeight + 8;
+      var w = Math.max(180, Math.min(aw, ah * asp)) * zoom, c0 = parseFloat(sv.style.width) || 0;
+      if (Math.abs(w - c0) > 4) sv.style.width = Math.round(w) + "px";
+    }
+    window.__fsFit = function () { if (on && fitN < 3) { fitN++; fit(); } };
+    function refresh() { fitN = 0; fit(); drawDrive(); fitSvgText(); fit(); }
+    function applyRot() { wrap.classList.toggle("fs-rot", on && rotPref && !lockOk && window.innerHeight > window.innerWidth); }
+    function setZoom(z) { zoom = Math.max(1, Math.min(3, z)); if (bZout) bZout.disabled = zoom <= 1; if (bZin) bZin.disabled = zoom >= 3; refresh(); }
+    function build() {
+      bar = el("div", "fsbar");
+      var row = el("div", "fsrow"), tools = el("div", "fstools");
+      mvTo(document.querySelector(".card-head .hd-r"), row);
+      bZout = mkBtn("\u2212", "Zoom out", function () { setZoom(zoom - 0.5); });
+      bZin = mkBtn("+", "Zoom in", function () { setZoom(zoom + 0.5); });
+      var bId = mkBtn("Idler", "Idler options", function () { panel.hidden = !panel.hidden; bId.setAttribute("aria-pressed", panel.hidden ? "false" : "true"); refresh(); }, "txt");
+      bId.setAttribute("aria-pressed", "false");
+      var bRot = mkBtn(I_ROT, "Turn the view sideways", function () { rotPref = !rotPref; applyRot(); refresh(); });
+      tools.appendChild(bZout); tools.appendChild(bZin); tools.appendChild(bId); tools.appendChild(bRot);
+      row.appendChild(tools); bar.appendChild(row);
+      panel = el("div", "fspanel"); panel.hidden = true; mvTo($("idGrp"), panel); bar.appendChild(panel);
+      wrap.insertBefore(bar, wrap.firstChild);
+      mvTo(btn, tools); mvTo($("idCopy"), wrap); mvTo($("idBox"), wrap);
+    }
+    function leaveNative() {
+      lockOk = false;
+      try { if (document.fullscreenElement && document.exitFullscreen) { wrap.classList.add("fs-keep"); var pr = document.exitFullscreen(); setTimeout(function () { wrap.classList.remove("fs-keep"); }, 500); if (pr && pr.catch) pr.catch(function () {}); } } catch (e) {}
+      if (on) { applyRot(); setTimeout(refresh, 80); }
+    }
     function setOn(v) {
       if (v === on) return;
       on = v;
-      var ctl = document.querySelector(".card-head .hd-r");
       if (v) {
-        if (ctl) { hd = ctl; hdParent = ctl.parentNode; hdNext = ctl.nextSibling; }
-        bar = document.createElement("div"); bar.className = "fsbar";
-        var hint = document.createElement("div"); hint.className = "fshint"; hint.textContent = "Rotate your phone to landscape for a wider view.";
-        var row = document.createElement("div"); row.className = "fsrow"; if (hd) row.appendChild(hd); row.appendChild(btn); bar.appendChild(row); bar.appendChild(hint); wrap.insertBefore(bar, wrap.firstChild);
-        wrap.classList.add("fs-on"); btn.textContent = "Close";
-        try { if (wrap.requestFullscreen) { var pr = wrap.requestFullscreen(); if (pr && pr.then) pr.then(function () { try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock("landscape").catch(function () {}); } catch (e) {} }).catch(function () {}); } } catch (e) {}
+        zoom = 1; rotPref = true; lockOk = false;
+        build(); wrap.classList.add("fs-on"); btn.innerHTML = I_CLOSE; btn.setAttribute("aria-label", "Close full screen"); btn.title = "Close full screen";
+        if (bZout) bZout.disabled = true;
+        applyRot();
+        // Native full screen only where the browser can also lock the screen to landscape (Android). Elsewhere the card fills the page and turns itself sideways.
+        try {
+          if (wrap.requestFullscreen && screen.orientation && screen.orientation.lock) {
+            wrap.requestFullscreen().then(function () { return screen.orientation.lock("landscape"); }).then(function () { lockOk = true; applyRot(); refresh(); }).catch(function () { leaveNative(); });
+          }
+        } catch (e) { leaveNative(); }
       } else {
-        wrap.classList.remove("fs-on"); btn.textContent = "Full screen"; wrap.insertBefore(btn, wrap.firstChild);
-        if (hd && hdParent) hdParent.insertBefore(hd, hdNext);
-        if (bar && bar.parentNode) bar.parentNode.removeChild(bar);
+        wrap.classList.remove("fs-on", "fs-rot"); btn.innerHTML = I_OPEN; btn.setAttribute("aria-label", "Full screen view of the animation"); btn.title = "Full screen";
+        restore(); if (bar && bar.parentNode) bar.parentNode.removeChild(bar); bar = null; panel = null; bZin = bZout = null; sv.style.width = "";
         try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); } catch (e) {}
         try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+        drawDrive(); fitSvgText(); return;
       }
-      drawDrive(); fitSvgText();
+      refresh();
     }
     btn.addEventListener("click", function () { setOn(!on); });
+    function onTurn() { if (on) { applyRot(); setTimeout(refresh, 60); } }
+    // the dimension chips appear after the idler is placed, which changes how much height the drawing can take
+    try { var mt = 0; new MutationObserver(function () { if (!on) return; clearTimeout(mt); mt = setTimeout(function () { fitN = 0; fit(); }, 30); }).observe($("idCopy"), { attributes: true, childList: true }); } catch (e) {}
+    window.addEventListener("resize", onTurn); window.addEventListener("orientationchange", onTurn);
     document.addEventListener("fullscreenchange", function () { if (on && !document.fullscreenElement && !wrap.classList.contains("fs-keep")) setOn(false); });
     document.addEventListener("keydown", function (ev) { if (on && ev.key === "Escape") setOn(false); });
   })();
